@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,15 +15,15 @@
       align-items: center;
 
       /* Background image with gradient overlay */
-      background: linear-gradient(135deg, rgba(0,31,63,0.85),#6A5ACD), 
-                  url('bi1.png') no-repeat center center / cover;
+      background: linear-gradient(135deg, rgba(0, 31, 63, 0.85), #6A5ACD),
+        url('bi1.png') no-repeat center center / cover;
     }
 
     .login-container {
       background: #fff;
       padding: 40px;
       border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
       width: 360px;
       text-align: center;
     }
@@ -85,6 +86,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="login-container">
     <div class="logo">IT'aawun</div>
@@ -100,5 +102,13 @@
       <p><a href="#">Create Account</a> | <a href="#">Forgot Password?</a></p>
     </div>
   </div>
+
+  <script type="module">
+    import { supabase } from './supabase.js'
+    const { data, error } = await supabase.from('profiles').select('*').limit(1)
+    console.log('Connection test:', data, error)
+  </script>
+
 </body>
+
 </html>
