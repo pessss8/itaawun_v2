@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - IT'aawun</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #333;
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .logo {
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      text-decoration: none;
+    }
+
+    .profile-container {
+      position: relative;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+      transition: transform 0.2s;
+    }
+
+    .profile-container:hover .profile-pic {
+      transform: scale(1.1);
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 50px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      min-width: 150px;
+      overflow: hidden;
+    }
+
+    .profile-container:hover .dropdown {
+      display: block;
+    }
+
+    .dropdown a {
+      display: block;
+      padding: 10px 15px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .dropdown a:hover {
+      background: #f5f0ff;
+      color: #6b21a8;
+    }
+
+    .back-button {
+      padding: 10px 40px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+      color: #001f3f;
+      font-size: 16px;
+    }
+
+    .back-button i {
+      margin-right: 8px;
+    }
+
+    .back-button:hover {
+      color: #004f80;
+    }
+
+    .page-title {
+      text-align: center;
+      padding: 10px 20px 20px;
+      color: #001f3f;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      padding: 0 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.3);
+      color: #001f3f;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #001f3f;
+      color: white;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Booking cards */
+    .booking-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 0 20px 30px;
+    }
+
+    .booking-card {
+      background: rgba(255, 255, 255, 0.95);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .booking-card .svc-title {
+      font-size: 17px;
+      font-weight: bold;
+      color: #001f3f;
+      margin: 0;
+    }
+
+    .booking-card .meta {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .booking-card .note-text {
+      font-size: 13px;
+      color: #444;
+      background: #f8f4ff;
+      border-radius: 6px;
+      padding: 8px 10px;
+      border-left: 3px solid #6b21a8;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+
+    .status-pending {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .status-accepted {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-done {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 9px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      min-width: 80px;
+    }
+
+    .btn-accept {
+      background: #166534;
+      color: white;
+    }
+
+    .btn-accept:hover {
+      background: #14532d;
+    }
+
+    .btn-reject {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-reject:hover {
+      background: #b91c1c;
+    }
+
+    .btn-done {
+      background: #1d4ed8;
+      color: white;
+    }
+
+    .btn-done:hover {
+      background: #1e3a8a;
+    }
+
+    .btn-cancel {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-cancel:hover {
+      background: #4b5563;
+    }
+
+    .btn-rate {
+      background: #6b21a8;
+      color: white;
+    }
+
+    .btn-rate:hover {
+      background: #581c87;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #001f3f;
+      font-size: 16px;
+      opacity: 0.7;
+      width: 100%;
+    }
+
+    /* Rating Modal */
+    #ratingModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+    }
+
+    .modal-content {
+      background: white;
+      max-width: 400px;
+      margin: 80px auto;
+      padding: 28px;
+      border-radius: 14px;
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-content h3 {
+      color: #001f3f;
+      margin-bottom: 16px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .star {
+      font-size: 32px;
+      cursor: pointer;
+      color: #d1d5db;
+      transition: color 0.15s;
+    }
+
+    .star.selected,
+    .star:hover {
+      color: #f59e0b;
+    }
+
+    .modal-content textarea {
+      width: 90%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: none;
+      font-family: 'Segoe UI', sans-serif;
+      margin-top: 8px;
+    }
+
+    .btn-submit-rating {
+      margin-top: 14px;
+      width: 100%;
+      padding: 11px;
+      background: #6b21a8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-submit-rating:hover {
+      background: #581c87;
+    }
+
+    footer {
+      margin-top: auto;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 15px 20px;
+      }
+
+      .back-button {
+        padding: 10px 20px;
+      }
+
+      .booking-card {
+        max-width: 95%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
+    <div class="profile-container">
+      <img src="assets/images/ipey.jpeg" class="profile-pic" id="profilePic">
+      <div class="dropdown">
+        <a href="profile.html">👤 My Profile</a>
+        <a href="#" onclick="doLogout()" style="color:#dc2626">🚪 Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="back-button" onclick="window.location.href='home.html'">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </div>
+
+  <div class="page-title">My Bookings</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('as-student')">📋 My Orders</button>
+    <button class="tab-btn" onclick="showTab('as-vendor')">🛠 Incoming Requests</button>
+  </div>
+
+  <!-- Student view: bookings I made -->
+  <div id="tab-as-student" class="booking-list">
+    <div class="empty-state">Loading...</div>
+  </div>
+
+  <!-- Vendor view: bookings made to my services -->
+  <div id="tab-as-vendor" class="booking-list" style="display:none">
+    <div class="empty-state">Loading...</div>
+  </div>
+
+  <!-- Rating Modal -->
+  <div id="ratingModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeRatingModal()">&times;</span>
+      <h3>Rate this service</h3>
+      <div class="stars" id="starRow">
+        <span class="star" onclick="setStar(1)">★</span>
+        <span class="star" onclick="setStar(2)">★</span>
+        <span class="star" onclick="setStar(3)">★</span>
+        <span class="star" onclick="setStar(4)">★</span>
+        <span class="star" onclick="setStar(5)">★</span>
+      </div>
+      <textarea id="ratingComment" rows="3" placeholder="Leave a comment (optional)"></textarea>
+      <button class="btn-submit-rating" onclick="submitRating()">Submit Rating</button>
+    </div>
+  </div>
+
+  <footer>&copy; 2025 IT'aawun | Student Freelance Collaboration</footer>
+
+  <script>
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    let currentUser = null
+    let selectedStar = 0
+    let ratingBookingId = null
+    let ratingTargetId = null
+
+    // ── Init ──────────────────────────────────────────────
+    db.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) { window.location.href = 'index.html'; return }
+      currentUser = session.user
+      loadStudentBookings()
+      loadVendorBookings()
+    })
+
+    // ── Tabs ──────────────────────────────────────────────
+    function showTab(tab) {
+      document.getElementById('tab-as-student').style.display = tab === 'as-student' ? 'flex' : 'none'
+      document.getElementById('tab-as-vendor').style.display = tab === 'as-vendor' ? 'flex' : 'none'
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', (i === 0 && tab === 'as-student') || (i === 1 && tab === 'as-vendor'))
+      })
+    }
+
+    // ── Load bookings I made (as student) ─────────────────
+    async function loadStudentBookings() {
+      const { data, error } = await db
+        .from('bookings')
+        .select('*, services(title, price, whatsapp)')
+        .eq('student_id', currentUser.id)
+        .order('created_at', { ascending: false })
+
+      const container = document.getElementById('tab-as-student')
+      if (!data || data.length === 0) {
+        container.innerHTML = '<div class="empty-state">You have not made any bookings yet.</div>'
+        return
+      }
+
+      container.innerHTML = data.map(b => {
+        const svc = b.services || {}
+        const canRate = b.status === 'done'
+        const canCancel = b.status === 'pending'
+        return `
+        <div class="booking-card">
+          <p class="svc-title">${svc.title || '(Service deleted)'}</p>
+          <p class="meta">📅 ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+          ${b.note ? `<div class="note-text">📝 ${b.note}</div>` : ''}
+          <div><span class="status-badge status-${b.status}">${b.status}</span></div>
+          ${svc.price ? `<p class="meta">💰 RM ${svc.price}</p>` : ''}
+          <div class="btn-row">
+            ${canRate ? `<button class="btn-action btn-rate"   onclick="openRatingModal('${b.id}','${b.vendor_id}')">⭐ Rate</button>` : ''}
+            ${canCancel ? `<button class="btn-action btn-cancel" onclick="updateStatus('${b.id}','cancelled','student')">Cancel</button>` : ''}
+          </div>
+        </div>`
+      }).join('')
+    }
+
+    // ── Load bookings to my services (as vendor) ──────────
+    async function loadVendorBookings() {
+      const { data, error } = await db
+        .from('bookings')
+        .select('*, services(title, price)')
+        .eq('vendor_id', currentUser.id)
+        .order('created_at', { ascending: false })
+
+      const container = document.getElementById('tab-as-vendor')
+      if (!data || data.length === 0) {
+        container.innerHTML = '<div class="empty-state">No incoming booking requests yet.</div>'
+        return
+      }
+
+      // Fetch student names
+      const studentIds = [...new Set(data.map(b => b.student_id))]
+      const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', studentIds)
+      const nameMap = {}
+      if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+
+      container.innerHTML = data.map(b => {
+        const svc = b.services || {}
+        const studentName = nameMap[b.student_id] || 'Student'
+        const isPending = b.status === 'pending'
+        const isAccepted = b.status === 'accepted'
+        return `
+        <div class="booking-card">
+          <p class="svc-title">${svc.title || '(Service deleted)'}</p>
+          <p class="meta">👤 ${studentName} &nbsp;|&nbsp; 📅 ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+          ${b.note ? `<div class="note-text">📝 "${b.note}"</div>` : ''}
+          <div><span class="status-badge status-${b.status}">${b.status}</span></div>
+          ${svc.price ? `<p class="meta">💰 RM ${svc.price}</p>` : ''}
+          <div class="btn-row">
+            ${isPending ? `<button class="btn-action btn-accept" onclick="updateStatus('${b.id}','accepted','vendor')">✓ Accept</button>` : ''}
+            ${isPending ? `<button class="btn-action btn-reject" onclick="updateStatus('${b.id}','cancelled','vendor')">✗ Reject</button>` : ''}
+            ${isAccepted ? `<button class="btn-action btn-done"   onclick="updateStatus('${b.id}','done','vendor')">✓ Mark Done</button>` : ''}
+          </div>
+        </div>`
+      }).join('')
+    }
+
+    // ── Update booking status ──────────────────────────────
+    async function updateStatus(bookingId, newStatus, view) {
+      const { error } = await db.from('bookings').update({ status: newStatus }).eq('id', bookingId)
+      if (error) { alert('Error: ' + error.message); return }
+      if (view === 'student') loadStudentBookings()
+      else loadVendorBookings()
+    }
+
+    // ── Rating ─────────────────────────────────────────────
+    function openRatingModal(bookingId, vendorId) {
+      ratingBookingId = bookingId
+      ratingTargetId = vendorId
+      selectedStar = 0
+      document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'))
+      document.getElementById('ratingComment').value = ''
+      document.getElementById('ratingModal').style.display = 'block'
+    }
+    function closeRatingModal() {
+      document.getElementById('ratingModal').style.display = 'none'
+    }
+    function setStar(n) {
+      selectedStar = n
+      document.querySelectorAll('.star').forEach((s, i) => {
+        s.classList.toggle('selected', i < n)
+      })
+    }
+    async function submitRating() {
+      if (!selectedStar) { alert('Please select a star rating.'); return }
+      const comment = document.getElementById('ratingComment').value.trim()
+      const { error } = await db.from('ratings').insert({
+        booking_id: ratingBookingId,
+        reviewer_id: currentUser.id,
+        target_id: ratingTargetId,
+        score: selectedStar,
+        comment: comment
+      })
+      if (error) { alert('Error: ' + error.message); return }
+      closeRatingModal()
+      alert('Thank you for your rating!')
+      loadStudentBookings()
+    }
+
+    // ── Logout ─────────────────────────────────────────────
+    async function doLogout() {
+      await db.auth.signOut()
+      window.location.replace('index.html')
+    }
+  </script>
+</body>
+
+</html>
