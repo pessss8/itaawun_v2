@@ -1,363 +1,755 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Service Needed - IT'aawun</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(-45deg, #00008B,#ffffff,#3F00FF);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    color: #333;
-  }
-  @keyframes gradientBG {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-  }
-  header { background: rgba(0,0,0,0.2); color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
-  header .logo { font-size:22px; font-weight:bold; cursor:pointer; }
-  .profile-container { position: relative; }
-  .profile-pic { width:40px; height:40px; border-radius:50%; cursor:pointer; border:2px solid white; }
-  .dropdown { display:none; position:absolute; right:0; top:50px; background:white; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.2); z-index:100; }
-  .dropdown a { display:block; padding:10px; text-decoration:none; color:#333; font-size:14px; }
-  .dropdown a:hover { background:#f0f0f0; }
-  .back-button { padding:10px 40px; display:flex; align-items:center; cursor:pointer; font-weight:bold; color:#001f3f; font-size:16px; }
-  .back-button i { margin-right:8px; }
-  .back-button:hover { color:#004f80; }
-  .page-title { text-align:center; padding:20px; color:#001f3f; font-size:28px; font-weight:bold; text-shadow:1px 1px 2px rgba(255,255,255,0.7); }
-  .filter-button { display:block; margin:0 auto 20px auto; padding:12px 20px; background:#001f3f; color:white; border:none; border-radius:8px; cursor:pointer; font-size:16px; font-weight:bold; }
-  .filter-button:hover { background:#004f80; }
-  .search-bar { text-align:center; margin-bottom:20px; }
-  .search-bar input { padding:10px; font-size:16px; border-radius:8px; border:1px solid #ccc; width:60%; }
-  .search-bar button { padding:12px 20px; border:none; border-radius:8px; background:#001f3f; color:white; font-size:16px; cursor:pointer; }
-  .search-bar button:hover { background:#004f80; }
-  .request-list { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; padding:20px; }
-  .request-card { background: rgba(255,255,255,0.95); max-width: 300px; width: 100%; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2); overflow:hidden; transition: transform .3s; display:flex; flex-direction:column; }
-  .request-card:hover { transform:scale(1.05); }
-  .request-card img { width:100%; height:120px; object-fit:cover; }
-  .requester { display:flex; align-items:center; gap:8px; padding:8px 12px 0 12px; }
-  .requester img { width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #001f3f; }
-  .requester span { font-size:13px; font-weight:600; color:#001f3f; }
-  .request-card .content { padding:12px; display:flex; flex-direction:column; flex:1; }
-  .request-card h3 { font-size:16px; margin:5px 0; color:#001f3f; }
-  .request-card p.desc { font-size:13px; margin:5px 0; color:#555; overflow:hidden; max-height:38px; transition:max-height 0.4s ease; }
-  .request-card p.desc.expanded { max-height:300px; }
-  .request-card .extra-info { font-size:11px; color:#555; margin:5px 0; }
-  .request-card .moreBtn { background:none; border:none; color:grey; font-weight:bold; cursor:pointer; padding:0; margin:3px 0; text-align:left; font-size:12px; }
-  .request-card span.price { font-weight:bold; color:#333; margin-top:5px; display:block; font-size:14px; }
-  .request-card button.offerBtn { margin-top:auto; padding:9px 12px; border:none; border-radius:6px; background:#001f3f; color:white; cursor:pointer; width:100%; font-weight:bold; font-size:14px; transition:.3s; }
-  .request-card button.offerBtn:hover { background:#004f80; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Needed - IT'aawun</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #333;
+    }
 
-  /* Modal */
-  #requestModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; }
-  #requestModal .modal-content { background:white; max-width:500px; margin:50px auto; padding:25px; border-radius:12px; position:relative; text-align:center; }
-  #requestModal .close { position:absolute; top:10px; right:15px; font-size:28px; cursor:pointer; }
-  #requestModal .contact-btn { padding:12px 20px; margin:10px 5px; border:none; border-radius:8px; color:white; font-size:16px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:8px; transition:.3s; }
-  #emailBtn { background:#ff6b6b; } #emailBtn:hover { background:#ff4c4c; }
-  #whatsappBtn { background:#25d366; } #whatsappBtn:hover { background:#1ebe57; }
-  #telegramBtn { background:#0088cc; } #telegramBtn:hover { background:#0077b3; }
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
 
-  /* Filter Popup */
-  #filterPopup { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:25px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.3); z-index:300; text-align:center; }
-  #filterPopup select { padding:10px; margin:10px; font-size:16px; border-radius:8px; border:1px solid #ccc; }
-  #filterPopup button { padding:10px 20px; margin-top:15px; border:none; border-radius:8px; background:#001f3f; color:white; cursor:pointer; font-weight:bold; }
-  #filterPopup button:hover { background:#004f80; }
+      50% {
+        background-position: 100% 50%;
+      }
 
-  footer { background: rgba(0,0,0,0.2); color:white; text-align:center; padding:15px; margin-top:20px; }
-  @media(max-width:600px){ .search-bar input { width:80%; } .request-list { gap:15px; justify-content:center; } .request-card { max-width:90%; } }
-</style>
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .logo {
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .profile-container {
+      position: relative;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 50px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+
+    .dropdown a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .dropdown a:hover {
+      background: #f0f0f0;
+    }
+
+    .back-button {
+      padding: 10px 40px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+      color: #001f3f;
+      font-size: 16px;
+    }
+
+    .back-button i {
+      margin-right: 8px;
+    }
+
+    .back-button:hover {
+      color: #004f80;
+    }
+
+    .page-title {
+      text-align: center;
+      padding: 20px;
+      color: #001f3f;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    }
+
+    .filter-button {
+      display: block;
+      margin: 0 auto 20px auto;
+      padding: 12px 20px;
+      background: #001f3f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .filter-button:hover {
+      background: #004f80;
+    }
+
+    .search-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .search-bar input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 60%;
+    }
+
+    .search-bar button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #001f3f;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .search-bar button:hover {
+      background: #004f80;
+    }
+
+    .request-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .request-card {
+      background: rgba(255, 255, 255, 0.95);
+      max-width: 300px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      transition: transform .3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .request-card:hover {
+      transform: scale(1.05);
+    }
+
+    .request-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+
+    .requester {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px 0 12px;
+    }
+
+    .requester img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #001f3f;
+    }
+
+    .requester span {
+      font-size: 13px;
+      font-weight: 600;
+      color: #001f3f;
+    }
+
+    .request-card .content {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .request-card h3 {
+      font-size: 16px;
+      margin: 5px 0;
+      color: #001f3f;
+    }
+
+    .request-card p.desc {
+      font-size: 13px;
+      margin: 5px 0;
+      color: #555;
+      overflow: hidden;
+      max-height: 38px;
+      transition: max-height 0.4s ease;
+    }
+
+    .request-card p.desc.expanded {
+      max-height: 300px;
+    }
+
+    .request-card .extra-info {
+      font-size: 11px;
+      color: #555;
+      margin: 5px 0;
+    }
+
+    .request-card .moreBtn {
+      background: none;
+      border: none;
+      color: grey;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      margin: 3px 0;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .request-card span.price {
+      font-weight: bold;
+      color: #333;
+      margin-top: 5px;
+      display: block;
+      font-size: 14px;
+    }
+
+    .request-card button.offerBtn {
+      margin-top: auto;
+      padding: 9px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #001f3f;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      font-size: 14px;
+      transition: .3s;
+    }
+
+    .request-card button.offerBtn:hover {
+      background: #004f80;
+    }
+
+    /* Modal */
+    #requestModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+    }
+
+    #requestModal .modal-content {
+      background: white;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 25px;
+      border-radius: 12px;
+      position: relative;
+      text-align: center;
+    }
+
+    #requestModal .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    #requestModal .contact-btn {
+      padding: 12px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: .3s;
+    }
+
+    #emailBtn {
+      background: #ff6b6b;
+    }
+
+    #emailBtn:hover {
+      background: #ff4c4c;
+    }
+
+    #whatsappBtn {
+      background: #25d366;
+    }
+
+    #whatsappBtn:hover {
+      background: #1ebe57;
+    }
+
+    #telegramBtn {
+      background: #0088cc;
+    }
+
+    #telegramBtn:hover {
+      background: #0077b3;
+    }
+
+    /* Filter Popup */
+    #filterPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      z-index: 300;
+      text-align: center;
+    }
+
+    #filterPopup select {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    #filterPopup button {
+      padding: 10px 20px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #001f3f;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #filterPopup button:hover {
+      background: #004f80;
+    }
+
+    footer {
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    @media(max-width:600px) {
+      .search-bar input {
+        width: 80%;
+      }
+
+      .request-list {
+        gap: 15px;
+        justify-content: center;
+      }
+
+      .request-card {
+        max-width: 90%;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
-  <div class="profile-container">
-    <img src="ipey.jpeg" class="profile-pic" onclick="toggleDropdown()">
-    <div class="dropdown" id="dropdownMenu">
-      <a href="profile.html">My Profile</a>
-      <a href="#">Settings</a>
-      <a href="index.html">Logout</a>
+  <header>
+    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
+    <div class="profile-container">
+      <img src="assets/images/ipey.jpeg" class="profile-pic" onclick="toggleDropdown()">
+      <div class="dropdown" id="dropdownMenu">
+        <a href="profile.html">My Profile</a>
+        <a href="#">Settings</a>
+        <a href="index.html">Logout</a>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<div class="back-button" onclick="window.location.href='home.html'">
-  <i class="fa-solid fa-arrow-left"></i> Back
-</div>
-
-<div class="page-title">Service Needed</div>
-
-<button class="filter-button" onclick="toggleFilterPopup()">Filter <i class="fa-solid fa-filter"></i></button>
-
-<div class="search-bar">
-  <input type="text" id="searchInput" placeholder="Search requests...">
-  <button onclick="searchRequests()">Search</button>
-</div>
-
-<div class="request-list">
-  <!-- 12 Request Cards -->
-  <div class="request-card" data-category="writing" data-price="25">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download1.jpg"><span>Ali Ahmad</span></div>
-    <div class="content">
-      <h3>Essay Help</h3>
-      <p class="desc">Need help writing an essay about AI with proper citations.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> mahallah zahrawi</p><p><strong>Time Needed:</strong> Weekdays 6pm - 10pm</p></div>
-      <span class="price">RM25</span>
-      <button class="offerBtn" onclick="openModal('Essay Help','Need help writing an essay about AI.','RM25','student1@student.com','student1telegram','60123456789')">Offer Service</button>
-    </div>
+  <div class="back-button" onclick="window.location.href='home.html'">
+    <i class="fa-solid fa-arrow-left"></i> Back
   </div>
 
-  <div class="request-card" data-category="design" data-price="40">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download2.jpg"><span>Aisha Zulkifli</span></div>
-    <div class="content">
-      <h3>Logo Design</h3>
-      <p class="desc">Looking for a modern logo for my online store.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Bangi</p><p><strong>Time Needed:</strong> Weekend</p></div>
-      <span class="price">RM40</span>
-      <button class="offerBtn" onclick="openModal('Logo Design','Looking for a modern logo for online store.','RM40','student2@student.com','student2telegram','60123456780')">Offer Service</button>
+  <div class="page-title">Service Needed</div>
+
+  <button class="filter-button" onclick="toggleFilterPopup()">Filter <i class="fa-solid fa-filter"></i></button>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search requests...">
+    <button onclick="searchRequests()">Search</button>
+  </div>
+
+  <div class="request-list">
+    <!-- 12 Request Cards -->
+    <div class="request-card" data-category="writing" data-price="25">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download1.jpg"><span>Ali Ahmad</span></div>
+      <div class="content">
+        <h3>Essay Help</h3>
+        <p class="desc">Need help writing an essay about AI with proper citations.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> mahallah zahrawi</p>
+          <p><strong>Time Needed:</strong> Weekdays 6pm - 10pm</p>
+        </div>
+        <span class="price">RM25</span>
+        <button class="offerBtn"
+          onclick="openModal('Essay Help','Need help writing an essay about AI.','RM25','student1@student.com','student1telegram','60123456789')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="design" data-price="40">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download2.jpg"><span>Aisha Zulkifli</span></div>
+      <div class="content">
+        <h3>Logo Design</h3>
+        <p class="desc">Looking for a modern logo for my online store.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Bangi</p>
+          <p><strong>Time Needed:</strong> Weekend</p>
+        </div>
+        <span class="price">RM40</span>
+        <button class="offerBtn"
+          onclick="openModal('Logo Design','Looking for a modern logo for online store.','RM40','student2@student.com','student2telegram','60123456780')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="coding" data-price="60">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download3.jpg"><span>Farid Rahman</span></div>
+      <div class="content">
+        <h3>Website Coding</h3>
+        <p class="desc">Need help coding a personal portfolio website.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Kuala Lumpur</p>
+          <p><strong>Time Needed:</strong> 1 Week</p>
+        </div>
+        <span class="price">RM60</span>
+        <button class="offerBtn"
+          onclick="openModal('Website Coding','Need help coding a personal portfolio website.','RM60','student3@student.com','student3telegram','60123456781')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="tutoring" data-price="30">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download4.jpg"><span>Nadia Amin</span></div>
+      <div class="content">
+        <h3>Math Tutoring</h3>
+        <p class="desc">Looking for a tutor to help with calculus revision.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Shah Alam</p>
+          <p><strong>Time Needed:</strong> Evenings</p>
+        </div>
+        <span class="price">RM30</span>
+        <button class="offerBtn"
+          onclick="openModal('Math Tutoring','Looking for a tutor to help with calculus revision.','RM30','student4@student.com','student4telegram','60123456782')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="photography" data-price="80">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download5.jpg"><span>Hafiz Noor</span></div>
+      <div class="content">
+        <h3>Event Photography</h3>
+        <p class="desc">Need someone to take photos at a birthday event.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Petaling Jaya</p>
+          <p><strong>Time Needed:</strong> Saturday Evening</p>
+        </div>
+        <span class="price">RM80</span>
+        <button class="offerBtn"
+          onclick="openModal('Event Photography','Need someone to take photos at a birthday event.','RM80','student5@student.com','student5telegram','60123456783')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="design" data-price="20">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download6.jpg"><span>Sarah Lim</span></div>
+      <div class="content">
+        <h3>Poster Design</h3>
+        <p class="desc">Need a poster for a school campaign, simple and creative.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Johor Bahru</p>
+          <p><strong>Time Needed:</strong> Within 3 days</p>
+        </div>
+        <span class="price">RM20</span>
+        <button class="offerBtn"
+          onclick="openModal('Poster Design','Need a poster for a school campaign.','RM20','student6@student.com','student6telegram','60123456784')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="writing" data-price="50">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download7.jpg"><span>Amirul Hakim</span></div>
+      <div class="content">
+        <h3>Article Writing</h3>
+        <p class="desc">Need 1000-word article about technology trends.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Ipoh</p>
+          <p><strong>Time Needed:</strong> 5 days</p>
+        </div>
+        <span class="price">RM50</span>
+        <button class="offerBtn"
+          onclick="openModal('Article Writing','Need 1000-word article about technology trends.','RM50','student7@student.com','student7telegram','60123456785')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="coding" data-price="35">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download8.jpg"><span>Liyana Salleh</span></div>
+      <div class="content">
+        <h3>Python Homework</h3>
+        <p class="desc">Need help solving Python exercises for assignment.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Seremban</p>
+          <p><strong>Time Needed:</strong> Urgent</p>
+        </div>
+        <span class="price">RM35</span>
+        <button class="offerBtn"
+          onclick="openModal('Python Homework','Need help solving Python exercises.','RM35','student8@student.com','student8telegram','60123456786')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="tutoring" data-price="45">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download9.jpg"><span>Siti Nur</span></div>
+      <div class="content">
+        <h3>English Tutor</h3>
+        <p class="desc">Need online English tutor for speaking practice.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Online</p>
+          <p><strong>Time Needed:</strong> Flexible</p>
+        </div>
+        <span class="price">RM45</span>
+        <button class="offerBtn"
+          onclick="openModal('English Tutor','Need online English tutor for speaking practice.','RM45','student9@student.com','student9telegram','60123456787')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="photography" data-price="100">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download10.jpg"><span>Daniel Tan</span></div>
+      <div class="content">
+        <h3>Graduation Photoshoot</h3>
+        <p class="desc">Need a photographer for outdoor graduation pictures.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Putrajaya</p>
+          <p><strong>Time Needed:</strong> Morning Session</p>
+        </div>
+        <span class="price">RM100</span>
+        <button class="offerBtn"
+          onclick="openModal('Graduation Photoshoot','Need a photographer for graduation pictures.','RM100','student10@student.com','student10telegram','60123456788')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="coding" data-price="70">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download11.jpg"><span>Zara Yusuf</span></div>
+      <div class="content">
+        <h3>Mobile App Debugging</h3>
+        <p class="desc">Need help debugging Android app crashes and errors.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Cyberjaya</p>
+          <p><strong>Time Needed:</strong> This Week</p>
+        </div>
+        <span class="price">RM70</span>
+        <button class="offerBtn"
+          onclick="openModal('Mobile App Debugging','Need help debugging Android app crashes.','RM70','student11@student.com','student11telegram','60123456789')">Offer
+          Service</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-category="design" data-price="55">
+      <img src="https://via.placeholder.com/300x120">
+      <div class="requester"><img src="download12.jpg"><span>Yusof Karim</span></div>
+      <div class="content">
+        <h3>UI/UX Design</h3>
+        <p class="desc">Looking for someone to design user interface for app.</p>
+        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+        <div class="extra-info">
+          <p><strong>Location:</strong> Penang</p>
+          <p><strong>Time Needed:</strong> 2 weeks</p>
+        </div>
+        <span class="price">RM55</span>
+        <button class="offerBtn"
+          onclick="openModal('UI/UX Design','Looking for someone to design UI for app.','RM55','student12@student.com','student12telegram','60123456790')">Offer
+          Service</button>
+      </div>
     </div>
   </div>
 
-  <div class="request-card" data-category="coding" data-price="60">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download3.jpg"><span>Farid Rahman</span></div>
-    <div class="content">
-      <h3>Website Coding</h3>
-      <p class="desc">Need help coding a personal portfolio website.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Kuala Lumpur</p><p><strong>Time Needed:</strong> 1 Week</p></div>
-      <span class="price">RM60</span>
-      <button class="offerBtn" onclick="openModal('Website Coding','Need help coding a personal portfolio website.','RM60','student3@student.com','student3telegram','60123456781')">Offer Service</button>
+  <!-- Filter Popup -->
+  <div id="filterPopup">
+    <h3>Filter Requests</h3>
+    <select id="categoryFilter">
+      <option value="all">All Categories</option>
+      <option value="design">Design</option>
+      <option value="coding">Coding</option>
+      <option value="writing">Writing</option>
+      <option value="tutoring">Tutoring</option>
+      <option value="photography">Photography</option>
+    </select>
+    <select id="priceFilter">
+      <option value="all">All Budgets</option>
+      <option value="under20">Under RM20</option>
+      <option value="20to50">RM20 - RM50</option>
+      <option value="above50">Above RM50</option>
+    </select>
+    <br>
+    <button onclick="applyFilter()">Apply</button>
+  </div>
+
+  <!-- Modal -->
+  <div id="requestModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <p id="modalDescription"></p>
+      <p><strong>Budget:</strong> <span id="modalPrice"></span></p>
+      <div>
+        <button id="emailBtn" class="contact-btn"><i class="fa-solid fa-envelope"></i>Email</button>
+        <button id="telegramBtn" class="contact-btn"><i class="fa-brands fa-telegram"></i>Telegram</button>
+        <button id="whatsappBtn" class="contact-btn"><i class="fa-brands fa-whatsapp"></i>WhatsApp</button>
+      </div>
     </div>
   </div>
 
-  <div class="request-card" data-category="tutoring" data-price="30">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download4.jpg"><span>Nadia Amin</span></div>
-    <div class="content">
-      <h3>Math Tutoring</h3>
-      <p class="desc">Looking for a tutor to help with calculus revision.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Shah Alam</p><p><strong>Time Needed:</strong> Evenings</p></div>
-      <span class="price">RM30</span>
-      <button class="offerBtn" onclick="openModal('Math Tutoring','Looking for a tutor to help with calculus revision.','RM30','student4@student.com','student4telegram','60123456782')">Offer Service</button>
-    </div>
-  </div>
+  <footer>
+    <p>&copy; 2025 IT'aawun - All Rights Reserved</p>
+  </footer>
 
-  <div class="request-card" data-category="photography" data-price="80">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download5.jpg"><span>Hafiz Noor</span></div>
-    <div class="content">
-      <h3>Event Photography</h3>
-      <p class="desc">Need someone to take photos at a birthday event.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Petaling Jaya</p><p><strong>Time Needed:</strong> Saturday Evening</p></div>
-      <span class="price">RM80</span>
-      <button class="offerBtn" onclick="openModal('Event Photography','Need someone to take photos at a birthday event.','RM80','student5@student.com','student5telegram','60123456783')">Offer Service</button>
-    </div>
-  </div>
+  <script>
+    // Profile dropdown
+    function toggleDropdown() { document.getElementById("dropdownMenu").style.display = document.getElementById("dropdownMenu").style.display === "block" ? "none" : "block"; }
+    window.onclick = function (event) { if (!event.target.matches('.profile-pic')) { document.getElementById("dropdownMenu").style.display = "none"; } }
 
-  <div class="request-card" data-category="design" data-price="20">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download6.jpg"><span>Sarah Lim</span></div>
-    <div class="content">
-      <h3>Poster Design</h3>
-      <p class="desc">Need a poster for a school campaign, simple and creative.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Johor Bahru</p><p><strong>Time Needed:</strong> Within 3 days</p></div>
-      <span class="price">RM20</span>
-      <button class="offerBtn" onclick="openModal('Poster Design','Need a poster for a school campaign.','RM20','student6@student.com','student6telegram','60123456784')">Offer Service</button>
-    </div>
-  </div>
+    // Description toggle
+    function toggleDesc(btn) { const desc = btn.previousElementSibling; desc.classList.toggle('expanded'); btn.textContent = desc.classList.contains('expanded') ? 'Less' : 'More'; }
 
-  <div class="request-card" data-category="writing" data-price="50">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download7.jpg"><span>Amirul Hakim</span></div>
-    <div class="content">
-      <h3>Article Writing</h3>
-      <p class="desc">Need 1000-word article about technology trends.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Ipoh</p><p><strong>Time Needed:</strong> 5 days</p></div>
-      <span class="price">RM50</span>
-      <button class="offerBtn" onclick="openModal('Article Writing','Need 1000-word article about technology trends.','RM50','student7@student.com','student7telegram','60123456785')">Offer Service</button>
-    </div>
-  </div>
+    // Modal
+    function openModal(title, desc, price, email, telegram, whatsapp) {
+      document.getElementById("requestModal").style.display = "block";
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalDescription").textContent = desc;
+      document.getElementById("modalPrice").textContent = price;
+      document.getElementById("emailBtn").onclick = () => { window.location.href = `mailto:${email}?subject=Offer for ${title}`; };
+      document.getElementById("telegramBtn").onclick = () => { window.open(`https://t.me/${telegram}`, "_blank"); };
+      document.getElementById("whatsappBtn").onclick = () => { window.open(`https://wa.me/${whatsapp}`, "_blank"); };
+    }
+    function closeModal() { document.getElementById("requestModal").style.display = "none"; }
 
-  <div class="request-card" data-category="coding" data-price="35">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download8.jpg"><span>Liyana Salleh</span></div>
-    <div class="content">
-      <h3>Python Homework</h3>
-      <p class="desc">Need help solving Python exercises for assignment.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Seremban</p><p><strong>Time Needed:</strong> Urgent</p></div>
-      <span class="price">RM35</span>
-      <button class="offerBtn" onclick="openModal('Python Homework','Need help solving Python exercises.','RM35','student8@student.com','student8telegram','60123456786')">Offer Service</button>
-    </div>
-  </div>
+    // Search
+    function searchRequests() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      document.querySelectorAll(".request-card").forEach(card => {
+        const title = card.querySelector("h3").textContent.toLowerCase();
+        const desc = card.querySelector(".desc").textContent.toLowerCase();
+        card.style.display = (title.includes(input) || desc.includes(input)) ? "flex" : "none";
+      });
+    }
 
-  <div class="request-card" data-category="tutoring" data-price="45">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download9.jpg"><span>Siti Nur</span></div>
-    <div class="content">
-      <h3>English Tutor</h3>
-      <p class="desc">Need online English tutor for speaking practice.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Online</p><p><strong>Time Needed:</strong> Flexible</p></div>
-      <span class="price">RM45</span>
-      <button class="offerBtn" onclick="openModal('English Tutor','Need online English tutor for speaking practice.','RM45','student9@student.com','student9telegram','60123456787')">Offer Service</button>
-    </div>
-  </div>
+    // Filter popup
+    function toggleFilterPopup() { const f = document.getElementById("filterPopup"); f.style.display = f.style.display === "block" ? "none" : "block"; }
+    function applyFilter() {
+      toggleFilterPopup();
+      filterRequests();
+    }
 
-  <div class="request-card" data-category="photography" data-price="100">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download10.jpg"><span>Daniel Tan</span></div>
-    <div class="content">
-      <h3>Graduation Photoshoot</h3>
-      <p class="desc">Need a photographer for outdoor graduation pictures.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Putrajaya</p><p><strong>Time Needed:</strong> Morning Session</p></div>
-      <span class="price">RM100</span>
-      <button class="offerBtn" onclick="openModal('Graduation Photoshoot','Need a photographer for graduation pictures.','RM100','student10@student.com','student10telegram','60123456788')">Offer Service</button>
-    </div>
-  </div>
-
-  <div class="request-card" data-category="coding" data-price="70">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download11.jpg"><span>Zara Yusuf</span></div>
-    <div class="content">
-      <h3>Mobile App Debugging</h3>
-      <p class="desc">Need help debugging Android app crashes and errors.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Cyberjaya</p><p><strong>Time Needed:</strong> This Week</p></div>
-      <span class="price">RM70</span>
-      <button class="offerBtn" onclick="openModal('Mobile App Debugging','Need help debugging Android app crashes.','RM70','student11@student.com','student11telegram','60123456789')">Offer Service</button>
-    </div>
-  </div>
-
-  <div class="request-card" data-category="design" data-price="55">
-    <img src="https://via.placeholder.com/300x120">
-    <div class="requester"><img src="download12.jpg"><span>Yusof Karim</span></div>
-    <div class="content">
-      <h3>UI/UX Design</h3>
-      <p class="desc">Looking for someone to design user interface for app.</p>
-      <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-      <div class="extra-info"><p><strong>Location:</strong> Penang</p><p><strong>Time Needed:</strong> 2 weeks</p></div>
-      <span class="price">RM55</span>
-      <button class="offerBtn" onclick="openModal('UI/UX Design','Looking for someone to design UI for app.','RM55','student12@student.com','student12telegram','60123456790')">Offer Service</button>
-    </div>
-  </div>
-</div>
-
-<!-- Filter Popup -->
-<div id="filterPopup">
-  <h3>Filter Requests</h3>
-  <select id="categoryFilter">
-    <option value="all">All Categories</option>
-    <option value="design">Design</option>
-    <option value="coding">Coding</option>
-    <option value="writing">Writing</option>
-    <option value="tutoring">Tutoring</option>
-    <option value="photography">Photography</option>
-  </select>
-  <select id="priceFilter">
-    <option value="all">All Budgets</option>
-    <option value="under20">Under RM20</option>
-    <option value="20to50">RM20 - RM50</option>
-    <option value="above50">Above RM50</option>
-  </select>
-  <br>
-  <button onclick="applyFilter()">Apply</button>
-</div>
-
-<!-- Modal -->
-<div id="requestModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2 id="modalTitle"></h2>
-    <p id="modalDescription"></p>
-    <p><strong>Budget:</strong> <span id="modalPrice"></span></p>
-    <div>
-      <button id="emailBtn" class="contact-btn"><i class="fa-solid fa-envelope"></i>Email</button>
-      <button id="telegramBtn" class="contact-btn"><i class="fa-brands fa-telegram"></i>Telegram</button>
-      <button id="whatsappBtn" class="contact-btn"><i class="fa-brands fa-whatsapp"></i>WhatsApp</button>
-    </div>
-  </div>
-</div>
-
-<footer>
-  <p>&copy; 2025 IT'aawun - All Rights Reserved</p>
-</footer>
-
-<script>
-  // Profile dropdown
-  function toggleDropdown() { document.getElementById("dropdownMenu").style.display = document.getElementById("dropdownMenu").style.display==="block"?"none":"block"; }
-  window.onclick = function(event){ if(!event.target.matches('.profile-pic')){ document.getElementById("dropdownMenu").style.display="none"; } }
-
-  // Description toggle
-  function toggleDesc(btn){ const desc = btn.previousElementSibling; desc.classList.toggle('expanded'); btn.textContent = desc.classList.contains('expanded')?'Less':'More'; }
-
-  // Modal
-  function openModal(title,desc,price,email,telegram,whatsapp){
-    document.getElementById("requestModal").style.display="block";
-    document.getElementById("modalTitle").textContent=title;
-    document.getElementById("modalDescription").textContent=desc;
-    document.getElementById("modalPrice").textContent=price;
-    document.getElementById("emailBtn").onclick=()=>{ window.location.href=`mailto:${email}?subject=Offer for ${title}`; };
-    document.getElementById("telegramBtn").onclick=()=>{ window.open(`https://t.me/${telegram}`,"_blank"); };
-    document.getElementById("whatsappBtn").onclick=()=>{ window.open(`https://wa.me/${whatsapp}`,"_blank"); };
-  }
-  function closeModal(){ document.getElementById("requestModal").style.display="none"; }
-
-  // Search
-  function searchRequests(){ 
-    const input = document.getElementById("searchInput").value.toLowerCase();
-    document.querySelectorAll(".request-card").forEach(card=>{
-      const title=card.querySelector("h3").textContent.toLowerCase();
-      const desc=card.querySelector(".desc").textContent.toLowerCase();
-      card.style.display=(title.includes(input)||desc.includes(input))?"flex":"none";
-    });
-  }
-
-  // Filter popup
-  function toggleFilterPopup(){ const f = document.getElementById("filterPopup"); f.style.display = f.style.display==="block"?"none":"block"; }
-  function applyFilter(){
-    toggleFilterPopup();
-    filterRequests();
-  }
-
-  // Filtering
-  document.getElementById("categoryFilter").addEventListener("change", filterRequests);
-  document.getElementById("priceFilter").addEventListener("change", filterRequests);
-  function filterRequests(){
-    const cat=document.getElementById("categoryFilter").value;
-    const price=document.getElementById("priceFilter").value;
-    document.querySelectorAll(".request-card").forEach(card=>{
-      let show=true;
-      const cardCat=card.getAttribute("data-category");
-      const cardPrice=parseInt(card.getAttribute("data-price"));
-      if(cat!=="all" && cardCat!==cat) show=false;
-      if(price!=="all"){
-        if(price==="under20" && cardPrice>=20) show=false;
-        if(price==="20to50" && (cardPrice<20 || cardPrice>50)) show=false;
-        if(price==="above50" && cardPrice<=50) show=false;
-      }
-      card.style.display=show?"flex":"none";
-    });
-  }
-</script>
+    // Filtering
+    document.getElementById("categoryFilter").addEventListener("change", filterRequests);
+    document.getElementById("priceFilter").addEventListener("change", filterRequests);
+    function filterRequests() {
+      const cat = document.getElementById("categoryFilter").value;
+      const price = document.getElementById("priceFilter").value;
+      document.querySelectorAll(".request-card").forEach(card => {
+        let show = true;
+        const cardCat = card.getAttribute("data-category");
+        const cardPrice = parseInt(card.getAttribute("data-price"));
+        if (cat !== "all" && cardCat !== cat) show = false;
+        if (price !== "all") {
+          if (price === "under20" && cardPrice >= 20) show = false;
+          if (price === "20to50" && (cardPrice < 20 || cardPrice > 50)) show = false;
+          if (price === "above50" && cardPrice <= 50) show = false;
+        }
+        card.style.display = show ? "flex" : "none";
+      });
+    }
+  </script>
 </body>
+
 </html>

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IT'aawun - Home</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* Body & Gradient Animation */
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -13,20 +13,19 @@
       display: flex;
       flex-direction: column;
       color: #fff;
-      background: linear-gradient(-45deg, #00008B,#ffffff,#3F00FF);
+      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
     }
-
     @keyframes gradientBG {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     /* Header */
     header {
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0,0,0,0.2);
       color: white;
       padding: 15px 20px;
       display: flex;
@@ -34,201 +33,161 @@
       align-items: center;
       flex-wrap: wrap;
     }
-
     header .logo {
-      font-size: 24px;
-      font-weight: bold;
-      text-decoration: none;
-      cursor: pointer;
+      font-size: 24px; font-weight: bold;
+      text-decoration: none; cursor: pointer;
     }
-
     nav a {
-      color: white;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: 500;
+      color: white; margin: 0 15px;
+      text-decoration: none; font-weight: 500;
     }
+    nav a:hover { text-decoration: underline; }
 
-    nav a:hover {
-      text-decoration: underline;
-    }
-
-    /* Profile Dropdown */
+    /* Profile dropdown — hover-based, no JS needed */
     .profile-container {
       position: relative;
       display: inline-block;
-      margin-top: 8px;
     }
-
     .profile-pic {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
+      width: 40px; height: 40px;
+      border-radius: 50%; cursor: pointer;
       border: 2px solid white;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
     }
-
+    /* Hover effect on profile pic */
+    .profile-container:hover .profile-pic {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+    }
     .dropdown {
       display: none;
       position: absolute;
-      right: 0;
-      top: 50px;
-      background: white;
-      color: #333;
-      border-radius: 8px;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-      min-width: 150px;
-      z-index: 100;
-    }
-
-    .dropdown a {
-      display: block;
-      padding: 10px 15px;
-      text-decoration: none;
-      color: #333;
-      font-size: 14px;
-    }
-
-    .dropdown a:hover {
-      background: #f0f0f0;
-    }
-
-    /* Hero Section */
-    .hero {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 50px 20px;
-    }
-
-    .hero h1 {
-      font-size: 42px;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-      color: #ffffff;
-    }
-
-    .hero p {
-      font-size: 18px;
-      margin-bottom: 40px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-      color: #ffffff;
-    }
-
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-    }
-
-    .buttons a {
-      text-decoration: none;
-      padding: 15px 30px;
-      font-size: 16px;
-      font-weight: bold;
+      right: 0; top: 48px;
+      background: white; color: #333;
       border-radius: 10px;
-      transition: 0.3s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
       min-width: 160px;
-      text-align: center;
+      z-index: 100;
+      overflow: hidden;
+      /* Smooth appear */
+      animation: fadeIn 0.15s ease;
     }
-
-    .find-btn {
-      background: #D8BFFD;
-      color: #ffffff;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-
-    .find-btn:hover {
-      background: #C29BFD;
+    /* Show dropdown on hover */
+    .profile-container:hover .dropdown { display: block; }
+    /* Keep open when hovering the dropdown itself */
+    .dropdown:hover { display: block; }
+    .dropdown a {
+      display: block; padding: 11px 16px;
+      text-decoration: none; color: #333; font-size: 14px;
+      transition: background 0.15s;
     }
+    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+    .dropdown .logout-link { color: #dc2626 !important; }
+    .dropdown .logout-link:hover { background: #fef2f2 !important; }
 
-    .create-btn {
-      background:#4B0082 ;
-      color: white;
+    /* Hero */
+    .hero {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; padding: 50px 20px;
     }
-
-    .create-btn:hover {
-      background:#370066;
+    .hero h1 {
+      font-size: 42px; margin-bottom: 20px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3); color: #ffffff;
     }
-
-    .needed-btn {
-      background:#8A2BE2 ;
-      color: white;
+    .hero p {
+      font-size: 18px; margin-bottom: 40px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3); color: #ffffff;
     }
-
-    .needed-btn:hover {
-      background: #7326C8;
+    .buttons {
+      display: flex; flex-wrap: wrap;
+      gap: 15px; justify-content: center;
     }
+    .buttons a {
+      text-decoration: none; padding: 15px 30px;
+      font-size: 16px; font-weight: bold;
+      border-radius: 10px; transition: 0.3s;
+      min-width: 160px; text-align: center;
+    }
+    .find-btn   { background: #D8BFFD; color: #ffffff; }
+    .find-btn:hover   { background: #C29BFD; }
+    .create-btn { background: #4B0082; color: white; }
+    .create-btn:hover { background: #370066; }
+    .needed-btn { background: #8A2BE2; color: white; }
+    .needed-btn:hover { background: #7326C8; }
 
-    /* Footer */
     footer {
-      background: rgba(0,0,0,0.2);
-      color: white;
-      text-align: center;
-      padding: 15px;
+      background: rgba(0,0,0,0.2); color: white;
+      text-align: center; padding: 15px;
     }
 
-    /* Responsive */
     @media (max-width: 600px) {
       .hero h1 { font-size: 28px; }
-      .hero p { font-size: 16px; }
-      header { flex-direction: column; align-items: flex-start; }
+      .hero p  { font-size: 16px; }
+      header   { flex-direction: column; align-items: flex-start; }
       .profile-container { align-self: flex-end; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <header>
     <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
-
-    <!-- Profile Picture -->
     <div class="profile-container">
-      <img src="ipey.jpeg" alt="Profile" class="profile-pic" onclick="toggleDropdown()">
-      <div class="dropdown" id="dropdownMenu">
-        <a href="profile.html">My Profile</a>
-        <a href="#">Settings</a>
-        <a href="index.html">Logout</a>
+      <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
+      <div class="dropdown">
+        <a href="profile.html">👤 My Profile</a>
+        <hr class="divider">
+        <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
   <section class="hero">
     <h1>Welcome to IT'aawun</h1>
     <p>A freelance platform specifically for CFS IIUM students</p>
     <div class="buttons">
-      <a href="find.html" class="find-btn">Service Offered</a>
+      <a href="find.html"   class="find-btn">Service Offered</a>
       <a href="needed.html" class="needed-btn">Service Needed</a>
       <a href="create.html" class="create-btn">Create Service</a>
     </div>
   </section>
-  
-  <!-- Footer -->
+
   <footer>
     <p>© 2025 IT'aawun | Student Freelance Collaboration</p>
   </footer>
 
   <script>
-    function toggleDropdown() {
-      const menu = document.getElementById("dropdownMenu");
-      menu.style.display = (menu.style.display === "block") ? "none" : "block";
-    }
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    // Tutup menu bila klik luar
-    window.onclick = function(event) {
-      if (!event.target.matches('.profile-pic')) {
-        const menu = document.getElementById("dropdownMenu");
-        if (menu && menu.style.display === "block") {
-          menu.style.display = "none";
-        }
-      }
+    // Protect page — redirect to login if not logged in
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (!session) window.location.href = 'index.html'
+    })
+
+    // Load real profile picture if available
+    db.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      db.from('profiles').select('avatar_url').eq('id', user.id).single()
+        .then(({ data }) => {
+          if (data?.avatar_url) {
+            document.getElementById('profilePic').src = data.avatar_url
+          }
+        })
+    })
+
+    async function doLogout() {
+      await db.auth.signOut()
+      window.location.href = 'index.html'
     }
   </script>
-
 </body>
 </html>

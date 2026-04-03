@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IT'aawun - Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,102 +13,91 @@
       display: flex;
       justify-content: center;
       align-items: center;
-
-      /* Background image with gradient overlay */
-      background: linear-gradient(135deg, rgba(0, 31, 63, 0.85), #6A5ACD),
-        url('bi1.png') no-repeat center center / cover;
+      background: linear-gradient(135deg, rgba(0,31,63,0.85), #6A5ACD),
+        url('assets/images/bi1.png') no-repeat center center / cover;
     }
-
     .login-container {
       background: #fff;
       padding: 40px;
       border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
       width: 360px;
       text-align: center;
     }
-
-    .logo {
-      font-size: 28px;
-      font-weight: bold;
-      color: #001f3f;
-      margin-bottom: 10px;
-    }
-
-    .tagline {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 25px;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      color: #001f3f;
-    }
-
+    .logo { font-size: 28px; font-weight: bold; color: #001f3f; margin-bottom: 10px; }
+    .tagline { font-size: 14px; color: #666; margin-bottom: 25px; }
+    h2 { margin-bottom: 20px; color: #001f3f; }
     input {
-      width: 90%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
+      width: 90%; padding: 12px; margin: 10px 0;
+      border: 1px solid #ccc; border-radius: 8px; font-size: 14px;
     }
-
     button {
-      width: 100%;
-      padding: 12px;
-      background: #001f3f;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s;
+      width: 100%; padding: 12px; background: #001f3f; color: #fff;
+      border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s;
     }
-
-    button:hover {
-      background: #003366;
+    button:hover { background: #003366; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #msg {
+      min-height: 20px; font-size: 13px; margin: 8px 0;
+      padding: 6px 10px; border-radius: 6px;
     }
-
-    .links {
-      margin-top: 15px;
-      font-size: 14px;
-    }
-
-    .links a {
-      color: #001f3f;
-      text-decoration: none;
-    }
-
-    .links a:hover {
-      text-decoration: underline;
-    }
+    #msg.error { background: #fef2f2; color: #dc2626; }
+    #msg.success { background: #f0fdf4; color: #16a34a; }
+    .links { margin-top: 15px; font-size: 14px; }
+    .links a { color: #6b21a8; text-decoration: none; margin: 0 8px; }
+    .links a:hover { text-decoration: underline; }
+    .divider { border: none; border-top: 1px solid #eee; margin: 16px 0; }
   </style>
 </head>
-
 <body>
   <div class="login-container">
     <div class="logo">IT'aawun</div>
     <div class="tagline">Student Freelance Collaboration</div>
     <h2>Login</h2>
-    <form action="home.html" method="get">
-      <input type="email" placeholder="Email" required>
-      <input type="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-    </form>
 
+    <div id="msg"></div>
+    <input id="email" type="email" placeholder="Email">
+    <input id="pass"  type="password" placeholder="Password">
+    <button id="btn-login" onclick="doLogin()">Login</button>
+
+    <hr class="divider">
     <div class="links">
-      <p><a href="#">Create Account</a> | <a href="#">Forgot Password?</a></p>
+      <a href="signup.html">Create Account</a> | <a href="forgot.html">Forgot Password?</a>
     </div>
   </div>
 
-  <script type="module">
-    import { supabase } from './supabase.js'
-    const { data, error } = await supabase.from('profiles').select('*').limit(1)
-    console.log('Connection test:', data, error)
+  <script>
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    // If already logged in, skip login
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = 'home.html'
+    })
+
+    function setMsg(text, type = 'error') {
+      const el = document.getElementById('msg')
+      el.textContent = text
+      el.className = type
+    }
+
+    async function doLogin() {
+      const email = document.getElementById('email').value.trim()
+      const pass  = document.getElementById('pass').value
+      if (!email || !pass) { setMsg('Please fill in both fields.'); return }
+
+      document.getElementById('btn-login').disabled = true
+      setMsg('Logging in...', 'success')
+
+      const { error } = await db.auth.signInWithPassword({ email, password: pass })
+      document.getElementById('btn-login').disabled = false
+
+      if (error) { setMsg(error.message); return }
+      window.location.href = 'home.html'
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
   </script>
-
 </body>
-
 </html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT'aawun - Create Account</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; height: 100vh; display: flex;
+      justify-content: center; align-items: center;
+      background: linear-gradient(135deg, rgba(0,31,63,0.85), #6A5ACD),
+        url('assets/images/bi1.png') no-repeat center center / cover;
+    }
+    .container {
+      background: #fff; padding: 40px; border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25); width: 360px; text-align: center;
+    }
+    .logo { font-size: 28px; font-weight: bold; color: #001f3f; margin-bottom: 6px; }
+    .tagline { font-size: 14px; color: #666; margin-bottom: 20px; }
+    h2 { margin-bottom: 16px; color: #001f3f; }
+    input {
+      width: 90%; padding: 12px; margin: 8px 0;
+      border: 1px solid #ccc; border-radius: 8px; font-size: 14px; display: block;
+      margin-left: auto; margin-right: auto;
+    }
+    button {
+      width: 100%; padding: 12px; background: #6b21a8; color: #fff;
+      border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
+      transition: 0.3s; margin-top: 8px;
+    }
+    button:hover { background: #581c87; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #msg { min-height: 20px; font-size: 13px; margin: 8px 0; padding: 6px 10px; border-radius: 6px; }
+    #msg.error   { background: #fef2f2; color: #dc2626; }
+    #msg.success { background: #f0fdf4; color: #16a34a; }
+    .links { margin-top: 15px; font-size: 14px; }
+    .links a { color: #6b21a8; text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
+    .hint { font-size: 12px; color: #999; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">IT'aawun</div>
+    <div class="tagline">Student Freelance Collaboration</div>
+    <h2>Create Account</h2>
+
+    <div id="msg"></div>
+    <input id="fullname" type="text"  placeholder="Full Name">
+    <input id="studentid" type="text" placeholder="Student ID (Matrix No.)">
+    <input id="email"    type="email"    placeholder="Student Email">
+    <input id="pass"     type="password" placeholder="Password (min. 6 characters)">
+    <input id="pass2"    type="password" placeholder="Confirm Password">
+    <button id="btn-signup" onclick="doSignup()">Create Account</button>
+
+    <div class="links">
+      <p>Already have an account? <a href="index.html">Login here</a></p>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    function setMsg(text, type = 'error') {
+      const el = document.getElementById('msg')
+      el.textContent = text
+      el.className = type
+    }
+
+    async function doSignup() {
+      const fullname  = document.getElementById('fullname').value.trim()
+      const studentid = document.getElementById('studentid').value.trim()
+      const email     = document.getElementById('email').value.trim()
+      const pass      = document.getElementById('pass').value
+      const pass2     = document.getElementById('pass2').value
+
+      if (!fullname || !studentid || !email || !pass || !pass2) {
+        setMsg('Please fill in all fields.'); return
+      }
+      if (pass.length < 6) { setMsg('Password must be at least 6 characters.'); return }
+      if (pass !== pass2)  { setMsg('Passwords do not match.'); return }
+
+      document.getElementById('btn-signup').disabled = true
+      setMsg('Creating your account...', 'success')
+
+      // 1. Create auth account
+      const { data, error } = await db.auth.signUp({ email, password: pass })
+      if (error) {
+        document.getElementById('btn-signup').disabled = false
+        setMsg(error.message); return
+      }
+
+      // 2. Save profile info to profiles table
+      if (data.user) {
+        await db.from('profiles').insert({
+          id:         data.user.id,
+          full_name:  fullname,
+          student_id: studentid,
+          role:       'student',
+          is_approved: false
+        })
+      }
+
+      document.getElementById('btn-signup').disabled = false
+      setMsg('Account created! Check your email to verify, then login.', 'success')
+      setTimeout(() => { window.location.href = 'index.html' }, 3000)
+    }
+  </script>
+</body>
+</html>
