@@ -127,9 +127,9 @@
     })
 
     async function doLogout() {
-      await db.auth.signOut()
-      // Clear session completely before redirecting
-      window.location.replace('index.html')
+      const { error } = await db.auth.signOut()
+      if (error) { console.error('Logout error:', error) }
+      window.location.replace('index.html?logged=out')
     }
   </script>
 </body>

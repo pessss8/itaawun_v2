@@ -238,7 +238,20 @@
     </form>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    let currentUser = null
+
+    // Auth check - redirect to login if not logged in
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { window.location.href = 'index.html'; return }
+      currentUser = session.user
+    })
+
     function toggleDropdown() {
       const m = document.getElementById("dropdownMenu");
       m.style.display = (m.style.display === "block") ? "none" : "block";
@@ -249,13 +262,15 @@
       }
     }
 
-    document.getElementById("serviceForm").addEventListener("submit", function (e) {
+    document.getElementById("serviceForm").addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      if (!currentUser) { alert('Please login first.'); return; }
 
       const type = document.getElementById("serviceType").value;
       const title = document.getElementById("title").value;
       const desc = document.getElementById("desc").value;
-      const price = document.getElementById("price").value;
+      const price = parseFloat(document.getElementById("price").value);
       const category = document.getElementById("category").value;
       const location = document.getElementById("location").value;
       const time = document.getElementById("time").value;
@@ -265,13 +280,45 @@
       let image = document.getElementById("image").value;
       if (!image) image = "https://via.placeholder.com/220x120";
 
-      let key = type === "needed" ? "neededServices" : "offeredServices";
-      let services = JSON.parse(localStorage.getItem(key) || "[]");
-      services.push({ title, desc, price, category, location, time, contact, whatsapp, telegram, image, type });
-      localStorage.setItem(key, JSON.stringify(services));
+      const btn = this.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
 
-      alert(`Service (${type}) added successfully!`);
+      // Insert into Supabase services table
+      const { data, error } = await db.from('services').insert({
+        vendor_id: currentUser.id,
+        title: title,
+        description: desc,
+        price: price,
+        category: category,
+        location: location,
+        available_time: time,
+        contact_email: contact,
+        whatsapp: whatsapp,
+        telegram: telegram,
+        image_url: image,
+        service_type: type, // 'offered' or 'needed'
+        status: 'active'
+      }).select()
+
+      btn.disabled = false;
+      btn.textContent = originalText;
+
+      if (error) {
+        alert('Error submitting service: ' + error.message);
+        return;
+      }
+
+      alert('Service submitted successfully! It will appear once approved.');
       document.getElementById("serviceForm").reset();
+
+      // Redirect based on service type
+      if (type === 'needed') {
+        window.location.href = 'needed.html';
+      } else {
+        window.location.href = 'find.html';
+      }
     });
   </script>
 

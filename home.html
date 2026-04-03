@@ -186,7 +186,7 @@
 
     async function doLogout() {
       await db.auth.signOut()
-      window.location.href = 'index.html'
+      window.location.replace('index.html')
     }
   </script>
 </body>

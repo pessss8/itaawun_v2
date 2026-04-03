@@ -572,265 +572,8 @@
     <button onclick="searchServices()">Search</button>
   </div>
 
-  <div class="service-list">
-    <div class="service-card" data-category="service" data-price="0.10">
-      <img src="assets/images/printing service.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Ali Ahmad</span></div>
-      <div class="content">
-        <h3>Printing Service</h3>
-        <p class="desc">High-quality printing services for assignments, documents, posters, and flyers. Fast turnaround
-          with attention to detail and professional finishing.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah zahrawi</p>
-          <p><strong>Available Time:</strong> Everydays 6pm - 10pm</p>
-        </div>
-        <span class="price">RM0.10</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Printing Service','High-quality printing services for assignments, documents, posters, and flyers.','RM0.10','student1@student.com','student1telegram','60123456789')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Printing Service','printing-static-1','vendor-static-1')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="service" data-price="5">
-      <img src="assets/images/iron service.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Siti Aminah</span></div>
-      <div class="content">
-        <h3>Iron Service</h3>
-        <p class="desc">Professional ironing service for clothes and garments. Ensures crisp, wrinkle-free results with
-          care for all fabric types.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah azdah</p>
-          <p><strong>Available Time:</strong> Weekends 10am - 6pm</p>
-        </div>
-        <span class="price">RM5</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Iron Service','Professional ironing service.','RM5','siti@student.com','sititelegram','60111222333')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Iron Service','iron-static-2','vendor-static-2')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="runner" data-price="2">
-      <img src="assets/images/runner cafe biruni.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Faizal</span></div>
-      <div class="content">
-        <h3>Runner Cafe Biruni</h3>
-        <p class="desc">Reliable runner service for cafe biruni deliveries, ensuring your orders reach customers quickly
-          and safely.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah zahrawi</p>
-          <p><strong>Available Time:</strong> Mon-Fri 7pm - 10pm</p>
-        </div>
-        <span class="price">RM2</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Runner Cafe Biruni','Reliable runner service.','RM2','faizal@student.com','faizaltelegram','60122334455')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Runner Cafe Biruni','runner-static-3','vendor-static-3')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="service" data-price="20">
-      <img src="assets/images/barber service.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Izzul</span></div>
-      <div class="content">
-        <h3>Barber Service</h3>
-        <p class="desc">Expert haircuts, trims, and grooming. Professional tools and techniques for a premium
-          experience.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah biruni</p>
-          <p><strong>Available Time:</strong> Tue & Thu 4pm - 8pm</p>
-        </div>
-        <span class="price">RM20</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Barber Service','Expert haircuts and grooming.','RM20','izzul@student.com','izzultelegram','60133445566')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Barber Service','barber-static-4','vendor-static-4')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="service" data-price="0.50">
-      <img src="assets/images/service colour printing.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Ahmad</span></div>
-      <div class="content">
-        <h3>Colour Printing</h3>
-        <p class="desc">Vibrant, accurate, and professional colour prints for documents, photos, flyers, and brochures.
-        </p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah aishah</p>
-          <p><strong>Available Time:</strong> Everyday</p>
-        </div>
-        <span class="price">RM0.50</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Colour Printing','Vibrant colour prints.','RM0.50','ahmad@student.com','ahmadtelegram','60144556677')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Colour Printing','colour-static-5','vendor-static-5')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="service" data-price="5">
-      <img src="assets/images/slide presentation service.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Maya</span></div>
-      <div class="content">
-        <h3>Slide Presentation</h3>
-        <p class="desc">Visually appealing and well-structured presentations for school, university, or business.
-          Customized to convey your message clearly.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> Online</p>
-          <p><strong>Available Time:</strong> Mon-Fri 10am - 6pm</p>
-        </div>
-        <span class="price">RM5</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Slide Presentation','Custom presentation design.','RM5','maya@student.com','mayatelegram','60155667788')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Slide Presentation','slide-static-6','vendor-static-6')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="runner" data-price="3">
-      <img src="assets/images/foodfest runner.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Anis</span></div>
-      <div class="content">
-        <h3>Foodfest Runner</h3>
-        <p class="desc">Efficient and timely delivery for food festivals. Orders reach you fresh and on schedule.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah fatimah, mahallah umamah</p>
-          <p><strong>Available Time:</strong> Tue-Sat 11am - 7pm</p>
-        </div>
-        <span class="price">RM3</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Foodfest Runner','Food festival delivery.','RM3','wan@student.com','wantelegram','60166778899')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Foodfest Runner','food-static-7','vendor-static-7')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="runner" data-price="2">
-      <img src="assets/images/runner parcel hub.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Karim</span></div>
-      <div class="content">
-        <h3>Runner Parcel Hub</h3>
-        <p class="desc">Collect items from the parcel hub and deliver directly to your room. Fast and reliable.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah aishah</p>
-          <p><strong>Available Time:</strong> Everyday 9am - 10pm</p>
-        </div>
-        <span class="price">RM2</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Runner Parcel Hub','Parcel pickup and delivery.','RM2','karim@student.com','karimtelegram','60177889900')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Runner Parcel Hub','parcel-static-8','vendor-static-8')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="service" data-price="2">
-      <img src="assets/images/service dobi.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Aminah</span></div>
-      <div class="content">
-        <h3>Laundry (Dobi)</h3>
-        <p class="desc">Professional laundry service that washes, dries, and folds your clothes, saving you time and
-          effort.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah umamah</p>
-          <p><strong>Available Time:</strong> Weekends 9am - 3pm</p>
-        </div>
-        <span class="price">RM2</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Laundry','Wash, dry, and fold.','RM2','aminah@student.com','aminahtelegram','60188990011')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Laundry (Dobi)','dobi-static-9','vendor-static-9')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="service" data-price="20">
-      <img src="assets/images/barber service 2.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Hakim</span></div>
-      <div class="content">
-        <h3>Barber Service</h3>
-        <p class="desc">Professional haircuts, trims, and grooming to keep you looking sharp and stylish.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah zahrawi</p>
-          <p><strong>Available Time:</strong> Thu-Sun 10am - 6pm</p>
-        </div>
-        <span class="price">RM20</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Barber Service','Professional haircut.','RM20','hakim@student.com','hakimtelegram','60199001122')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Barber Service','barber-static-10','vendor-static-10')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="runner" data-price="2">
-      <img src="assets/images/groceries runner.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Fatimah</span></div>
-      <div class="content">
-        <h3>Groceries Runner</h3>
-        <p class="desc">Grocery pickup and delivery from stores directly to your door. Saves you time and effort.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah fatimah</p>
-          <p><strong>Available Time:</strong> Saturday 1pm - 6pm</p>
-        </div>
-        <span class="price">RM2</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Groceries Runner','Grocery delivery.','RM2','fatimah@student.com','fatimahtelegram','60110111213')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Groceries Runner','grocery-static-11','vendor-static-11')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="service-card" data-category="service" data-price="5">
-      <img src="assets/images/sewing service.jpg">
-      <div class="offerer"><img src="assets/images/OIP.jpg" alt="profile"><span>Sofea</span></div>
-      <div class="content">
-        <h3>Sewing Service</h3>
-        <p class="desc">Sewing and repair service for torn clothes or alterations.</p>
-        <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-        <div class="extra-info">
-          <p><strong>Location:</strong> mahallah azdah</p>
-          <p><strong>Available Time:</strong> Tue-Fri 10am - 5pm</p>
-        </div>
-        <span class="price">RM5</span>
-        <div class="card-actions">
-          <button class="orderBtn"
-            onclick="openModal('Sewing Service','Clothes repair and alteration.','RM5','sofea@student.com','sofeatelegram','60112131415')">Contact</button>
-          <button class="bookBtn" onclick="openBookModal('Sewing Service','sewing-static-12','vendor-static-12')">📋
-            Book</button>
-        </div>
-      </div>
-    </div>
+  <div class="service-list" id="serviceList">
+    <div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">Loading services...</div>
   </div>
 
   <!-- Contact Modal (unchanged from original) -->
@@ -868,24 +611,103 @@
 
     let currentUser = null
     let pendingBook = { serviceId: null, vendorId: null, title: '' }
+    let allServices = [] // Store loaded services for filtering
 
     // Auth check
     db.auth.getSession().then(({ data: { session } }) => {
       if (!session) { window.location.href = 'index.html'; return }
       currentUser = session.user
+      loadServices()
     })
 
-    // ── Existing functions (unchanged) ──────────────────
+    // ── Load services from Supabase ──────────────────────
+    async function loadServices() {
+      const { data, error } = await db
+        .from('services')
+        .select('*')
+        .eq('status', 'active')
+        .eq('service_type', 'offered')
+        .order('created_at', { ascending: false })
+
+      const container = document.getElementById('serviceList')
+      if (error || !data || data.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">No services available yet. Be the first to offer!</div>'
+        return
+      }
+
+      allServices = data
+
+      // Fetch vendor names and avatars
+      const vendorIds = [...new Set(data.map(s => s.vendor_id))]
+      const { data: profiles } = await db.from('profiles').select('id, full_name, avatar_url').in('id', vendorIds)
+      const profileMap = {}
+      if (profiles) profiles.forEach(p => { profileMap[p.id] = p })
+
+      renderServices(data, profileMap)
+    }
+
+    function renderServices(services, profileMap) {
+      const container = document.getElementById('serviceList')
+      if (services.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">No services found.</div>'
+        return
+      }
+
+      container.innerHTML = services.map(s => {
+        const vendor = profileMap[s.vendor_id] || {}
+        const vendorName = vendor.full_name || 'Vendor'
+        const avatar = vendor.avatar_url || 'assets/images/OIP.jpg'
+        const category = s.category || 'service'
+        const priceVal = parseFloat(s.price) || 0
+
+        return `
+        <div class="service-card" data-category="${category}" data-price="${priceVal}">
+          <img src="${s.image_url || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
+          <div class="offerer"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(vendorName)}</span></div>
+          <div class="content">
+            <h3>${escapeHtml(s.title)}</h3>
+            <p class="desc">${escapeHtml(s.description || '')}</p>
+            <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+            <div class="extra-info">
+              <p><strong>Location:</strong> ${escapeHtml(s.location || '—')}</p>
+              <p><strong>Available Time:</strong> ${escapeHtml(s.available_time || '—')}</p>
+            </div>
+            <span class="price">RM${priceVal.toFixed(2)}</span>
+            <div class="card-actions">
+              <button class="orderBtn" onclick="openModal('${escapeJs(s.title)}','${escapeJs(s.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(s.contact_email || '')}','${escapeJs(s.telegram || '')}','${escapeJs(s.whatsapp || '')}')">Contact</button>
+              <button class="bookBtn" onclick="openBookModal('${escapeJs(s.title)}','${s.id}','${s.vendor_id}')">📋 Book</button>
+            </div>
+          </div>
+        </div>`
+      }).join('')
+    }
+
+    function escapeHtml(text) {
+      if (!text) return ''
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    }
+    function escapeJs(text) {
+      if (!text) return ''
+      return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"')
+    }
+
+    // ── Filter & Search functions ────────────────────────
     function toggleDesc(btn) {
       const desc = btn.previousElementSibling
       desc.classList.toggle('expanded')
       btn.textContent = desc.classList.contains('expanded') ? 'Less' : 'More'
     }
+
     function toggleFilterPopup() {
       const f = document.getElementById('filterPopup')
       f.style.display = (f.style.display === 'block') ? 'none' : 'block'
     }
-    function applyFilters() { filterServices(); document.getElementById('filterPopup').style.display = 'none' }
+
+    function applyFilters() {
+      filterServices()
+      document.getElementById('filterPopup').style.display = 'none'
+    }
+
     window.addEventListener('click', function (e) {
       const popup = document.getElementById('filterPopup')
       const btn = document.querySelector('.filter-button')
@@ -893,27 +715,51 @@
         popup.style.display = 'none'
       }
     })
+
     function filterServices() {
       const cat = document.getElementById('categoryFilter').value
       const price = document.getElementById('priceFilter').value
-      document.querySelectorAll('.service-card').forEach(card => {
-        let show = true
-        if (cat !== 'all' && card.dataset.category !== cat) show = false
-        if (price !== 'all') {
-          const p = parseFloat(card.dataset.price)
-          if (price === 'under2' && p >= 2) show = false
-          if (price === '2to5' && (p < 2 || p > 5)) show = false
-          if (price === 'above10' && p <= 10) show = false
-        }
-        card.style.display = show ? 'flex' : 'none'
+
+      let filtered = allServices.filter(s => {
+        const category = s.category || 'service'
+        const p = parseFloat(s.price) || 0
+
+        if (cat !== 'all' && category !== cat) return false
+        if (price === 'under2' && p >= 2) return false
+        if (price === '2to5' && (p < 2 || p > 5)) return false
+        if (price === 'above10' && p <= 10) return false
+        return true
       })
+
+      // Re-render with filtered results
+      db.from('profiles').select('id, full_name, avatar_url')
+        .in('id', [...new Set(filtered.map(s => s.vendor_id))])
+        .then(({ data }) => {
+          const profileMap = {}
+          if (data) data.forEach(p => { profileMap[p.id] = p })
+          renderServices(filtered, profileMap)
+        })
     }
+
     function searchServices() {
-      const term = document.getElementById('searchInput').value.toLowerCase()
-      document.querySelectorAll('.service-card').forEach(card => {
-        card.style.display = card.querySelector('h3').textContent.toLowerCase().includes(term) ? 'flex' : 'none'
-      })
+      const term = document.getElementById('searchInput').value.toLowerCase().trim()
+      if (!term) { loadServices(); return }
+
+      let filtered = allServices.filter(s =>
+        (s.title && s.title.toLowerCase().includes(term)) ||
+        (s.description && s.description.toLowerCase().includes(term))
+      )
+
+      db.from('profiles').select('id, full_name, avatar_url')
+        .in('id', [...new Set(filtered.map(s => s.vendor_id))])
+        .then(({ data }) => {
+          const profileMap = {}
+          if (data) data.forEach(p => { profileMap[p.id] = p })
+          renderServices(filtered, profileMap)
+        })
     }
+
+    // ── Modal functions ──────────────────────────────────
     let modalData = { email: '', whatsapp: '', telegram: '' }
     function openModal(title, desc, price, email, telegram, whatsapp) {
       modalData = { email, telegram, whatsapp }
@@ -927,7 +773,7 @@
     function contactWhatsApp() { window.open('https://wa.me/' + modalData.whatsapp, '_blank') }
     function contactTelegram() { window.open('https://t.me/' + modalData.telegram, '_blank') }
 
-    // ── NEW: Book Modal ──────────────────────────────────
+    // ── Book Modal ───────────────────────────────────────
     function openBookModal(title, serviceId, vendorId) {
       if (!currentUser) { window.location.href = 'index.html'; return }
       pendingBook = { serviceId, vendorId, title }
@@ -960,8 +806,9 @@
     }
 
     async function doLogout() {
-      await db.auth.signOut()
-      window.location.replace('index.html')
+      const { error } = await db.auth.signOut()
+      if (error) { console.error('Logout error:', error) }
+      window.location.replace('index.html?logged=out')
     }
   </script>
 </body>
