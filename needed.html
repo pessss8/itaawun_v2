@@ -547,7 +547,7 @@
 
         return `
         <div class="request-card" data-category="${category}" data-price="${priceVal}">
-          <img src="${r.image_url || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
+          <img src="${r.image || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
           <div class="requester"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(requesterName)}</span></div>
           <div class="content">
             <h3>${escapeHtml(r.title)}</h3>
@@ -555,10 +555,10 @@
             <button class="moreBtn" onclick="toggleDesc(this)">More</button>
             <div class="extra-info">
               <p><strong>Location:</strong> ${escapeHtml(r.location || '—')}</p>
-              <p><strong>Time Needed:</strong> ${escapeHtml(r.available_time || '—')}</p>
+              <p><strong>Time Needed:</strong> ${escapeHtml(r.time || '—')}</p>
             </div>
             <span class="price">RM${priceVal.toFixed(2)}</span>
-            <button class="offerBtn" onclick="openModal('${escapeJs(r.title)}','${escapeJs(r.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(r.contact_email || '')}','${escapeJs(r.telegram || '')}','${escapeJs(r.whatsapp || '')}')">Offer Service</button>
+            <button class="offerBtn" onclick="openModal('${escapeJs(r.title)}','${escapeJs(r.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(r.contact || '')}','${escapeJs(r.telegram || '')}','${escapeJs(r.whatsapp || '')}')">Offer Service</button>
           </div>
         </div>`
       }).join('')
@@ -633,6 +633,9 @@
         if (price === "above50" && p <= 50) return false
         return true
       })
+
+      // Also filter by service_type = 'needed'
+      filtered = filtered.filter(r => r.type === 'needed')
 
       db.from('profiles').select('id, full_name, avatar_url')
         .in('id', [...new Set(filtered.map(r => r.vendor_id))])

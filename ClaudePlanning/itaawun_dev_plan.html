@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iTa'awun — MVP Development Plan</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f1fb; color: #1a1a2e; padding: 24px; }
+  h1 { color: #6b21a8; font-size: 1.6rem; margin-bottom: 4px; }
+  .subtitle { color: #555; font-size: 0.9rem; margin-bottom: 24px; }
+  h2 { font-size: 1.1rem; color: #6b21a8; margin: 28px 0 10px; border-left: 4px solid #a855f7; padding-left: 10px; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 28px; font-size: 0.88rem; }
+  th { background: #6b21a8; color: white; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #ede9f5; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf5ff; }
+  .phase { font-weight: 700; color: #6b21a8; white-space: nowrap; }
+  .dates { font-size: 0.82rem; color: #666; white-space: nowrap; }
+  .goal { font-weight: 600; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; }
+  .tag-must { background: #fce7f3; color: #9d174d; }
+  .tag-nice { background: #e0f2fe; color: #0369a1; }
+  .tag-done { background: #dcfce7; color: #166534; }
+  .stack-box { background: white; border-radius: 10px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 28px; }
+  .stack-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; align-items: center; }
+  .stack-label { font-weight: 700; color: #6b21a8; min-width: 110px; font-size: 0.88rem; }
+  .stack-val { background: #f3e8ff; color: #6b21a8; padding: 2px 10px; border-radius: 20px; font-size: 0.82rem; font-weight: 500; }
+  .stack-free { font-size: 0.75rem; color: #15803d; font-weight: 600; margin-left: 4px; }
+  .warn { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.87rem; color: #92400e; }
+  .warn strong { color: #78350f; }
+  .note { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.87rem; color: #166534; }
+  ul { padding-left: 18px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<h1>🌙 iTa'awun — MVP Development Plan</h1>
+<p class="subtitle">2 March → 12 April 2026 &nbsp;|&nbsp; 41 days total &nbsp;|&nbsp; Free-first stack</p>
+
+<div class="warn">
+  <strong>⚠️ Context-aware constraints:</strong> Eid holiday 18–22 Mar (no work). Online class 23–28 Mar (light work only). Buffer week before 12 Apr for deploy + feedback. Hard deadline: <strong>12 April 2026</strong>.
+</div>
+
+<h2>🛠 Free Tech Stack</h2>
+<div class="stack-box">
+  <div class="stack-row"><span class="stack-label">Frontend</span><span class="stack-val">HTML + CSS + Vanilla JS</span><span class="stack-free">✓ Free — extend your existing files</span></div>
+  <div class="stack-row"><span class="stack-label">Backend / DB / Auth</span><span class="stack-val">Supabase</span><span class="stack-free">✓ Free tier — PostgreSQL + Auth + Storage + REST API</span></div>
+  <div class="stack-row"><span class="stack-label">Hosting (frontend)</span><span class="stack-val">GitHub Pages</span><span class="stack-free">✓ Free — already set up</span></div>
+  <div class="stack-row"><span class="stack-label">Email (OTP/verify)</span><span class="stack-val">Supabase built-in SMTP</span><span class="stack-free">✓ Free tier (3–4 emails/hr)</span></div>
+  <div class="stack-row"><span class="stack-label">Payments</span><span class="stack-val">None for MVP — cash-based or manual</span><span class="stack-free">✓ Skip for now</span></div>
+  <div class="stack-row"><span class="stack-label">Version Control</span><span class="stack-val">GitHub</span><span class="stack-free">✓ Free — already set up</span></div>
+  <div class="stack-row"><span class="stack-label">Admin Dashboard</span><span class="stack-val">Custom HTML page + Supabase queries</span><span class="stack-free">✓ Free</span></div>
+</div>
+
+<h2>📅 Phase Plan</h2>
+<table>
+  <tr>
+    <th style="width:100px">Phase</th>
+    <th style="width:110px">Dates</th>
+    <th>Goal</th>
+    <th>Key Deliverables</th>
+    <th style="width:70px">Priority</th>
+  </tr>
+  <tr>
+    <td class="phase">Phase 0<br>Setup</td>
+    <td class="dates">2–3 Mar</td>
+    <td class="goal">Foundation ready</td>
+    <td>
+      <ul>
+        <li>Create Supabase project</li>
+        <li>Design DB schema (users, services, bookings, ratings)</li>
+        <li>Connect Supabase JS client to your GitHub Pages site</li>
+        <li>Enable email auth in Supabase</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-must">MUST</span></td>
+  </tr>
+  <tr>
+    <td class="phase">Phase 1<br>Auth</td>
+    <td class="dates">4–6 Mar</td>
+    <td class="goal">Login & roles working</td>
+    <td>
+      <ul>
+        <li>Student signup → email verification</li>
+        <li>Login with session persistence</li>
+        <li>3 roles: <em>student, vendor, admin</em></li>
+        <li>Admin manually approves vendors via dashboard</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-must">MUST</span></td>
+  </tr>
+  <tr>
+    <td class="phase">Phase 2<br>Core</td>
+    <td class="dates">7–12 Mar</td>
+    <td class="goal">Services live end-to-end</td>
+    <td>
+      <ul>
+        <li>Vendor: create / edit / delete service listing</li>
+        <li>Student: browse and search listings</li>
+        <li>Student: submit booking request</li>
+        <li>Vendor: accept / reject booking</li>
+        <li>Service categories (Parcel, Food, Print, etc.)</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-must">MUST</span></td>
+  </tr>
+  <tr>
+    <td class="phase">Phase 3<br>Trust</td>
+    <td class="dates">13–17 Mar</td>
+    <td class="goal">Safety & quality layer</td>
+    <td>
+      <ul>
+        <li>Rating & review after completed booking</li>
+        <li>Transaction history visible to user</li>
+        <li>Report/flag a listing button</li>
+        <li>Basic profile page with rating score</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-must">MUST</span></td>
+  </tr>
+  <tr>
+    <td class="phase" style="color:#aaa">🌙 Eid Break</td>
+    <td class="dates" style="color:#aaa">18–22 Mar</td>
+    <td colspan="3" style="color:#aaa; font-style:italic">No work. Rest. Raya Mubarak!</td>
+  </tr>
+  <tr>
+    <td class="phase" style="color:#888">Online Class</td>
+    <td class="dates" style="color:#888">23–28 Mar</td>
+    <td colspan="3" style="color:#888; font-style:italic">Light work only. Review code, fix small bugs, no major features.</td>
+  </tr>
+  <tr>
+    <td class="phase">Phase 4<br>Admin</td>
+    <td class="dates">29–31 Mar</td>
+    <td class="goal">Admin dashboard complete</td>
+    <td>
+      <ul>
+        <li>View all vendors + approve/suspend</li>
+        <li>View all transactions</li>
+        <li>Flag students with low grades (manual input for MVP)</li>
+        <li>Basic analytics: total bookings, active vendors</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-must">MUST</span></td>
+  </tr>
+  <tr>
+    <td class="phase">Phase 5<br>Polish</td>
+    <td class="dates">1–5 Apr</td>
+    <td class="goal">MVP-ready UI + security</td>
+    <td>
+      <ul>
+        <li>Mobile-responsive all pages</li>
+        <li>Supabase Row Level Security (RLS) policies</li>
+        <li>Input validation + sanitization</li>
+        <li>Loading states, error messages</li>
+        <li>Purple branding consistency across all pages</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-must">MUST</span></td>
+  </tr>
+  <tr>
+    <td class="phase">Phase 6<br>Deploy</td>
+    <td class="dates">6–8 Apr</td>
+    <td class="goal">Live & tested</td>
+    <td>
+      <ul>
+        <li>Deploy final version to GitHub Pages</li>
+        <li>Test all user flows end-to-end</li>
+        <li>Onboard 3–5 test users (real students)</li>
+        <li>Fix any critical bugs</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-must">MUST</span></td>
+  </tr>
+  <tr>
+    <td class="phase">Buffer</td>
+    <td class="dates">9–12 Apr</td>
+    <td class="goal">Feedback + final fixes</td>
+    <td>
+      <ul>
+        <li>Collect user feedback</li>
+        <li>Fix bugs from real usage</li>
+        <li>Nice-to-have: notifications (Supabase realtime)</li>
+        <li>Submit/present by 12 Apr ✓</li>
+      </ul>
+    </td>
+    <td><span class="tag tag-nice">BUFFER</span></td>
+  </tr>
+</table>
+
+<h2>🗄 Database Schema (MVP)</h2>
+<table>
+  <tr><th>Table</th><th>Key Fields</th><th>Notes</th></tr>
+  <tr><td><strong>users</strong></td><td>id, email, name, student_id, role (student/vendor/admin), cgpa, is_approved, is_b40</td><td>Supabase Auth user synced here</td></tr>
+  <tr><td><strong>services</strong></td><td>id, vendor_id, title, category, description, price, is_active, created_at</td><td>Listings by vendors</td></tr>
+  <tr><td><strong>bookings</strong></td><td>id, service_id, student_id, vendor_id, status (pending/accepted/done/cancelled), created_at</td><td>Core transaction record</td></tr>
+  <tr><td><strong>ratings</strong></td><td>id, booking_id, reviewer_id, target_id, score (1–5), comment</td><td>Two-way: student rates vendor & vice versa</td></tr>
+  <tr><td><strong>reports</strong></td><td>id, reporter_id, service_id, reason, created_at</td><td>Flag system for admin</td></tr>
+</table>
+
+<h2>✅ MVP Feature Checklist (Scope Lock)</h2>
+<div class="note">
+  <strong>Rule:</strong> If it's not on this list, it does not exist for MVP. Add everything else to a "v2" backlog.
+</div>
+<table>
+  <tr><th>Feature</th><th>In MVP?</th><th>Notes</th></tr>
+  <tr><td>Student signup + login</td><td><span class="tag tag-must">YES</span></td><td>Email verification via Supabase</td></tr>
+  <tr><td>Vendor registration (admin-approved)</td><td><span class="tag tag-must">YES</span></td><td>Admin clicks approve in dashboard</td></tr>
+  <tr><td>Browse service listings</td><td><span class="tag tag-must">YES</span></td><td>Filter by category</td></tr>
+  <tr><td>Book a service</td><td><span class="tag tag-must">YES</span></td><td>Simple request form</td></tr>
+  <tr><td>Rate & review</td><td><span class="tag tag-must">YES</span></td><td>After booking marked done</td></tr>
+  <tr><td>Admin dashboard</td><td><span class="tag tag-must">YES</span></td><td>Approve vendors, view activity</td></tr>
+  <tr><td>In-app payment / escrow</td><td><span class="tag tag-nice">NO</span></td><td>Cash on delivery for now</td></tr>
+  <tr><td>Real-time chat / messaging</td><td><span class="tag tag-nice">NO</span></td><td>WhatsApp number on listing = good enough</td></tr>
+  <tr><td>Mobile app</td><td><span class="tag tag-nice">NO</span></td><td>Responsive web is fine for MVP</td></tr>
+  <tr><td>Automated CGPA tracking</td><td><span class="tag tag-nice">NO</span></td><td>Manual admin input for now</td></tr>
+  <tr><td>Email notifications</td><td><span class="tag tag-nice">OPTIONAL</span></td><td>Add if time allows</td></tr>
+</table>
+
+<h2>⚡ Immediate Next Steps (Start Tonight or Tomorrow)</h2>
+<table>
+  <tr><th>#</th><th>Action</th><th>How</th></tr>
+  <tr><td>1</td><td>Create Supabase account + new project</td><td>supabase.com → free plan → "New Project"</td></tr>
+  <tr><td>2</td><td>Create the 5 tables above in Supabase Table Editor</td><td>Use the GUI, no SQL needed</td></tr>
+  <tr><td>3</td><td>Add <code>supabase-js</code> CDN to your index.html</td><td>One script tag, no npm needed</td></tr>
+  <tr><td>4</td><td>Wire up your existing login form to Supabase Auth</td><td>~10 lines of JS</td></tr>
+  <tr><td>5</td><td>Tell me when setup is done — I'll write all the JS code for each page</td><td>—</td></tr>
+</table>
+
+<p style="margin-top:20px; font-size:0.82rem; color:#888; text-align:center">Generated by Claude · iTa'awun MVP Plan · 2 March 2026</p>
+</body>
+</html>

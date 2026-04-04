@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iTa'awun — Final Sprint Plan</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f1fb; color: #1a1a2e; padding: 20px; font-size: 14px; }
+h1 { color: #6b21a8; font-size: 1.4rem; margin-bottom: 4px; }
+.sub { color: #666; font-size: 0.83rem; margin-bottom: 18px; }
+h2 { font-size: 0.95rem; color: #6b21a8; margin: 22px 0 8px; border-left: 4px solid #a855f7; padding-left: 10px; }
+
+.card { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 12px; overflow: hidden; }
+.card-head { display: flex; align-items: center; gap: 10px; padding: 11px 15px; border-bottom: 1px solid #f0ebff; flex-wrap: wrap; }
+.badge { border-radius: 7px; padding: 3px 10px; font-weight: 700; font-size: 0.75rem; white-space: nowrap; }
+.b-day   { background: #6b21a8; color: white; }
+.b-ipo   { background: #0369a1; color: white; }
+.b-off   { background: #94a3b8; color: white; }
+.b-buf   { background: #0891b2; color: white; }
+.card-title { font-weight: 700; font-size: 0.9rem; flex: 1; }
+.card-date { font-size: 0.78rem; color: #888; white-space: nowrap; }
+.card-time { background: #f3e8ff; color: #6b21a8; padding: 2px 9px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; white-space: nowrap; }
+.card-body { padding: 12px 15px; }
+
+.step { display: flex; gap: 9px; margin-bottom: 9px; align-items: flex-start; }
+.sn { background: #ede9fe; color: #6b21a8; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.st { flex: 1; }
+.st b { display: block; margin-bottom: 2px; }
+.st span { color: #555; font-size: 0.82rem; line-height: 1.5; }
+.code { background: #1e1e2e; color: #cdd6f4; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 0.78rem; margin: 5px 0; white-space: pre; overflow-x: auto; line-height: 1.6; }
+.green { color: #a6e3a1; }
+.gray  { color: #6c7086; }
+.purple{ color: #cba6f7; }
+
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 16px; }
+th { background: #6b21a8; color: white; padding: 9px 12px; text-align: left; font-size: 0.82rem; }
+td { padding: 8px 12px; border-bottom: 1px solid #ede9f5; font-size: 0.82rem; vertical-align: top; line-height: 1.5; }
+tr:last-child td { border-bottom: none; }
+
+.alert { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.83rem; color: #7f1d1d; }
+.warn  { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.83rem; color: #78350f; }
+.good  { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.83rem; color: #14532d; }
+.info  { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.83rem; color: #1e3a8a; }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 20px; font-size: 0.71rem; font-weight: 700; }
+.done { background: #dcfce7; color: #166534; }
+.todo { background: #fce7f3; color: #9d174d; }
+.ipo  { background: #dbeafe; color: #1e40af; }
+ul { padding-left: 16px; }
+li { margin-bottom: 3px; line-height: 1.5; }
+.phase-bar { background: linear-gradient(90deg, #6b21a8, #a855f7); color: white; padding: 9px 15px; border-radius: 8px; margin: 18px 0 8px; font-weight: 700; font-size: 0.88rem; }
+</style>
+</head>
+<body>
+
+<h1>🚀 iTa'awun — Final Sprint</h1>
+<p class="sub">Today: 4 April 2026 &nbsp;|&nbsp; Hard deadline: 12 April &nbsp;|&nbsp; 8 days left</p>
+
+<div class="alert"><strong>⚠️ Reality:</strong> Today is Saturday. You have THIS weekend (4–5 Apr) to finish all coding. Then 6–8 Apr = testing + IPO prep. 9–12 Apr = buffer, polish, submit.</div>
+
+<div class="good"><strong>✅ Already done (Phase 0–2):</strong> Supabase setup, auth (login/signup/forgot), home page, profile page, service listing form, browse services page. New HTML files added today.</div>
+
+<!-- ══════════ GITHUB FIRST ══════════ -->
+<h2>🖥 Push Today's New Files to GitHub Right Now</h2>
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-day">DO THIS FIRST</span>
+    <span class="card-title">Terminal commands — push everything you just edited</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Open terminal in your project folder</b>
+    <span>In VS Code: press <code>Ctrl + `</code> (backtick). Or open Windows Terminal and type <code>cd</code> to your folder path.</span></div></div>
+
+    <div class="step"><div class="sn">2</div><div class="st"><b>Check what files changed</b>
+    <span>This shows you every file that was added or modified since your last push:</span></div></div>
+    <div class="code">git status</div>
+
+    <div class="step"><div class="sn">3</div><div class="st"><b>Stage ALL changed files</b>
+    <span>The dot ( . ) means "everything in this folder":</span></div></div>
+    <div class="code">git add .</div>
+
+    <div class="step"><div class="sn">4</div><div class="st"><b>Write a commit message describing what you did</b></div></div>
+    <div class="code">git commit -m <span class="green">"Add auth pages, fix logout, reorganise files"</span></div>
+
+    <div class="step"><div class="sn">5</div><div class="st"><b>Push to GitHub</b></div></div>
+    <div class="code">git push</div>
+
+    <div class="step"><div class="sn">6</div><div class="st"><b>Verify it's live</b>
+    <span>Go to <strong>ipanboy.github.io/testitaawun/index.html</strong> — wait 1–2 min for GitHub Pages to rebuild, then refresh.</span></div></div>
+
+    <div class="warn" style="margin-top:10px;"><strong>If it asks for username/password:</strong> GitHub no longer accepts passwords. Use a Personal Access Token instead. Go to github.com → Settings → Developer Settings → Personal Access Tokens → Generate new token → copy it → paste as your password.</div>
+  </div>
+</div>
+
+<!-- ══════════ WEEKEND CODING ══════════ -->
+<div class="phase-bar">💻 WEEKEND CODING — Saturday 4 Apr + Sunday 5 Apr</div>
+<div class="info">Goal: finish ALL remaining features this weekend. After Sunday, no more new features — only testing and fixes.</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-day">SAT 4 APR</span>
+    <span class="card-title">Bookings system — full loop</span>
+    <span class="card-date">Today</span>
+    <span class="card-time">3–4 hrs</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Create bookings.html (new file)</b>
+    <span>Message me "bookings.html" and I'll generate the complete file. It will show: student's booking history + vendor's incoming requests with Accept/Reject buttons.</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>Add "Book This" button to find.html service cards</b>
+    <span>Message me "book button" and I'll give you the exact JS to add to find.html. Clicking inserts a row into the bookings table.</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="st"><b>Add nav link to bookings.html in home.html</b>
+    <span>Add <code>&lt;a href="bookings.html"&gt;My Bookings&lt;/a&gt;</code> to the nav.</span></div></div>
+    <div class="step"><div class="sn">4</div><div class="st"><b>Push to GitHub</b></div></div>
+    <div class="code">git add . && git commit -m <span class="green">"Bookings system complete"</span> && git push</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-day">SAT 4 APR</span>
+    <span class="card-title">Rating system</span>
+    <span class="card-date">Tonight</span>
+    <span class="card-time">1–2 hrs</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Add rating modal to bookings.html</b>
+    <span>After vendor marks booking "done", a Rate button appears. Message me "rating modal" and I'll give you the complete popup with 1–5 stars + comment box.</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>Show average stars on service cards in find.html</b>
+    <span>Message me "star display" for the query to add average rating under each service card.</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="st"><b>Push</b></div></div>
+    <div class="code">git add . && git commit -m <span class="green">"Rating system added"</span> && git push</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-day">SUN 5 APR</span>
+    <span class="card-title">Admin dashboard</span>
+    <span class="card-date">Tomorrow morning</span>
+    <span class="card-time">2–3 hrs</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Create admin.html (new file)</b>
+    <span>Message me "admin.html" and I'll generate the complete file. It will have: vendor approval queue, all bookings view, flagged reports, CGPA input per vendor, basic stats.</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>Set your own account as admin in Supabase</b>
+    <span>Supabase → Table Editor → profiles → find your row → click role cell → change to "admin" → save.</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="st"><b>Push</b></div></div>
+    <div class="code">git add . && git commit -m <span class="green">"Admin dashboard complete"</span> && git push</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-day">SUN 5 APR</span>
+    <span class="card-title">Security (RLS) + mobile polish</span>
+    <span class="card-date">Tomorrow afternoon</span>
+    <span class="card-time">1–2 hrs</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Enable Row Level Security on all 5 Supabase tables</b>
+    <span>Supabase → Table Editor → each table → toggle RLS on. Message me "RLS policies" and I'll give you the SQL to paste into Supabase SQL Editor.</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>Quick mobile test</b>
+    <span>Chrome → F12 → phone icon → iPhone SE. Check every page. Fix any broken layouts.</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="st"><b>Final weekend push</b></div></div>
+    <div class="code">git add . && git commit -m <span class="green">"RLS security + mobile fixes"</span> && git push</div>
+  </div>
+</div>
+
+<!-- ══════════ MON–WED ══════════ -->
+<div class="phase-bar">🧪 TESTING + IPO PREP — Mon 6 Apr to Wed 8 Apr</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-day">MON 6 APR</span>
+    <span class="card-title">End-to-end testing on live site</span>
+    <span class="card-time">1–2 hrs</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Open ipanboy.github.io/testitaawun on your phone</b>
+    <span>Do a full flow: sign up → browse → book a service → vendor accepts → mark done → rate. Every step must work on mobile.</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>Invite 2–3 real students to test</b>
+    <span>Share the link on WhatsApp. Ask them to create an account and book one service. Watch Supabase dashboard as they do it.</span></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-ipo">TUE 7 APR</span>
+    <span class="card-title">IPO Application — documents & pitch</span>
+    <span class="card-time">Full day</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Prepare these documents (message me for drafts of each)</b>
+    <span>
+      • <strong>Project Abstract</strong> — 300 words, problem + solution + impact<br>
+      • <strong>Technical Description</strong> — stack, architecture, Supabase schema<br>
+      • <strong>Innovation Statement</strong> — what makes iTa'awun different from WhatsApp groups<br>
+      • <strong>Social Impact Statement</strong> — B40/Zakat angle, Maqasid al-Shariah framework<br>
+      • <strong>Screenshots</strong> — login, home, service listing, booking flow, admin panel
+    </span></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>Prepare poster/slide if required</b>
+    <span>Message me "IPO poster content" and I'll give you structured content to drop into Canva.</span></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-day">WED 8 APR</span>
+    <span class="card-title">Bug fixes from tester feedback</span>
+    <span class="card-time">1–2 hrs</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Fix top 2–3 issues from Monday's testers</b>
+    <span>Don't fix everything. Only fix things that block people from completing a booking. Everything else goes to a post-deadline backlog.</span></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>Final push</b></div></div>
+    <div class="code">git add . && git commit -m <span class="green">"Final fixes before deadline"</span> && git push</div>
+  </div>
+</div>
+
+<!-- ══════════ BUFFER ══════════ -->
+<div class="phase-bar">🛡 BUFFER — Thu 9 Apr to Sun 12 Apr</div>
+<div class="card">
+  <div class="card-head">
+    <span class="badge b-buf">9–12 APR</span>
+    <span class="card-title">Submit, present, handle surprises</span>
+    <span class="card-time">As needed</span>
+  </div>
+  <div class="card-body">
+    <div class="step"><div class="sn">1</div><div class="st"><b>Submit IPO application with all documents + live link</b></div></div>
+    <div class="step"><div class="sn">2</div><div class="st"><b>If anything breaks, message me immediately</b>
+    <span>Don't panic. Every bug has a fix. Give me the error message and I'll solve it.</span></div></div>
+    <div class="step"><div class="sn">3</div><div class="st"><b>Optional if time allows</b>
+    <span>Email notifications via Supabase, WhatsApp deep-link on service cards, improved mobile navbar.</span></div></div>
+  </div>
+</div>
+
+<!-- ══════════ OVERVIEW TABLE ══════════ -->
+<h2>📊 8-Day Overview</h2>
+<table>
+  <tr><th>Date</th><th>Task</th><th>Output</th><th>Status</th></tr>
+  <tr><td><strong>Sat 4 Apr</strong></td><td>Bookings + Rating system</td><td>bookings.html complete</td><td><span class="tag todo">TODAY</span></td></tr>
+  <tr><td><strong>Sun 5 Apr</strong></td><td>Admin dashboard + RLS security</td><td>admin.html complete</td><td><span class="tag todo">TOMORROW</span></td></tr>
+  <tr><td><strong>Mon 6 Apr</strong></td><td>Live testing + real student testers</td><td>Bug list</td><td><span class="tag todo">PENDING</span></td></tr>
+  <tr><td><strong>Tue 7 Apr</strong></td><td>IPO documents + poster</td><td>Abstract, screenshots, pitch</td><td><span class="tag ipo">IPO</span></td></tr>
+  <tr><td><strong>Wed 8 Apr</strong></td><td>Bug fixes from testers</td><td>Stable MVP</td><td><span class="tag todo">PENDING</span></td></tr>
+  <tr><td><strong>Thu–Sun 9–12 Apr</strong></td><td>Submit + buffer</td><td>Submitted ✓</td><td><span class="tag ipo">BUFFER</span></td></tr>
+</table>
+
+<!-- ══════════ IPO SECTION ══════════ -->
+<h2>📋 IPO Application — What You Need</h2>
+<table>
+  <tr><th>Document</th><th>Content Summary</th><th>Action</th></tr>
+  <tr><td><strong>Project Abstract</strong></td><td>Problem (fragmented WhatsApp economy), Solution (centralized verified platform), Impact (B40 students, admin oversight)</td><td>Message me "draft abstract"</td></tr>
+  <tr><td><strong>Innovation Statement</strong></td><td>First campus platform with admin-verified vendors + academic balance tracking. Grounded in Maqasid al-Shariah.</td><td>Message me "draft innovation"</td></tr>
+  <tr><td><strong>Technical Specs</strong></td><td>HTML/CSS/JS frontend, Supabase backend, GitHub Pages hosting, 5-table PostgreSQL schema, RLS security</td><td>Ready — use DOCUMENTATION.md</td></tr>
+  <tr><td><strong>Social Impact</strong></td><td>Targets Zakat/welfare recipients (7–8% of campus), provides dignified income, reduces safety risk from unmonitored transactions</td><td>Message me "draft impact"</td></tr>
+  <tr><td><strong>Screenshots/Demo</strong></td><td>Login, home, service browse, booking flow, admin panel, profile page</td><td>Take these after Sunday</td></tr>
+  <tr><td><strong>Live Demo Link</strong></td><td>ipanboy.github.io/testitaawun</td><td>Already live ✓</td></tr>
+</table>
+
+<div class="good" style="margin-top:8px;"><strong>The rule for this weekend:</strong> Message me one keyword at a time — "bookings.html", "book button", "rating modal", "star display", "admin.html", "RLS policies" — and I generate the exact code. You paste and push. Don't write complex code from scratch.</div>
+
+<p style="margin-top:18px; font-size:0.76rem; color:#aaa; text-align:center">iTa'awun Final Sprint · 4 April 2026 · 8 days to deadline</p>
+</body>
+</html>

@@ -179,13 +179,23 @@
 <!-- Tabs -->
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('vendors')">👥 Vendor Approvals</button>
+  <button class="tab-btn" onclick="showTab('services')">📦 Services</button>
   <button class="tab-btn" onclick="showTab('users')">🎓 All Users</button>
   <button class="tab-btn" onclick="showTab('bookings')">📋 Bookings</button>
   <button class="tab-btn" onclick="showTab('reports')">🚩 Reports</button>
 </div>
 
+<!-- Panel: Services -->
+<div id="panel-services" class="panel">
+  <div class="section-title">📦 All Services</div>
+  <table class="data-table">
+    <thead><tr><th>Title</th><th>Vendor</th><th>Type</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody id="tbody-services"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody>
+  </table>
+</div>
+
 <!-- Panel: Vendor Approvals -->
-<div id="panel-vendors" class="panel active">
+<div id="panel-vendors" class="panel">
   <div class="section-title">⏳ Pending Vendor Applications</div>
   <table class="data-table">
     <thead><tr><th>Name</th><th>Student ID</th><th>Email</th><th>B40</th><th>Action</th></tr></thead>
@@ -249,6 +259,7 @@
 
   function loadAll() {
     loadStats()
+    loadServices()
     loadPendingVendors()
     loadApprovedVendors()
     loadAllUsers()
@@ -262,6 +273,55 @@
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
     document.getElementById('panel-' + tab).classList.add('active')
     event.target.classList.add('active')
+  }
+
+  // ── Services ───────────────────────────────────────────
+  async function loadServices() {
+    const { data, error } = await db
+      .from('services')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50)
+
+    const tb = document.getElementById('tbody-services')
+    if (error || !data || data.length === 0) {
+      tb.innerHTML = '<tr class="empty-row"><td colspan="6">No services yet.</td></tr>'; return
+    }
+
+    // Fetch vendor names
+    const vendorIds = [...new Set(data.map(s => s.vendor_id))]
+    const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', vendorIds)
+    const nameMap = {}
+    if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+
+    tb.innerHTML = data.map(s => `
+      <tr>
+        <td>${s.title || '—'}</td>
+        <td>${nameMap[s.vendor_id] || s.vendor_id?.slice(0,8)+'…'}</td>
+        <td><span class="status-badge s-${s.type === 'offered' ? 'vendor' : 'student'}">${s.type}</span></td>
+        <td>RM${parseFloat(s.price || 0).toFixed(2)}</td>
+        <td><span class="status-badge s-${s.status}">${s.status}</span></td>
+        <td>
+          ${s.status === 'active'
+            ? `<button class="btn-sm btn-suspend" onclick="deactivateService('${s.id}')">Deactivate</button>`
+            : `<button class="btn-sm btn-approve" onclick="activateService('${s.id}')">Activate</button>`}
+          <button class="btn-sm btn-suspend" onclick="deleteService('${s.id}')">Delete</button>
+        </td>
+      </tr>`).join('')
+  }
+
+  async function activateService(id) {
+    await db.from('services').update({ status: 'active' }).eq('id', id)
+    loadServices()
+  }
+  async function deactivateService(id) {
+    await db.from('services').update({ status: 'inactive' }).eq('id', id)
+    loadServices()
+  }
+  async function deleteService(id) {
+    if (!confirm('Delete this service permanently?')) return
+    await db.from('services').delete().eq('id', id)
+    loadServices()
   }
 
   // ── Stats ──────────────────────────────────────────────

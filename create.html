@@ -285,32 +285,37 @@
       btn.disabled = true;
       btn.textContent = 'Submitting...';
 
-      // Insert into Supabase services table
-      const { data, error } = await db.from('services').insert({
+      // Insert into Supabase services table - try with common column names
+      const serviceData = {
         vendor_id: currentUser.id,
         title: title,
         description: desc,
         price: price,
         category: category,
         location: location,
-        available_time: time,
-        contact_email: contact,
+        time: time,
+        contact: contact,
         whatsapp: whatsapp,
         telegram: telegram,
-        image_url: image,
-        service_type: type, // 'offered' or 'needed'
+        image: image,
+        type: type,
         status: 'active'
-      }).select()
+      }
+
+      console.log('Submitting service data:', serviceData)
+
+      const { data, error } = await db.from('services').insert(serviceData).select()
 
       btn.disabled = false;
       btn.textContent = originalText;
 
       if (error) {
-        alert('Error submitting service: ' + error.message);
+        console.error('Supabase error details:', error)
+        alert('Error submitting service: ' + error.message + '\n\nCheck browser console (F12) for column name details.');
         return;
       }
 
-      alert('Service submitted successfully! It will appear once approved.');
+      alert('Service submitted successfully!');
       document.getElementById("serviceForm").reset();
 
       // Redirect based on service type

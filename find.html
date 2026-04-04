@@ -662,7 +662,7 @@
 
         return `
         <div class="service-card" data-category="${category}" data-price="${priceVal}">
-          <img src="${s.image_url || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
+          <img src="${s.image || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
           <div class="offerer"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(vendorName)}</span></div>
           <div class="content">
             <h3>${escapeHtml(s.title)}</h3>
@@ -670,11 +670,11 @@
             <button class="moreBtn" onclick="toggleDesc(this)">More</button>
             <div class="extra-info">
               <p><strong>Location:</strong> ${escapeHtml(s.location || '—')}</p>
-              <p><strong>Available Time:</strong> ${escapeHtml(s.available_time || '—')}</p>
+              <p><strong>Available Time:</strong> ${escapeHtml(s.time || '—')}</p>
             </div>
             <span class="price">RM${priceVal.toFixed(2)}</span>
             <div class="card-actions">
-              <button class="orderBtn" onclick="openModal('${escapeJs(s.title)}','${escapeJs(s.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(s.contact_email || '')}','${escapeJs(s.telegram || '')}','${escapeJs(s.whatsapp || '')}')">Contact</button>
+              <button class="orderBtn" onclick="openModal('${escapeJs(s.title)}','${escapeJs(s.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(s.contact || '')}','${escapeJs(s.telegram || '')}','${escapeJs(s.whatsapp || '')}')">Contact</button>
               <button class="bookBtn" onclick="openBookModal('${escapeJs(s.title)}','${s.id}','${s.vendor_id}')">📋 Book</button>
             </div>
           </div>
@@ -730,6 +730,9 @@
         if (price === 'above10' && p <= 10) return false
         return true
       })
+
+      // Also filter by service_type = 'offered'
+      filtered = filtered.filter(s => s.type === 'offered')
 
       // Re-render with filtered results
       db.from('profiles').select('id, full_name, avatar_url')
