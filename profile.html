@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,68 +9,157 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .back-button {
-      padding: 10px 40px; display: flex; align-items: center;
-      cursor: pointer; font-weight: bold; color: #001f3f; font-size: 16px;
+      padding: 10px 40px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+      color: #001f3f;
+      font-size: 16px;
     }
-    .back-button i { margin-right: 8px; }
-    .back-button:hover { color: #004f80; }
+
+    .back-button i {
+      margin-right: 8px;
+    }
+
+    .back-button:hover {
+      color: #004f80;
+    }
+
     body {
-      margin: 0; font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh; display: flex; flex-direction: column;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
     }
+
     @keyframes gradientBG {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
     }
+
     header {
-      background: rgba(0,0,0,0.2); color: white;
-      padding: 15px 40px; display: flex;
-      justify-content: space-between; align-items: center;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    header .logo { font-size: 22px; font-weight: bold; cursor: pointer; color: white; }
+
+    header .logo {
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+    }
+
     .profile-card {
-      background: rgba(255,255,255,0.95);
-      max-width: 500px; margin: 50px auto;
-      padding: 30px; border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      text-align: center; transition: transform 0.3s;
+      background: rgba(255, 255, 255, 0.95);
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      transition: transform 0.3s;
     }
-    .profile-card:hover { transform: translateY(-5px); }
+
+    .profile-card:hover {
+      transform: translateY(-5px);
+    }
+
     .profile-card img {
-      width: 120px; height: 120px; border-radius: 50%;
-      border: 3px solid #001f3f; margin-bottom: 15px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #001f3f;
+      margin-bottom: 15px;
       object-fit: cover;
     }
-    .profile-card h2 { margin: 10px 0; color: #001f3f; }
+
+    .profile-card h2 {
+      margin: 10px 0;
+      color: #001f3f;
+    }
+
     .role-badge {
-      display: inline-block; padding: 3px 12px;
-      border-radius: 20px; font-size: 12px; font-weight: bold;
-      background: #f3e8ff; color: #6b21a8; margin-bottom: 10px;
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #f3e8ff;
+      color: #6b21a8;
+      margin-bottom: 10px;
     }
-    .info { text-align: left; margin-top: 20px; }
-    .info p { font-size: 15px; margin: 10px 0; color: #333; }
-    .info strong { color: #001f3f; }
+
+    .info {
+      text-align: left;
+      margin-top: 20px;
+    }
+
+    .info p {
+      font-size: 15px;
+      margin: 10px 0;
+      color: #333;
+    }
+
+    .info strong {
+      color: #001f3f;
+    }
+
     .logout-btn {
-      margin-top: 25px; padding: 10px 20px;
-      background: #dc2626; color: white;
-      border: none; border-radius: 8px;
-      font-size: 16px; cursor: pointer; transition: 0.3s;
+      margin-top: 25px;
+      padding: 10px 20px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
     }
-    .logout-btn:hover { background: #b91c1c; }
+
+    .logout-btn:hover {
+      background: #b91c1c;
+    }
+
     footer {
-      margin-top: auto; background: rgba(0,0,0,0.2);
-      color: white; text-align: center; padding: 15px;
+      margin-top: auto;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      text-align: center;
+      padding: 15px;
     }
+
     @media (max-width: 600px) {
-      .profile-card { margin: 30px 20px; padding: 20px; }
-      .profile-card img { width: 100px; height: 100px; }
+      .profile-card {
+        margin: 30px 20px;
+        padding: 20px;
+      }
+
+      .profile-card img {
+        width: 100px;
+        height: 100px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <header>
@@ -117,9 +207,9 @@
 
       if (profile) {
         document.getElementById('displayName').textContent = profile.full_name || 'No name set'
-        document.getElementById('studentId').textContent   = profile.student_id || '—'
-        document.getElementById('userPhone').textContent   = profile.phone || '—'
-        document.getElementById('roleBadge').textContent   = profile.role || 'student'
+        document.getElementById('studentId').textContent = profile.student_id || '—'
+        document.getElementById('userPhone').textContent = profile.phone || '—'
+        document.getElementById('roleBadge').textContent = profile.role || 'student'
         if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url
       } else {
         document.getElementById('displayName').textContent = session.user.email
@@ -133,4 +223,5 @@
     }
   </script>
 </body>
+
 </html>

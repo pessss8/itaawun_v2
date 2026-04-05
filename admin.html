@@ -1,357 +1,641 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard - IT'aawun</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  body {
-    margin: 0; font-family: 'Segoe UI', sans-serif;
-    min-height: 100vh; display: flex; flex-direction: column;
-    background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    color: #333;
-  }
-  @keyframes gradientBG {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  header {
-    background: rgba(0,0,0,0.2); color: white;
-    padding: 15px 30px; display: flex;
-    justify-content: space-between; align-items: center;
-  }
-  header .logo { font-size: 22px; font-weight: bold; cursor: pointer; color: white; }
-  .admin-badge {
-    background: #fbbf24; color: #78350f;
-    padding: 3px 12px; border-radius: 20px;
-    font-size: 12px; font-weight: bold;
-  }
-  .header-right { display: flex; align-items: center; gap: 14px; }
-  .logout-btn-top {
-    background: rgba(255,255,255,0.2); color: white;
-    border: 1px solid rgba(255,255,255,0.4);
-    padding: 7px 16px; border-radius: 8px;
-    cursor: pointer; font-size: 13px; transition: 0.2s;
-  }
-  .logout-btn-top:hover { background: rgba(255,255,255,0.35); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - IT'aawun</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #333;
+    }
 
-  .page-title {
-    text-align: center; padding: 20px;
-    color: #001f3f; font-size: 26px; font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
-  }
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
 
-  /* Stats row */
-  .stats-row {
-    display: flex; flex-wrap: wrap;
-    justify-content: center; gap: 14px;
-    padding: 0 20px 20px;
-  }
-  .stat-card {
-    background: rgba(255,255,255,0.92);
-    border-radius: 12px; padding: 18px 24px;
-    text-align: center; min-width: 130px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .stat-card .num { font-size: 30px; font-weight: bold; color: #6b21a8; }
-  .stat-card .lbl { font-size: 12px; color: #666; margin-top: 4px; }
+      50% {
+        background-position: 100% 50%;
+      }
 
-  /* Tabs */
-  .tabs {
-    display: flex; justify-content: center;
-    gap: 8px; flex-wrap: wrap; padding: 0 20px 20px;
-  }
-  .tab-btn {
-    padding: 9px 20px; border: none; border-radius: 8px;
-    font-size: 13px; font-weight: bold; cursor: pointer;
-    background: rgba(255,255,255,0.3); color: #001f3f; transition: 0.2s;
-  }
-  .tab-btn.active { background: #001f3f; color: white; }
-  .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.6); }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
-  /* Content panels */
-  .panel { display: none; padding: 0 20px 30px; }
-  .panel.active { display: block; }
+    header {
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  /* Table */
-  .data-table {
-    width: 100%; border-collapse: collapse;
-    background: rgba(255,255,255,0.95);
-    border-radius: 12px; overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .data-table th {
-    background: #001f3f; color: white;
-    padding: 11px 14px; text-align: left; font-size: 13px;
-  }
-  .data-table td {
-    padding: 10px 14px; border-bottom: 1px solid #eee;
-    font-size: 13px; vertical-align: middle;
-  }
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table tr:hover td { background: #f8f4ff; }
+    header .logo {
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+    }
 
-  .status-badge {
-    display: inline-block; padding: 2px 10px;
-    border-radius: 20px; font-size: 11px; font-weight: bold;
-  }
-  .s-student  { background: #dbeafe; color: #1e40af; }
-  .s-vendor   { background: #dcfce7; color: #166534; }
-  .s-admin    { background: #fef9c3; color: #854d0e; }
-  .s-pending  { background: #fef9c3; color: #854d0e; }
-  .s-accepted { background: #dcfce7; color: #166534; }
-  .s-done     { background: #dbeafe; color: #1e40af; }
-  .s-cancelled{ background: #fee2e2; color: #991b1b; }
-  .s-active   { background: #dcfce7; color: #166534; }
-  .s-inactive { background: #fee2e2; color: #991b1b; }
-  .s-b40      { background: #fef9c3; color: #854d0e; }
+    .admin-badge {
+      background: #fbbf24;
+      color: #78350f;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
 
-  .btn-sm {
-    padding: 5px 12px; border: none; border-radius: 6px;
-    font-size: 12px; font-weight: bold; cursor: pointer;
-    transition: 0.2s; margin: 2px;
-  }
-  .btn-approve  { background: #166534; color: white; }
-  .btn-approve:hover  { background: #14532d; }
-  .btn-suspend  { background: #dc2626; color: white; }
-  .btn-suspend:hover  { background: #b91c1c; }
-  .btn-save     { background: #1d4ed8; color: white; }
-  .btn-save:hover     { background: #1e3a8a; }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
-  .cgpa-input {
-    width: 60px; padding: 4px 6px;
-    border: 1px solid #ccc; border-radius: 5px;
-    font-size: 13px; text-align: center;
-  }
+    .logout-btn-top {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 7px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+    }
 
-  .empty-row td { text-align: center; color: #999; padding: 30px; }
+    .logout-btn-top:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
 
-  .section-title {
-    font-size: 15px; font-weight: bold; color: #001f3f;
-    margin: 20px 0 10px; padding-left: 4px;
-  }
+    .page-title {
+      text-align: center;
+      padding: 20px;
+      color: #001f3f;
+      font-size: 26px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    }
 
-  .flag-badge {
-    background: #fee2e2; color: #991b1b;
-    padding: 2px 8px; border-radius: 20px;
-    font-size: 11px; font-weight: bold;
-  }
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      padding: 0 20px 20px;
+    }
 
-  footer {
-    margin-top: auto; background: rgba(0,0,0,0.2);
-    color: white; text-align: center; padding: 15px;
-  }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      padding: 18px 24px;
+      text-align: center;
+      min-width: 130px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
 
-  @media (max-width: 700px) {
-    .data-table { font-size: 12px; }
-    .data-table th, .data-table td { padding: 8px 8px; }
-    .stats-row { gap: 10px; }
-    .stat-card { min-width: 100px; padding: 14px 16px; }
-  }
-</style>
+    .stat-card .num {
+      font-size: 30px;
+      font-weight: bold;
+      color: #6b21a8;
+    }
+
+    .stat-card .lbl {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 0 20px 20px;
+    }
+
+    .tab-btn {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.3);
+      color: #001f3f;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #001f3f;
+      color: white;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Content panels */
+    .panel {
+      display: none;
+      padding: 0 20px 30px;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    /* Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .data-table th {
+      background: #001f3f;
+      color: white;
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: #f8f4ff;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .s-student {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .s-vendor {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .s-admin {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .s-pending {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .s-accepted {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .s-done {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .s-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .s-active {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .s-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .s-b40 {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 2px;
+    }
+
+    .btn-approve {
+      background: #166534;
+      color: white;
+    }
+
+    .btn-approve:hover {
+      background: #14532d;
+    }
+
+    .btn-suspend {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-suspend:hover {
+      background: #b91c1c;
+    }
+
+    .btn-save {
+      background: #1d4ed8;
+      color: white;
+    }
+
+    .btn-save:hover {
+      background: #1e3a8a;
+    }
+
+    .cgpa-input {
+      width: 60px;
+      padding: 4px 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .empty-row td {
+      text-align: center;
+      color: #999;
+      padding: 30px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: #001f3f;
+      margin: 20px 0 10px;
+      padding-left: 4px;
+    }
+
+    .flag-badge {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: auto;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 700px) {
+      .data-table {
+        font-size: 12px;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 8px 8px;
+      }
+
+      .stats-row {
+        gap: 10px;
+      }
+
+      .stat-card {
+        min-width: 100px;
+        padding: 14px 16px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
-  <div class="header-right">
-    <span class="admin-badge">⚙️ Admin</span>
-    <button class="logout-btn-top" onclick="doLogout()">Logout</button>
+  <header>
+    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
+    <div class="header-right">
+      <span class="admin-badge">⚙️ Admin</span>
+      <button class="logout-btn-top" onclick="doLogout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="page-title">Admin Dashboard</div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="num" id="stat-users">—</div>
+      <div class="lbl">Total Users</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-vendors">—</div>
+      <div class="lbl">Active Vendors</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-pending">—</div>
+      <div class="lbl">Pending Approvals</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-bookings">—</div>
+      <div class="lbl">Total Bookings</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-reports">—</div>
+      <div class="lbl">Reports</div>
+    </div>
   </div>
-</header>
 
-<div class="page-title">Admin Dashboard</div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('vendors')">👥 Vendor Approvals</button>
+    <button class="tab-btn" onclick="showTab('services')">📦 Services</button>
+    <button class="tab-btn" onclick="showTab('users')">🎓 All Users</button>
+    <button class="tab-btn" onclick="showTab('bookings')">📋 Bookings</button>
+    <button class="tab-btn" onclick="showTab('reports')">🚩 Reports</button>
+  </div>
 
-<!-- Stats -->
-<div class="stats-row">
-  <div class="stat-card"><div class="num" id="stat-users">—</div><div class="lbl">Total Users</div></div>
-  <div class="stat-card"><div class="num" id="stat-vendors">—</div><div class="lbl">Active Vendors</div></div>
-  <div class="stat-card"><div class="num" id="stat-pending">—</div><div class="lbl">Pending Approvals</div></div>
-  <div class="stat-card"><div class="num" id="stat-bookings">—</div><div class="lbl">Total Bookings</div></div>
-  <div class="stat-card"><div class="num" id="stat-reports">—</div><div class="lbl">Reports</div></div>
-</div>
+  <!-- Panel: Services -->
+  <div id="panel-services" class="panel">
+    <div class="section-title">📦 All Services</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Vendor</th>
+          <th>Type</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-services">
+        <tr class="empty-row">
+          <td colspan="6">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<!-- Tabs -->
-<div class="tabs">
-  <button class="tab-btn active" onclick="showTab('vendors')">👥 Vendor Approvals</button>
-  <button class="tab-btn" onclick="showTab('services')">📦 Services</button>
-  <button class="tab-btn" onclick="showTab('users')">🎓 All Users</button>
-  <button class="tab-btn" onclick="showTab('bookings')">📋 Bookings</button>
-  <button class="tab-btn" onclick="showTab('reports')">🚩 Reports</button>
-</div>
+  <!-- Panel: Vendor Approvals -->
+  <div id="panel-vendors" class="panel">
+    <div class="section-title">⏳ Pending Vendor Applications</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Student ID</th>
+          <th>Email</th>
+          <th>B40</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-pending">
+        <tr class="empty-row">
+          <td colspan="5">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
 
-<!-- Panel: Services -->
-<div id="panel-services" class="panel">
-  <div class="section-title">📦 All Services</div>
-  <table class="data-table">
-    <thead><tr><th>Title</th><th>Vendor</th><th>Type</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
-    <tbody id="tbody-services"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody>
-  </table>
-</div>
+    <div class="section-title" style="margin-top:28px">✅ Approved Vendors</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Student ID</th>
+          <th>CGPA</th>
+          <th>B40</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-vendors">
+        <tr class="empty-row">
+          <td colspan="6">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<!-- Panel: Vendor Approvals -->
-<div id="panel-vendors" class="panel">
-  <div class="section-title">⏳ Pending Vendor Applications</div>
-  <table class="data-table">
-    <thead><tr><th>Name</th><th>Student ID</th><th>Email</th><th>B40</th><th>Action</th></tr></thead>
-    <tbody id="tbody-pending"><tr class="empty-row"><td colspan="5">Loading...</td></tr></tbody>
-  </table>
+  <!-- Panel: All Users -->
+  <div id="panel-users" class="panel">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Student ID</th>
+          <th>Role</th>
+          <th>CGPA</th>
+          <th>Update CGPA</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-users">
+        <tr class="empty-row">
+          <td colspan="5">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div class="section-title" style="margin-top:28px">✅ Approved Vendors</div>
-  <table class="data-table">
-    <thead><tr><th>Name</th><th>Student ID</th><th>CGPA</th><th>B40</th><th>Status</th><th>Action</th></tr></thead>
-    <tbody id="tbody-vendors"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody>
-  </table>
-</div>
+  <!-- Panel: Bookings -->
+  <div id="panel-bookings" class="panel">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Student</th>
+          <th>Vendor</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-bookings">
+        <tr class="empty-row">
+          <td colspan="5">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<!-- Panel: All Users -->
-<div id="panel-users" class="panel">
-  <table class="data-table">
-    <thead><tr><th>Name</th><th>Student ID</th><th>Role</th><th>CGPA</th><th>Update CGPA</th></tr></thead>
-    <tbody id="tbody-users"><tr class="empty-row"><td colspan="5">Loading...</td></tr></tbody>
-  </table>
-</div>
+  <!-- Panel: Reports -->
+  <div id="panel-reports" class="panel">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reported By</th>
+          <th>Service ID</th>
+          <th>Reason</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-reports">
+        <tr class="empty-row">
+          <td colspan="5">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<!-- Panel: Bookings -->
-<div id="panel-bookings" class="panel">
-  <table class="data-table">
-    <thead><tr><th>Service</th><th>Student</th><th>Vendor</th><th>Status</th><th>Date</th></tr></thead>
-    <tbody id="tbody-bookings"><tr class="empty-row"><td colspan="5">Loading...</td></tr></tbody>
-  </table>
-</div>
+  <footer>&copy; 2025 IT'aawun | Admin Panel</footer>
 
-<!-- Panel: Reports -->
-<div id="panel-reports" class="panel">
-  <table class="data-table">
-    <thead><tr><th>Reported By</th><th>Service ID</th><th>Reason</th><th>Date</th><th>Action</th></tr></thead>
-    <tbody id="tbody-reports"><tr class="empty-row"><td colspan="5">Loading...</td></tr></tbody>
-  </table>
-</div>
+  <script>
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-<footer>&copy; 2025 IT'aawun | Admin Panel</footer>
+      // ── Auth + Admin Gate ──────────────────────────────────
+      (async function initAdmin() {
+        const { data: { session } } = await db.auth.getSession()
+        if (!session) { window.location.href = 'index.html'; return }
 
-<script>
-  const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
-  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+        const { data: profile, error } = await db
+          .from('profiles').select('role').eq('id', session.user.id).single()
 
-  // ── Auth + Admin Gate ──────────────────────────────────
-  (async function initAdmin() {
-    const { data: { session } } = await db.auth.getSession()
-    if (!session) { window.location.href = 'index.html'; return }
+        if (error || !profile || profile.role !== 'admin') {
+          alert('Access denied. Admins only.')
+          window.location.href = 'home.html'
+          return
+        }
 
-    const { data: profile, error } = await db
-      .from('profiles').select('role').eq('id', session.user.id).single()
+        loadAll()
+      })()
 
-    if (error || !profile || profile.role !== 'admin') {
-      alert('Access denied. Admins only.')
-      window.location.href = 'home.html'
-      return
+    function loadAll() {
+      loadStats()
+      loadServices()
+      loadPendingVendors()
+      loadApprovedVendors()
+      loadAllUsers()
+      loadBookings()
+      loadReports()
     }
 
-    loadAll()
-  })()
-
-  function loadAll() {
-    loadStats()
-    loadServices()
-    loadPendingVendors()
-    loadApprovedVendors()
-    loadAllUsers()
-    loadBookings()
-    loadReports()
-  }
-
-  // ── Tabs ──────────────────────────────────────────────
-  function showTab(tab) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
-    document.getElementById('panel-' + tab).classList.add('active')
-    event.target.classList.add('active')
-  }
-
-  // ── Services ───────────────────────────────────────────
-  async function loadServices() {
-    const { data, error } = await db
-      .from('services')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50)
-
-    const tb = document.getElementById('tbody-services')
-    if (error || !data || data.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="6">No services yet.</td></tr>'; return
+    // ── Tabs ──────────────────────────────────────────────
+    function showTab(tab) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+      document.getElementById('panel-' + tab).classList.add('active')
+      event.target.classList.add('active')
     }
 
-    // Fetch vendor names
-    const vendorIds = [...new Set(data.map(s => s.vendor_id))]
-    const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', vendorIds)
-    const nameMap = {}
-    if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+    // ── Services ───────────────────────────────────────────
+    async function loadServices() {
+      const { data, error } = await db
+        .from('services')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50)
 
-    tb.innerHTML = data.map(s => `
+      const tb = document.getElementById('tbody-services')
+      if (error || !data || data.length === 0) {
+        tb.innerHTML = '<tr class="empty-row"><td colspan="6">No services yet.</td></tr>'; return
+      }
+
+      // Fetch vendor names
+      const vendorIds = [...new Set(data.map(s => s.vendor_id))]
+      const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', vendorIds)
+      const nameMap = {}
+      if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+
+      tb.innerHTML = data.map(s => `
       <tr>
         <td>${s.title || '—'}</td>
-        <td>${nameMap[s.vendor_id] || s.vendor_id?.slice(0,8)+'…'}</td>
+        <td>${nameMap[s.vendor_id] || s.vendor_id?.slice(0, 8) + '…'}</td>
         <td><span class="status-badge s-${s.type === 'offered' ? 'vendor' : 'student'}">${s.type}</span></td>
         <td>RM${parseFloat(s.price || 0).toFixed(2)}</td>
         <td><span class="status-badge s-${s.status}">${s.status}</span></td>
         <td>
           ${s.status === 'active'
-            ? `<button class="btn-sm btn-suspend" onclick="deactivateService('${s.id}')">Deactivate</button>`
-            : `<button class="btn-sm btn-approve" onclick="activateService('${s.id}')">Activate</button>`}
+          ? `<button class="btn-sm btn-suspend" onclick="deactivateService('${s.id}')">Deactivate</button>`
+          : `<button class="btn-sm btn-approve" onclick="activateService('${s.id}')">Activate</button>`}
           <button class="btn-sm btn-suspend" onclick="deleteService('${s.id}')">Delete</button>
         </td>
       </tr>`).join('')
-  }
-
-  async function activateService(id) {
-    await db.from('services').update({ status: 'active' }).eq('id', id)
-    loadServices()
-  }
-  async function deactivateService(id) {
-    await db.from('services').update({ status: 'inactive' }).eq('id', id)
-    loadServices()
-  }
-  async function deleteService(id) {
-    if (!confirm('Delete this service permanently?')) return
-    await db.from('services').delete().eq('id', id)
-    loadServices()
-  }
-
-  // ── Stats ──────────────────────────────────────────────
-  async function loadStats() {
-    const [users, bookings, reports, pending] = await Promise.all([
-      db.from('profiles').select('id', { count: 'exact', head: true }),
-      db.from('bookings').select('id', { count: 'exact', head: true }),
-      db.from('reports').select('id', { count: 'exact', head: true }),
-      db.from('profiles').select('id', { count: 'exact', head: true })
-        .eq('role', 'vendor').eq('is_approved', false)
-    ])
-    const vendors = await db.from('profiles').select('id', { count: 'exact', head: true })
-      .eq('role', 'vendor').eq('is_approved', true)
-
-    document.getElementById('stat-users').textContent    = users.count    ?? '—'
-    document.getElementById('stat-bookings').textContent = bookings.count  ?? '—'
-    document.getElementById('stat-reports').textContent  = reports.count   ?? '—'
-    document.getElementById('stat-pending').textContent  = pending.count   ?? '—'
-    document.getElementById('stat-vendors').textContent  = vendors.count   ?? '—'
-  }
-
-  // ── Pending vendor approvals ───────────────────────────
-  async function loadPendingVendors() {
-    const { data } = await db.from('profiles').select('*')
-      .eq('role', 'vendor').eq('is_approved', false)
-    const tb = document.getElementById('tbody-pending')
-    if (!data || data.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="5">No pending applications.</td></tr>'; return
     }
-    tb.innerHTML = data.map(u => `
+
+    async function activateService(id) {
+      await db.from('services').update({ status: 'active' }).eq('id', id)
+      loadServices()
+    }
+    async function deactivateService(id) {
+      await db.from('services').update({ status: 'inactive' }).eq('id', id)
+      loadServices()
+    }
+    async function deleteService(id) {
+      if (!confirm('Delete this service permanently?')) return
+      await db.from('services').delete().eq('id', id)
+      loadServices()
+    }
+
+    // ── Stats ──────────────────────────────────────────────
+    async function loadStats() {
+      const [users, bookings, reports, pending] = await Promise.all([
+        db.from('profiles').select('id', { count: 'exact', head: true }),
+        db.from('bookings').select('id', { count: 'exact', head: true }),
+        db.from('reports').select('id', { count: 'exact', head: true }),
+        db.from('profiles').select('id', { count: 'exact', head: true })
+          .eq('role', 'vendor').eq('is_approved', false)
+      ])
+      const vendors = await db.from('profiles').select('id', { count: 'exact', head: true })
+        .eq('role', 'vendor').eq('is_approved', true)
+
+      document.getElementById('stat-users').textContent = users.count ?? '—'
+      document.getElementById('stat-bookings').textContent = bookings.count ?? '—'
+      document.getElementById('stat-reports').textContent = reports.count ?? '—'
+      document.getElementById('stat-pending').textContent = pending.count ?? '—'
+      document.getElementById('stat-vendors').textContent = vendors.count ?? '—'
+    }
+
+    // ── Pending vendor approvals ───────────────────────────
+    async function loadPendingVendors() {
+      const { data } = await db.from('profiles').select('*')
+        .eq('role', 'vendor').eq('is_approved', false)
+      const tb = document.getElementById('tbody-pending')
+      if (!data || data.length === 0) {
+        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No pending applications.</td></tr>'; return
+      }
+      tb.innerHTML = data.map(u => `
       <tr>
         <td>${u.full_name || '—'}</td>
         <td>${u.student_id || '—'}</td>
@@ -362,17 +646,17 @@
           <button class="btn-sm btn-suspend" onclick="rejectVendor('${u.id}')">✗ Reject</button>
         </td>
       </tr>`).join('')
-  }
-
-  // ── Approved vendors ───────────────────────────────────
-  async function loadApprovedVendors() {
-    const { data } = await db.from('profiles').select('*')
-      .eq('role', 'vendor').eq('is_approved', true)
-    const tb = document.getElementById('tbody-vendors')
-    if (!data || data.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="6">No approved vendors yet.</td></tr>'; return
     }
-    tb.innerHTML = data.map(u => `
+
+    // ── Approved vendors ───────────────────────────────────
+    async function loadApprovedVendors() {
+      const { data } = await db.from('profiles').select('*')
+        .eq('role', 'vendor').eq('is_approved', true)
+      const tb = document.getElementById('tbody-vendors')
+      if (!data || data.length === 0) {
+        tb.innerHTML = '<tr class="empty-row"><td colspan="6">No approved vendors yet.</td></tr>'; return
+      }
+      tb.innerHTML = data.map(u => `
       <tr>
         <td>${u.full_name || '—'}</td>
         <td>${u.student_id || '—'}</td>
@@ -384,23 +668,23 @@
         <td>${u.is_b40 ? '<span class="s-b40">B40</span>' : '—'}</td>
         <td>
           ${u.cgpa && parseFloat(u.cgpa) < 2.0
-            ? '<span class="flag-badge">⚠️ Low CGPA</span>'
-            : '<span class="status-badge s-active">OK</span>'}
+          ? '<span class="flag-badge">⚠️ Low CGPA</span>'
+          : '<span class="status-badge s-active">OK</span>'}
         </td>
         <td>
           <button class="btn-sm btn-suspend" onclick="suspendVendor('${u.id}')">Suspend</button>
         </td>
       </tr>`).join('')
-  }
-
-  // ── All users ──────────────────────────────────────────
-  async function loadAllUsers() {
-    const { data } = await db.from('profiles').select('*').order('created_at', { ascending: false })
-    const tb = document.getElementById('tbody-users')
-    if (!data || data.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="5">No users found.</td></tr>'; return
     }
-    tb.innerHTML = data.map(u => `
+
+    // ── All users ──────────────────────────────────────────
+    async function loadAllUsers() {
+      const { data } = await db.from('profiles').select('*').order('created_at', { ascending: false })
+      const tb = document.getElementById('tbody-users')
+      if (!data || data.length === 0) {
+        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No users found.</td></tr>'; return
+      }
+      tb.innerHTML = data.map(u => `
       <tr>
         <td>${u.full_name || '—'}</td>
         <td>${u.student_id || '—'}</td>
@@ -412,89 +696,90 @@
           <button class="btn-sm btn-save" onclick="saveCgpaUser('${u.id}')">Save</button>
         </td>
       </tr>`).join('')
-  }
-
-  // ── Bookings ───────────────────────────────────────────
-  async function loadBookings() {
-    const { data } = await db.from('bookings')
-      .select('*, services(title)')
-      .order('created_at', { ascending: false })
-      .limit(50)
-    const tb = document.getElementById('tbody-bookings')
-    if (!data || data.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="5">No bookings yet.</td></tr>'; return
     }
 
-    // Fetch names for student + vendor IDs
-    const ids = [...new Set([...data.map(b => b.student_id), ...data.map(b => b.vendor_id)])]
-    const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', ids)
-    const nameMap = {}
-    if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+    // ── Bookings ───────────────────────────────────────────
+    async function loadBookings() {
+      const { data } = await db.from('bookings')
+        .select('*, services(title)')
+        .order('created_at', { ascending: false })
+        .limit(50)
+      const tb = document.getElementById('tbody-bookings')
+      if (!data || data.length === 0) {
+        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No bookings yet.</td></tr>'; return
+      }
 
-    tb.innerHTML = data.map(b => `
+      // Fetch names for student + vendor IDs
+      const ids = [...new Set([...data.map(b => b.student_id), ...data.map(b => b.vendor_id)])]
+      const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', ids)
+      const nameMap = {}
+      if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+
+      tb.innerHTML = data.map(b => `
       <tr>
         <td>${b.services?.title || '(deleted)'}</td>
-        <td>${nameMap[b.student_id] || b.student_id?.slice(0,8)+'…'}</td>
-        <td>${nameMap[b.vendor_id]  || b.vendor_id?.slice(0,8)+'…'}</td>
+        <td>${nameMap[b.student_id] || b.student_id?.slice(0, 8) + '…'}</td>
+        <td>${nameMap[b.vendor_id] || b.vendor_id?.slice(0, 8) + '…'}</td>
         <td><span class="status-badge s-${b.status}">${b.status}</span></td>
-        <td>${new Date(b.created_at).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'})}</td>
+        <td>${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
       </tr>`).join('')
-  }
-
-  // ── Reports ────────────────────────────────────────────
-  async function loadReports() {
-    const { data } = await db.from('reports').select('*').order('created_at', { ascending: false })
-    const tb = document.getElementById('tbody-reports')
-    if (!data || data.length === 0) {
-      tb.innerHTML = '<tr class="empty-row"><td colspan="5">No reports filed.</td></tr>'; return
     }
-    tb.innerHTML = data.map(r => `
+
+    // ── Reports ────────────────────────────────────────────
+    async function loadReports() {
+      const { data } = await db.from('reports').select('*').order('created_at', { ascending: false })
+      const tb = document.getElementById('tbody-reports')
+      if (!data || data.length === 0) {
+        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No reports filed.</td></tr>'; return
+      }
+      tb.innerHTML = data.map(r => `
       <tr>
-        <td>${r.reporter_id?.slice(0,8)}…</td>
-        <td>${r.service_id?.slice(0,8)}…</td>
+        <td>${r.reporter_id?.slice(0, 8)}…</td>
+        <td>${r.service_id?.slice(0, 8)}…</td>
         <td>${r.reason || '—'}</td>
-        <td>${new Date(r.created_at).toLocaleDateString('en-MY',{day:'numeric',month:'short'})}</td>
+        <td>${new Date(r.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short' })}</td>
         <td><button class="btn-sm btn-suspend" onclick="dismissReport('${r.id}')">Dismiss</button></td>
       </tr>`).join('')
-  }
+    }
 
-  // ── Actions ────────────────────────────────────────────
-  async function approveVendor(id) {
-    await db.from('profiles').update({ is_approved: true }).eq('id', id)
-    loadAll()
-  }
-  async function rejectVendor(id) {
-    if (!confirm('Reject and remove this vendor application?')) return
-    await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
-    loadAll()
-  }
-  async function suspendVendor(id) {
-    if (!confirm('Suspend this vendor? They will lose vendor access.')) return
-    await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
-    loadAll()
-  }
-  async function saveCgpa(id) {
-    const val = parseFloat(document.getElementById('cgpa-' + id).value)
-    if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
-    await db.from('profiles').update({ cgpa: val }).eq('id', id)
-    loadApprovedVendors()
-  }
-  async function saveCgpaUser(id) {
-    const val = parseFloat(document.getElementById('cgpau-' + id).value)
-    if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
-    await db.from('profiles').update({ cgpa: val }).eq('id', id)
-    alert('CGPA updated.')
-  }
-  async function dismissReport(id) {
-    await db.from('reports').delete().eq('id', id)
-    loadReports()
-    loadStats()
-  }
-  async function doLogout() {
-    const { error } = await db.auth.signOut()
-    if (error) { console.error('Logout error:', error) }
-    window.location.replace('index.html?logged=out')
-  }
-</script>
+    // ── Actions ────────────────────────────────────────────
+    async function approveVendor(id) {
+      await db.from('profiles').update({ is_approved: true }).eq('id', id)
+      loadAll()
+    }
+    async function rejectVendor(id) {
+      if (!confirm('Reject and remove this vendor application?')) return
+      await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
+      loadAll()
+    }
+    async function suspendVendor(id) {
+      if (!confirm('Suspend this vendor? They will lose vendor access.')) return
+      await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
+      loadAll()
+    }
+    async function saveCgpa(id) {
+      const val = parseFloat(document.getElementById('cgpa-' + id).value)
+      if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
+      await db.from('profiles').update({ cgpa: val }).eq('id', id)
+      loadApprovedVendors()
+    }
+    async function saveCgpaUser(id) {
+      const val = parseFloat(document.getElementById('cgpau-' + id).value)
+      if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
+      await db.from('profiles').update({ cgpa: val }).eq('id', id)
+      alert('CGPA updated.')
+    }
+    async function dismissReport(id) {
+      await db.from('reports').delete().eq('id', id)
+      loadReports()
+      loadStats()
+    }
+    async function doLogout() {
+      const { error } = await db.auth.signOut()
+      if (error) { console.error('Logout error:', error) }
+      window.location.replace('index.html?logged=out')
+    }
+  </script>
 </body>
+
 </html>

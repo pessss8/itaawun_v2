@@ -1,18 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Check Supabase Schema</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #a6e3a1; }
-    pre { background: #1e1e2e; padding: 15px; border-radius: 8px; overflow-x: auto; }
-    .error { color: #f38ba8; }
-    .success { color: #a6e3a1; }
-    h1 { color: #89b4fa; }
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #a6e3a1;
+    }
+
+    pre {
+      background: #1e1e2e;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    .error {
+      color: #f38ba8;
+    }
+
+    .success {
+      color: #a6e3a1;
+    }
+
+    h1 {
+      color: #89b4fa;
+    }
   </style>
 </head>
+
 <body>
   <h1>Supabase Schema Checker</h1>
   <div id="output">Checking schema...</div>
@@ -99,4 +121,5 @@ CREATE INDEX IF NOT EXISTS idx_services_vendor ON services(vendor_id);
     checkSchema()
   </script>
 </body>
+
 </html>
