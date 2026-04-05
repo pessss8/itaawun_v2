@@ -626,7 +626,7 @@
         .from('services')
         .select('*')
         .eq('status', 'active')
-        .eq('service_type', 'offered')
+        .eq('type', 'offered')
         .order('created_at', { ascending: false })
 
       const container = document.getElementById('serviceList')

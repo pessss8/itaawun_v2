@@ -109,6 +109,11 @@
       display: flex; flex-wrap: wrap;
       gap: 15px; justify-content: center;
     }
+    .buttons {
+      display: flex; flex-wrap: wrap;
+      gap: 15px; justify-content: center;
+      max-width: 500px; margin: 0 auto;
+    }
     .buttons a {
       text-decoration: none; padding: 15px 30px;
       font-size: 16px; font-weight: bold;
@@ -121,6 +126,9 @@
     .create-btn:hover { background: #370066; }
     .needed-btn { background: #8A2BE2; color: white; }
     .needed-btn:hover { background: #7326C8; }
+    .vendor-btn { background: #059669; color: white; }
+    .vendor-btn:hover { background: #047857; }
+    .vendor-btn.hidden { display: none; }
 
     footer {
       background: rgba(0,0,0,0.2); color: white;
@@ -155,7 +163,10 @@
     <div class="buttons">
       <a href="find.html"   class="find-btn">Service Offered</a>
       <a href="needed.html" class="needed-btn">Service Needed</a>
+    </div>
+    <div class="buttons" style="margin-top: 15px;">
       <a href="create.html" class="create-btn">Create Service</a>
+      <a href="vendor.html" class="vendor-btn hidden" id="vendorBtn">Vendor Dashboard</a>
     </div>
   </section>
 
@@ -168,25 +179,43 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    // Protect page — redirect to login if not logged in
-    db.auth.getSession().then(({ data: { session } }) => {
-      if (!session) window.location.href = 'index.html'
-    })
+    // Protect page and check role
+    (async function initHome() {
+      const { data: { session } } = await db.auth.getSession()
+      if (!session) {
+        window.location.href = 'index.html'
+        return
+      }
 
-    // Load real profile picture if available
-    db.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
-      db.from('profiles').select('avatar_url').eq('id', user.id).single()
-        .then(({ data }) => {
-          if (data?.avatar_url) {
-            document.getElementById('profilePic').src = data.avatar_url
-          }
-        })
-    })
+      // Load profile to check role
+      const { data: profile } = await db
+        .from('profiles')
+        .select('role, avatar_url')
+        .eq('id', session.user.id)
+        .single()
+
+      // Redirect admin users to admin.html
+      if (profile?.role === 'admin') {
+        window.location.href = 'admin.html'
+        return
+      }
+
+      // Show Vendor button for vendor users
+      if (profile?.role === 'vendor' || profile?.role === 'admin') {
+        const vendorBtn = document.getElementById('vendorBtn')
+        if (vendorBtn) vendorBtn.classList.remove('hidden')
+      }
+
+      // Load profile picture
+      if (profile?.avatar_url) {
+        document.getElementById('profilePic').src = profile.avatar_url
+      }
+    })()
 
     async function doLogout() {
-      await db.auth.signOut()
-      window.location.replace('index.html')
+      const { error } = await db.auth.signOut()
+      if (error) console.error('Logout error:', error)
+      window.location.replace('index.html?logged=out')
     }
   </script>
 </body>
