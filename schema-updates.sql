@@ -8,6 +8,8 @@
 -- ============================================================
 -- STEP 1: Add missing columns to profiles table
 -- ============================================================
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS room_address TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS gender TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS trust_score INTEGER DEFAULT 0;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_asnaf BOOLEAN DEFAULT false;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS matric_card_url TEXT;
@@ -422,6 +424,45 @@ CREATE POLICY "Admins can read all applications" ON tasker_applications
   );
 
 CREATE POLICY "Admins can update applications" ON tasker_applications
+  FOR UPDATE TO authenticated
+  USING (
+    EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
+  );
+
+-- ============================================================
+-- Admin Applications Table (used by home.html "Apply for Admin Work" form)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS admin_applications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  position TEXT NOT NULL,  -- 'vendor', 'moderator', 'admin'
+  reason TEXT,
+  qualifications TEXT,
+  whatsapp TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_applications_user ON admin_applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_admin_applications_status ON admin_applications(status);
+
+ALTER TABLE admin_applications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can create own admin applications" ON admin_applications
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can read own admin applications" ON admin_applications
+  FOR SELECT TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Admins can read all admin applications" ON admin_applications
+  FOR SELECT TO authenticated
+  USING (
+    EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
+  );
+
+CREATE POLICY "Admins can update admin applications" ON admin_applications
   FOR UPDATE TO authenticated
   USING (
     EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.role = 'admin')

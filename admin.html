@@ -535,7 +535,7 @@
   </div>
 
   <!-- Panel: Vendor Approvals -->
-  <div id="panel-vendors" class="panel active">
+  <div id="panel-vendors" class="panel">
     <div class="section-title">⏳ Pending Vendor Applications</div>
     <table class="data-table">
       <thead>
@@ -749,10 +749,14 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
+    let currentUser = null
+
       // ── Auth + Admin Gate ──────────────────────────────────
       (async function initAdmin() {
         const { data: { session } } = await db.auth.getSession()
         if (!session) { window.location.href = 'index.html'; return }
+
+        currentUser = session.user
 
         const { data: profile, error } = await db
           .from('profiles').select('role').eq('id', session.user.id).single()
@@ -774,6 +778,9 @@
       loadAllUsers()
       loadBookings()
       loadReports()
+      loadTaskerApplications()
+      loadAsnafVerifications()
+      loadLiveGigs()
     }
 
     // ── Tabs ──────────────────────────────────────────────
@@ -1003,6 +1010,228 @@
       const { error } = await db.auth.signOut()
       if (error) { console.error('Logout error:', error) }
       window.location.replace('index.html?logged=out')
+    }
+
+    // ── Tasker Applications ────────────────────────────────
+    async function loadTaskerApplications() {
+      const { data, error } = await db
+        .from('admin_applications')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+
+      const tb = document.getElementById('tbody-tasker-pending')
+      if (error || !data || data.length === 0) {
+        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No pending applications.</td></tr>'; return
+      }
+
+      // Fetch applicant names
+      const ids = [...new Set(data.map(a => a.user_id))]
+      const { data: profiles } = await db.from('profiles').select('id, full_name, email').in('id', ids)
+      const nameMap = {}
+      if (profiles) profiles.forEach(p => { nameMap[p.id] = p })
+
+      tb.innerHTML = data.map(a => `
+      <tr>
+        <td>${nameMap[a.user_id]?.full_name || '—'}</td>
+        <td>${nameMap[a.user_id]?.email || '—'}</td>
+        <td>${a.position || '—'}: ${a.reason || '—'}</td>
+        <td>${new Date(a.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+        <td>
+          <button class="btn-sm btn-approve" onclick="approveTasker('${a.user_id}', '${a.id}', '${a.position}')">✓ Approve</button>
+          <button class="btn-sm btn-suspend" onclick="rejectTasker('${a.id}')">✗ Reject</button>
+        </td>
+      </tr>`).join('')
+    }
+
+    async function approveTasker(userId, appId, position) {
+      const newRole = (position === 'admin') ? 'admin' : 'vendor'
+      await db.from('profiles').update({ role: newRole, is_approved: true }).eq('id', userId)
+      await db.from('admin_applications').update({ status: 'approved' }).eq('id', appId)
+      loadTaskerApplications()
+      loadStats()
+    }
+
+    async function rejectTasker(appId) {
+      if (!confirm('Reject this application?')) return
+      await db.from('admin_applications').update({ status: 'rejected' }).eq('id', appId)
+      loadTaskerApplications()
+    }
+
+    // ── Asnaf Verifications ────────────────────────────────
+    async function loadAsnafVerifications() {
+      const { data: pending } = await db
+        .from('verifications')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+
+      const tbPending = document.getElementById('tbody-asnaf-pending')
+      if (!pending || pending.length === 0) {
+        tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending verifications.</td></tr>'
+      } else {
+        const ids = [...new Set(pending.map(v => v.user_id))]
+        const { data: profiles } = await db.from('profiles').select('id, full_name, student_id').in('id', ids)
+        const nameMap = {}
+        if (profiles) profiles.forEach(p => { nameMap[p.id] = p })
+
+        tbPending.innerHTML = pending.map(v => `
+        <tr>
+          <td>${nameMap[v.user_id]?.full_name || '—'}</td>
+          <td>${nameMap[v.user_id]?.student_id || '—'}</td>
+          <td><a href="${v.doc_url}" target="_blank" style="color:#6b21a8">View Doc</a></td>
+          <td>${new Date(v.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+          <td>
+            <button class="btn-sm btn-approve" onclick="approveAsnaf('${v.id}','${v.user_id}')">✓ Verify</button>
+            <button class="btn-sm btn-suspend" onclick="rejectAsnaf('${v.id}')">✗ Reject</button>
+          </td>
+        </tr>`).join('')
+      }
+
+      const { data: verified } = await db
+        .from('profiles').select('full_name, student_id, updated_at')
+        .eq('is_asnaf', true).order('updated_at', { ascending: false })
+
+      const tbVerified = document.getElementById('tbody-asnaf-verified')
+      if (!verified || verified.length === 0) {
+        tbVerified.innerHTML = '<tr class="empty-row"><td colspan="4">No verified Asnaf members yet.</td></tr>'
+      } else {
+        tbVerified.innerHTML = verified.map(u => `
+        <tr>
+          <td>${u.full_name || '—'}</td>
+          <td>${u.student_id || '—'}</td>
+          <td>Admin</td>
+          <td>${new Date(u.updated_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+        </tr>`).join('')
+      }
+    }
+
+    async function approveAsnaf(verificationId, userId) {
+      await db.from('verifications').update({ status: 'approved', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', verificationId)
+      await db.from('profiles').update({ is_asnaf: true }).eq('id', userId)
+      loadAsnafVerifications()
+    }
+
+    async function rejectAsnaf(verificationId) {
+      const reason = prompt('Reason for rejection (optional):') || ''
+      await db.from('verifications').update({ status: 'rejected', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString(), rejection_reason: reason }).eq('id', verificationId)
+      loadAsnafVerifications()
+    }
+
+    // ── Live Gigs ──────────────────────────────────────────
+    async function loadLiveGigs() {
+      // Pending
+      const { data: pending } = await db.from('gigs').select('*').eq('status', 'pending_review').order('created_at', { ascending: false })
+      const tbPending = document.getElementById('tbody-gigs-pending')
+      if (!pending || pending.length === 0) {
+        tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending gigs.</td></tr>'
+      } else {
+        const ids = [...new Set(pending.map(g => g.requester_id))]
+        const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', ids)
+        const nameMap = {}
+        if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+        tbPending.innerHTML = pending.map(g => `
+        <tr>
+          <td>${g.title}</td>
+          <td>${nameMap[g.requester_id] || '—'}</td>
+          <td>RM${parseFloat(g.reward_amount || 0).toFixed(2)}</td>
+          <td>${g.flag_count > 0 ? '<span class="flag-badge">Flagged (' + g.flag_count + ')</span>' : 'Clean'}</td>
+          <td>
+            <button class="btn-sm btn-approve" onclick="approveGig('${g.id}')">✓ Approve</button>
+            <button class="btn-sm btn-suspend" onclick="rejectGig('${g.id}')">✗ Reject</button>
+          </td>
+        </tr>`).join('')
+      }
+
+      // Active
+      const { data: active } = await db.from('gigs').select('*').in('status', ['live', 'grabbed', 'completed']).order('created_at', { ascending: false }).limit(20)
+      const tbActive = document.getElementById('tbody-gigs-active')
+      if (!active || active.length === 0) {
+        tbActive.innerHTML = '<tr class="empty-row"><td colspan="6">No active gigs.</td></tr>'
+      } else {
+        tbActive.innerHTML = active.map(g => `
+        <tr>
+          <td>${g.title}</td>
+          <td>${g.requester_id?.slice(0, 8)}…</td>
+          <td>—</td>
+          <td>RM${parseFloat(g.reward_amount || 0).toFixed(2)}</td>
+          <td><span class="status-badge s-${g.status === 'live' ? 'active' : g.status === 'grabbed' ? 'accepted' : 'done'}">${g.status}</span></td>
+          <td><button class="btn-sm btn-suspend" onclick="removeGig('${g.id}')">Remove</button></td>
+        </tr>`).join('')
+      }
+
+      // Flagged
+      const { data: flagged } = await db.from('gigs').select('*').eq('status', 'flagged').order('flag_count', { ascending: false })
+      const tbFlagged = document.getElementById('tbody-gigs-flagged')
+      if (!flagged || flagged.length === 0) {
+        tbFlagged.innerHTML = '<tr class="empty-row"><td colspan="4">No flagged gigs.</td></tr>'
+      } else {
+        tbFlagged.innerHTML = flagged.map(g => `
+        <tr>
+          <td>${g.title}</td>
+          <td><span class="flag-badge">${g.flag_count} reports</span></td>
+          <td>${g.requester_id?.slice(0, 8)}…</td>
+          <td>
+            <button class="btn-sm btn-approve" onclick="approveGig('${g.id}')">Restore</button>
+            <button class="btn-sm btn-suspend" onclick="removeGig('${g.id}')">Remove</button>
+          </td>
+        </tr>`).join('')
+      }
+    }
+
+    async function approveGig(id) {
+      await db.from('gigs').update({ status: 'live' }).eq('id', id)
+      loadLiveGigs()
+    }
+    async function rejectGig(id) {
+      if (!confirm('Reject this gig?')) return
+      await db.from('gigs').update({ status: 'rejected' }).eq('id', id)
+      loadLiveGigs()
+    }
+    async function removeGig(id) {
+      if (!confirm('Remove this gig permanently?')) return
+      await db.from('gigs').delete().eq('id', id)
+      loadLiveGigs()
+    }
+
+    // ── Impact Report ──────────────────────────────────────
+    async function generateImpactReport() {
+      const month = document.getElementById('reportMonth').value
+      if (!month) { alert('Please select a month.'); return }
+
+      const [year, mon] = month.split('-')
+      const startDate = `${year}-${mon}-01`
+      const lastDay = new Date(parseInt(year), parseInt(mon), 0).getDate()
+      const endDate = `${year}-${mon}-${String(lastDay).padStart(2, '0')}`
+
+      const [bookings, asnafUsers, completedGigs] = await Promise.all([
+        db.from('bookings').select('id', { count: 'exact', head: true }).eq('status', 'done').gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59'),
+        db.from('profiles').select('id', { count: 'exact', head: true }).eq('is_asnaf', true),
+        db.from('gigs').select('id, reward_amount').eq('status', 'completed').gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59')
+      ])
+
+      const totalEarnings = completedGigs.data?.reduce((sum, g) => sum + parseFloat(g.reward_amount || 0), 0) || 0
+
+      document.getElementById('reportStats').innerHTML = `
+        <p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString('en-MY', { month: 'long', year: 'numeric' })}</p>
+        <p><strong>Bookings Completed:</strong> ${bookings.count ?? 0}</p>
+        <p><strong>Gigs Completed:</strong> ${completedGigs.data?.length ?? 0}</p>
+        <p><strong>Total Student Earnings (Gigs):</strong> RM${totalEarnings.toFixed(2)}</p>
+        <p><strong>Total Asnaf Members:</strong> ${asnafUsers.count ?? 0}</p>
+      `
+      document.getElementById('reportPreview').style.display = 'block'
+    }
+
+    function downloadReport() {
+      const content = document.getElementById('reportStats').innerText
+      const month = document.getElementById('reportMonth').value
+      const blob = new Blob([`iTa'awun Impact Report\n${month}\n\n` + content], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `itaawun-impact-${month}.txt`
+      a.click()
+      URL.revokeObjectURL(url)
     }
 
     // ── Seed Data Functions ─────────────────────────────────

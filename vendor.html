@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vendor Dashboard - IT'aawun</title>
+  <title>Vendor Dashboard - iTa'awun</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -733,14 +733,19 @@
     async function loadIncomingRequests() {
       const { data: bookings } = await db
         .from('bookings')
-        .select(`
-          *,
-          service:services (title, type),
-          student:student_id (full_name, avatar_url, student_id)
-        `)
+        .select('*, services(title, type)')
         .eq('vendor_id', currentUser.id)
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
+
+      // Fetch student profiles separately
+      if (bookings && bookings.length > 0) {
+        const studentIds = [...new Set(bookings.map(b => b.student_id))]
+        const { data: profiles } = await db.from('profiles').select('id, full_name, avatar_url, student_id').in('id', studentIds)
+        const profileMap = {}
+        if (profiles) profiles.forEach(p => { profileMap[p.id] = p })
+        bookings.forEach(b => { b.student = profileMap[b.student_id] || null; b.service = b.services })
+      }
 
       const listEl = document.getElementById('incoming-list')
       const countEl = document.getElementById('incoming-count')
@@ -828,14 +833,19 @@
     async function loadHistory() {
       const { data: bookings } = await db
         .from('bookings')
-        .select(`
-          *,
-          service:services (title),
-          student:student_id (full_name, student_id)
-        `)
+        .select('*, services(title)')
         .eq('vendor_id', currentUser.id)
         .eq('status', 'done')
         .order('created_at', { ascending: false })
+
+      // Fetch student profiles separately
+      if (bookings && bookings.length > 0) {
+        const studentIds = [...new Set(bookings.map(b => b.student_id))]
+        const { data: profiles } = await db.from('profiles').select('id, full_name, student_id').in('id', studentIds)
+        const profileMap = {}
+        if (profiles) profiles.forEach(p => { profileMap[p.id] = p })
+        bookings.forEach(b => { b.student = profileMap[b.student_id] || null; b.service = b.services })
+      }
 
       const listEl = document.getElementById('history-list')
       const countEl = document.getElementById('history-count')

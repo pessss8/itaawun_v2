@@ -108,10 +108,6 @@
     .buttons {
       display: flex; flex-wrap: wrap;
       gap: 15px; justify-content: center;
-    }
-    .buttons {
-      display: flex; flex-wrap: wrap;
-      gap: 15px; justify-content: center;
       max-width: 500px; margin: 0 auto;
     }
     .buttons a {
@@ -131,18 +127,31 @@
     .vendor-btn.hidden { display: none; }
     .vendor-link.hidden { display: none; }
 
-    /* Admin Application Button */
-    .admin-application-btn {
-      background: rgba(255,255,255,0.15);
+    /* Apply for Role — right-center fixed button */
+    .apply-role-btn {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(107,33,168,0.85);
       color: white;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 13px;
+      padding: 12px 10px;
+      border-radius: 10px 0 0 10px;
+      font-size: 12px;
+      font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-      border: 1px solid rgba(255,255,255,0.3);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 1px;
+      z-index: 50;
+      border: none;
+      transition: background 0.2s, padding 0.2s;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
     }
-    .admin-application-btn:hover { background: rgba(255,255,255,0.25); }
+    .apply-role-btn:hover {
+      background: rgba(107,33,168,1);
+      padding: 12px 14px;
+    }
 
     /* Extended hover area for profile container */
     .profile-container::before {
@@ -282,7 +291,6 @@
         <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
       </div>
     </div>
-    <div class="admin-application-btn" onclick="toggleAdminApplicationPopup()">📝 Apply for Admin Work</div>
   </header>
 
   <section class="hero">
@@ -294,15 +302,16 @@
       <a href="needed.html" class="needed-btn">Service Needed</a>
     </div>
 
-    <div class="create-fab" onclick="toggleCreatePopup()">
-      <span>+</span>
-    </div>
+    <div class="create-fab" onclick="toggleCreatePopup()">+</div>
     <p class="create-fab-label">Create Service</p>
 
     <div class="buttons" style="margin-top: 15px;">
       <a href="vendor.html" class="vendor-btn hidden" id="vendorBtn">🏪 Vendor Dashboard</a>
     </div>
   </section>
+
+  <!-- Apply for a Role — right-center tab -->
+  <button class="apply-role-btn" onclick="toggleApplyPanel()">💼 Apply for a Role</button>
 
   <footer>
     <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
@@ -370,25 +379,27 @@
     </div>
   </div>
 
-  <!-- Admin Application Slide-in Panel -->
-  <div id="adminPanel" class="slide-panel">
+  <!-- Apply for a Role Slide-in Panel -->
+  <div id="applyPanel" class="slide-panel">
     <div class="slide-panel-content">
-      <span class="close-panel" onclick="toggleAdminApplicationPopup()">&times;</span>
-      <h2>Apply for Admin/Official Work</h2>
-      <form id="adminApplicationForm">
-        <label>Position Applying For</label>
-        <select id="adminPosition" required>
-          <option value="">Select Position</option>
-          <option value="vendor">Vendor</option>
-          <option value="moderator">Moderator</option>
-          <option value="admin">Administrator</option>
+      <span class="close-panel" onclick="toggleApplyPanel()">&times;</span>
+      <h2>Apply for a Role</h2>
+      <p style="font-size:13px;color:#666;margin-bottom:16px">Want to sell services or work at a campus outlet? Apply here and an admin will review your request.</p>
+      <form id="applyRoleForm">
+        <label>Role Applying For</label>
+        <select id="applyPosition" required>
+          <option value="">Select Role</option>
+          <option value="vendor">🛍️ Vendor (sell your services)</option>
+          <option value="barista">☕ Barista (campus cafe)</option>
+          <option value="parcel">📦 Parcel Hub Staff</option>
+          <option value="other">🔧 Other Official Work</option>
         </select>
-        <label>Why do you want this position?</label>
-        <textarea id="adminReason" rows="4" required></textarea>
-        <label>Your Qualifications</label>
-        <textarea id="adminQualifications" rows="3" required></textarea>
+        <label>Why do you want this role?</label>
+        <textarea id="applyReason" rows="4" placeholder="Tell us why you're interested..." required></textarea>
+        <label>Your Relevant Experience / Qualifications</label>
+        <textarea id="applyQualifications" rows="3" placeholder="Any related skills or experience..." required></textarea>
         <label>WhatsApp Contact *</label>
-        <input type="text" id="adminWhatsapp" placeholder="60123456789" required>
+        <input type="text" id="applyWhatsapp" placeholder="60123456789" required>
         <button type="submit" class="submit-btn">Submit Application</button>
       </form>
     </div>
@@ -450,9 +461,9 @@
       panel.classList.toggle('active')
     }
 
-    // Admin application popup
-    function toggleAdminApplicationPopup() {
-      const panel = document.getElementById('adminPanel')
+    // Apply for a Role popup
+    function toggleApplyPanel() {
+      const panel = document.getElementById('applyPanel')
       panel.classList.toggle('active')
     }
 
@@ -516,8 +527,8 @@
       this.reset()
     })
 
-    // Admin application form submission
-    document.getElementById('adminApplicationForm')?.addEventListener('submit', async function(e) {
+    // Apply for a Role form submission
+    document.getElementById('applyRoleForm')?.addEventListener('submit', async function(e) {
       e.preventDefault()
       if (!currentUser) { alert('Please login first'); return }
 
@@ -527,10 +538,10 @@
 
       const { error } = await db.from('admin_applications').insert({
         user_id: currentUser.id,
-        position: document.getElementById('adminPosition').value,
-        reason: document.getElementById('adminReason').value,
-        qualifications: document.getElementById('adminQualifications').value,
-        whatsapp: document.getElementById('adminWhatsapp').value,
+        position: document.getElementById('applyPosition').value,
+        reason: document.getElementById('applyReason').value,
+        qualifications: document.getElementById('applyQualifications').value,
+        whatsapp: document.getElementById('applyWhatsapp').value,
         status: 'pending'
       })
 
@@ -543,7 +554,7 @@
       }
 
       alert('Application submitted! Admin will review your request.')
-      toggleAdminApplicationPopup()
+      toggleApplyPanel()
       this.reset()
     })
   </script>

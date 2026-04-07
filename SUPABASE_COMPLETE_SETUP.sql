@@ -33,6 +33,8 @@ CREATE TABLE profiles (
   is_approved boolean DEFAULT false,  -- For vendor approval
   cgpa numeric,
   avatar_url text,
+  room_address text,
+  gender text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
