@@ -171,7 +171,7 @@
       <div class="dropdown" id="dropdownMenu">
         <a href="profile.html">My Profile</a>
         <a href="#">Settings</a>
-        <a href="index.html">Logout</a>
+        <a href="#" onclick="doLogout()">Logout</a>
       </div>
     </div>
   </header>
@@ -250,7 +250,18 @@
     db.auth.getSession().then(({ data: { session } }) => {
       if (!session) { window.location.href = 'index.html'; return }
       currentUser = session.user
+      // Load profile picture
+      db.from('profiles').select('avatar_url').eq('id', session.user.id).single()
+        .then(({ data }) => {
+          if (data?.avatar_url) document.querySelector('.profile-pic').src = data.avatar_url
+        })
     })
+
+    async function doLogout() {
+      const { error } = await db.auth.signOut()
+      if (error) console.error('Logout error:', error)
+      window.location.replace('index.html?logged=out')
+    }
 
     function toggleDropdown() {
       const m = document.getElementById("dropdownMenu");

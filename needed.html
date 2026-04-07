@@ -511,7 +511,7 @@
         .from('services')
         .select('*')
         .eq('status', 'active')
-        .eq('service_type', 'needed')
+        .eq('type', 'needed')
         .order('created_at', { ascending: false })
 
       const container = document.getElementById('requestList')

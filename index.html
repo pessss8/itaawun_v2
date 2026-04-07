@@ -138,10 +138,18 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    // If already logged in, skip login
-    db.auth.getSession().then(({ data: { session } }) => {
-      if (session) window.location.href = 'home.html'
-    })
+    // If arriving from logout, sign out first then stay on this page
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('logged') === 'out') {
+      db.auth.signOut().then(() => {
+        window.history.replaceState({}, '', 'index.html')
+      })
+    } else {
+      // If already logged in (and not logging out), skip login
+      db.auth.getSession().then(({ data: { session } }) => {
+        if (session) window.location.href = 'home.html'
+      })
+    }
 
     function setMsg(text, type = 'error') {
       const el = document.getElementById('msg')

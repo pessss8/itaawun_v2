@@ -475,6 +475,9 @@
     db.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { window.location.href = 'index.html'; return }
       currentUser = session.user
+      // Load profile picture
+      const { data: profile } = await db.from('profiles').select('avatar_url').eq('id', session.user.id).single()
+      if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
       loadStudentBookings()
       loadVendorBookings()
     })
