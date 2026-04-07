@@ -51,52 +51,63 @@
       text-decoration: none;
     }
 
+    /* Profile dropdown - hover-based with extended hit area */
     .profile-container {
       position: relative;
+      display: inline-block;
     }
-
+    .profile-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      z-index: -1;
+    }
     .profile-pic {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid white;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
     }
-
     .profile-container:hover .profile-pic {
       transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
     }
-
     .dropdown {
       display: none;
       position: absolute;
       right: 0;
-      top: 50px;
+      top: 48px;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-      min-width: 150px;
-      overflow: hidden;
-    }
-
-    .profile-container:hover .dropdown {
-      display: block;
-    }
-
-    .dropdown a {
-      display: block;
-      padding: 10px 15px;
-      text-decoration: none;
       color: #333;
-      font-size: 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      min-width: 160px;
+      z-index: 100;
+      overflow: hidden;
+      animation: fadeIn 0.15s ease;
     }
-
-    .dropdown a:hover {
-      background: #f5f0ff;
-      color: #6b21a8;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    .profile-container:hover .dropdown { display: block; }
+    .dropdown:hover { display: block; }
+    .dropdown a {
+      display: block; padding: 11px 16px;
+      text-decoration: none; color: #333; font-size: 14px;
+      transition: background 0.15s;
+    }
+    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+    .dropdown .logout-link { color: #dc2626 !important; }
+    .dropdown .logout-link:hover { background: #fef2f2 !important; }
+    .vendor-link.hidden { display: none; }
 
     .back-button {
       padding: 10px 40px;
@@ -411,12 +422,14 @@
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
-    <div class="profile-container">
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+    <div class="profile-container" id="profileContainer">
       <img src="assets/images/ipey.jpeg" class="profile-pic" id="profilePic">
       <div class="dropdown">
         <a href="profile.html">👤 My Profile</a>
-        <a href="#" onclick="doLogout()" style="color:#dc2626">🚪 Logout</a>
+        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">🏪 Vendor Dashboard</a>
+        <hr class="divider">
+        <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
       </div>
     </div>
   </header>
@@ -459,7 +472,7 @@
     </div>
   </div>
 
-  <footer>&copy; 2025 IT'aawun | Student Freelance Collaboration</footer>
+  <footer>&copy; 2025 iTa'awun | Student Freelance Collaboration</footer>
 
   <script>
     const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
@@ -472,15 +485,22 @@
     let ratingTargetId = null
 
     // ── Init ──────────────────────────────────────────────
-    db.auth.getSession().then(async ({ data: { session } }) => {
+    (async function initBookings() {
+      const { data: { session } } = await db.auth.getSession()
       if (!session) { window.location.href = 'index.html'; return }
       currentUser = session.user
-      // Load profile picture
-      const { data: profile } = await db.from('profiles').select('avatar_url').eq('id', session.user.id).single()
+
+      // Load profile for vendor link and avatar
+      const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
       if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
+      if (profile?.role === 'vendor' || profile?.role === 'admin') {
+        const vendorLink = document.getElementById('vendorDropdownLink')
+        if (vendorLink) vendorLink.classList.remove('hidden')
+      }
+
       loadStudentBookings()
       loadVendorBookings()
-    })
+    })()
 
     // ── Tabs ──────────────────────────────────────────────
     function showTab(tab) {

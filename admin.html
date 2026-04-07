@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - IT'aawun</title>
+  <title>Admin Dashboard - iTa'awun</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -353,10 +353,10 @@
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
     <div class="header-right">
       <span class="admin-badge">⚙️ Admin</span>
-      <button class="logout-btn-top" onclick="doLogout()">Logout</button>
+      <button class="logout-btn-top" onclick="doLogout()">🚪 Logout</button>
     </div>
   </header>
 
@@ -666,9 +666,11 @@
     </div>
   </div>
 
-  <!-- Seed Data Section -->
-  <div style="padding:0 20px 30px;">
-    <div style="background:white;border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+  <!-- Developer Tools - Hidden behind + button -->
+  <div class="dev-tools-fab" onclick="toggleDevTools()">+</div>
+  <div id="devToolsPanel" class="slide-panel">
+    <div class="slide-panel-content">
+      <span class="close-panel" onclick="toggleDevTools()">&times;</span>
       <h3 style="color:#001f3f;margin-bottom:10px;">🔧 Developer Tools</h3>
       <p style="color:#666;font-size:14px;margin-bottom:15px;">Add sample data for testing and demonstration.</p>
       <button class="btn-approve" onclick="seedDummyData()">📦 Add Sample Services (50 listings)</button>
@@ -677,7 +679,70 @@
     </div>
   </div>
 
-  <footer>&copy; 2025 IT'aawun | Admin Panel</footer>
+  <footer>&copy; 2025 iTa'awun | Admin Panel</footer>
+
+  <style>
+    /* Developer Tools FAB */
+    .dev-tools-fab {
+      position: fixed;
+      bottom: 80px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #6b21a8;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(107,33,168,0.4);
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dev-tools-fab:hover {
+      transform: scale(1.1);
+      background: #7c3aed;
+    }
+    /* Slide panel */
+    .slide-panel {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 400px;
+      max-width: 90%;
+      height: 100vh;
+      background: white;
+      z-index: 1000;
+      box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+      overflow-y: auto;
+    }
+    .slide-panel.active { display: block; animation: slideIn 0.3s ease; }
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .slide-panel-content { padding: 25px; }
+    .close-panel {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #666;
+    }
+    .close-panel:hover { color: #333; }
+  </style>
+
+  <script>
+    function toggleDevTools() {
+      const panel = document.getElementById('devToolsPanel')
+      panel.classList.toggle('active')
+    }
+  </script>
 
   <script>
     const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'

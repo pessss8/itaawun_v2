@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT'aawun - Home</title>
+  <title>iTa'awun - Home</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
@@ -129,6 +129,132 @@
     .vendor-btn { background: #059669; color: white; }
     .vendor-btn:hover { background: #047857; }
     .vendor-btn.hidden { display: none; }
+    .vendor-link.hidden { display: none; }
+
+    /* Admin Application Button */
+    .admin-application-btn {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .admin-application-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* Extended hover area for profile container */
+    .profile-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      z-index: -1;
+    }
+
+    /* Create FAB button */
+    .create-fab {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #6b21a8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(107,33,168,0.4);
+      transition: 0.3s;
+      margin: 10px auto;
+    }
+    .create-fab:hover {
+      transform: scale(1.1);
+      background: #7c3aed;
+    }
+    .create-fab-label {
+      text-align: center;
+      font-size: 13px;
+      color: white;
+      margin-top: 5px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    /* Slide-in Panel */
+    .slide-panel {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 400px;
+      max-width: 90%;
+      height: 100vh;
+      background: white;
+      z-index: 1000;
+      box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+      overflow-y: auto;
+    }
+    .slide-panel.active { display: block; animation: slideIn 0.3s ease; }
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .slide-panel-content { padding: 25px; }
+    .close-panel {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #666;
+    }
+    .close-panel:hover { color: #333; }
+    .slide-panel h2 { color: #6b21a8; margin-bottom: 20px; }
+    .slide-panel label {
+      display: block;
+      margin: 12px 0 5px;
+      font-size: 14px;
+      color: #333;
+    }
+    .slide-panel input,
+    .slide-panel select,
+    .slide-panel textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    .slide-panel textarea { resize: vertical; }
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: #6b21a8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    .submit-btn:hover { background: #5b1a8a; }
+
+    /* Time slots */
+    .time-slots { background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+    .time-slot { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .time-slot span { font-size: 13px; color: #555; min-width: 70px; }
+    .time-slot input[type="time"] { flex: 1; margin: 0; }
+
+    /* Image upload row */
+    .image-upload-row { display: flex; flex-direction: column; gap: 8px; }
+    .image-upload-row span { font-size: 12px; color: #888; text-align: center; }
 
     footer {
       background: rgba(0,0,0,0.2); color: white;
@@ -146,41 +272,134 @@
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
-    <div class="profile-container">
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+    <div class="profile-container" id="profileContainer">
       <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
       <div class="dropdown">
         <a href="profile.html">👤 My Profile</a>
+        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">🏪 Vendor Dashboard</a>
         <hr class="divider">
         <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
       </div>
     </div>
+    <div class="admin-application-btn" onclick="toggleAdminApplicationPopup()">📝 Apply for Admin Work</div>
   </header>
 
   <section class="hero">
-    <h1>Welcome to IT'aawun</h1>
+    <h1>Welcome to iTa'awun</h1>
     <p>A freelance platform specifically for CFS IIUM students</p>
-    <div class="buttons">
-      <a href="live-gigs.html" class="find-btn">📋 Live Gigs</a>
+
+    <div class="buttons" style="margin-top: 20px;">
       <a href="find.html" class="find-btn">Service Offered</a>
-    </div>
-    <div class="buttons" style="margin-top: 15px;">
       <a href="needed.html" class="needed-btn">Service Needed</a>
-      <a href="create.html" class="create-btn">Create Service</a>
     </div>
+
+    <div class="create-fab" onclick="toggleCreatePopup()">
+      <span>+</span>
+    </div>
+    <p class="create-fab-label">Create Service</p>
+
     <div class="buttons" style="margin-top: 15px;">
       <a href="vendor.html" class="vendor-btn hidden" id="vendorBtn">🏪 Vendor Dashboard</a>
     </div>
   </section>
 
   <footer>
-    <p>© 2025 IT'aawun | Student Freelance Collaboration</p>
+    <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
   </footer>
+
+  <!-- Create Service Slide-in Panel -->
+  <div id="createPanel" class="slide-panel">
+    <div class="slide-panel-content">
+      <span class="close-panel" onclick="toggleCreatePopup()">&times;</span>
+      <h2>Create Service</h2>
+      <form id="quickCreateForm">
+        <label>Title</label>
+        <input type="text" id="quickTitle" required>
+        <label>Category</label>
+        <select id="quickCategory" required>
+          <option value="">Select Category</option>
+          <option value="food">Food & Drinks</option>
+          <option value="runner">Runner</option>
+          <option value="printing">Printing</option>
+          <option value="cleaning">Cleaning</option>
+          <option value="laundry">Laundry</option>
+          <option value="delivery">Delivery</option>
+          <option value="tutoring">Tutoring</option>
+          <option value="design">Design</option>
+          <option value="coding">Coding</option>
+          <option value="photography">Photography</option>
+          <option value="repair">Repair</option>
+          <option value="other">Other</option>
+        </select>
+        <label>Description</label>
+        <textarea id="quickDesc" rows="3" required></textarea>
+        <label>Price (RM)</label>
+        <input type="number" id="quickPrice" step="0.5" required>
+        <label>Location</label>
+        <input type="text" id="quickLocation" placeholder="e.g. Mahallah Z, B15" required>
+        <label>Available Time</label>
+        <div class="time-slots">
+          <div class="time-slot">
+            <span>Weekday:</span>
+            <input type="time" id="weekdayStart" value="09:00">
+            <span>-</span>
+            <input type="time" id="weekdayEnd" value="17:00">
+          </div>
+          <div class="time-slot">
+            <span>Weekend:</span>
+            <input type="time" id="weekendStart" value="10:00">
+            <span>-</span>
+            <input type="time" id="weekendEnd" value="18:00">
+          </div>
+        </div>
+        <label>WhatsApp *</label>
+        <input type="text" id="quickWhatsapp" placeholder="60123456789" required>
+        <label>Telegram *</label>
+        <input type="text" id="quickTelegram" placeholder="username" required>
+        <label>Email (optional)</label>
+        <input type="email" id="quickEmail">
+        <label>Image</label>
+        <div class="image-upload-row">
+          <input type="text" id="quickImageUrl" placeholder="Image URL">
+          <span>OR</span>
+          <input type="file" id="quickImageFile" accept="image/*">
+        </div>
+        <button type="submit" class="submit-btn">Submit for Approval</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Application Slide-in Panel -->
+  <div id="adminPanel" class="slide-panel">
+    <div class="slide-panel-content">
+      <span class="close-panel" onclick="toggleAdminApplicationPopup()">&times;</span>
+      <h2>Apply for Admin/Official Work</h2>
+      <form id="adminApplicationForm">
+        <label>Position Applying For</label>
+        <select id="adminPosition" required>
+          <option value="">Select Position</option>
+          <option value="vendor">Vendor</option>
+          <option value="moderator">Moderator</option>
+          <option value="admin">Administrator</option>
+        </select>
+        <label>Why do you want this position?</label>
+        <textarea id="adminReason" rows="4" required></textarea>
+        <label>Your Qualifications</label>
+        <textarea id="adminQualifications" rows="3" required></textarea>
+        <label>WhatsApp Contact *</label>
+        <input type="text" id="adminWhatsapp" placeholder="60123456789" required>
+        <button type="submit" class="submit-btn">Submit Application</button>
+      </form>
+    </div>
+  </div>
 
   <script>
     const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    let currentUser = null
 
     // Protect page and check role
     (async function initHome() {
@@ -189,6 +408,8 @@
         window.location.href = 'index.html'
         return
       }
+
+      currentUser = session.user
 
       // Load profile to check role
       const { data: profile } = await db
@@ -203,10 +424,12 @@
         return
       }
 
-      // Show Vendor button for vendor users
+      // Show Vendor button and link for vendor users
       if (profile?.role === 'vendor' || profile?.role === 'admin') {
         const vendorBtn = document.getElementById('vendorBtn')
+        const vendorLink = document.getElementById('vendorDropdownLink')
         if (vendorBtn) vendorBtn.classList.remove('hidden')
+        if (vendorLink) vendorLink.classList.remove('hidden')
       }
 
       // Load profile picture
@@ -220,6 +443,109 @@
       if (error) console.error('Logout error:', error)
       window.location.replace('index.html?logged=out')
     }
+
+    // Create service popup
+    function toggleCreatePopup() {
+      const panel = document.getElementById('createPanel')
+      panel.classList.toggle('active')
+    }
+
+    // Admin application popup
+    function toggleAdminApplicationPopup() {
+      const panel = document.getElementById('adminPanel')
+      panel.classList.toggle('active')
+    }
+
+    // Quick create form submission
+    document.getElementById('quickCreateForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault()
+      if (!currentUser) { alert('Please login first'); return }
+
+      const btn = this.querySelector('.submit-btn')
+      btn.disabled = true
+      btn.textContent = 'Submitting...'
+
+      // Handle image upload
+      let imageUrl = document.getElementById('quickImageUrl').value || 'https://via.placeholder.com/300x120'
+      const imageFile = document.getElementById('quickImageFile').files[0]
+      if (imageFile) {
+        try {
+          const fileExt = imageFile.name.split('.').pop()
+          const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`
+          const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile)
+          if (!uploadError) {
+            const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName)
+            imageUrl = publicUrl
+          }
+        } catch (err) {
+          console.error('Image upload error:', err)
+        }
+      }
+
+      const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`
+      const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`
+
+      const serviceData = {
+        vendor_id: currentUser.id,
+        type: 'offered',
+        title: document.getElementById('quickTitle').value,
+        category: document.getElementById('quickCategory').value,
+        description: document.getElementById('quickDesc').value,
+        price: parseFloat(document.getElementById('quickPrice').value),
+        location: document.getElementById('quickLocation').value,
+        time: `${weekdayTime}, ${weekendTime}`,
+        whatsapp: document.getElementById('quickWhatsapp').value,
+        telegram: document.getElementById('quickTelegram').value,
+        contact: document.getElementById('quickEmail').value || null,
+        image: imageUrl,
+        status: 'pending' // Requires admin approval
+      }
+
+      const { error } = await db.from('services').insert(serviceData)
+
+      btn.disabled = false
+      btn.textContent = 'Submit for Approval'
+
+      if (error) {
+        alert('Error: ' + error.message)
+        return
+      }
+
+      alert('Service submitted! Waiting for admin approval.')
+      toggleCreatePopup()
+      this.reset()
+    })
+
+    // Admin application form submission
+    document.getElementById('adminApplicationForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault()
+      if (!currentUser) { alert('Please login first'); return }
+
+      const btn = this.querySelector('.submit-btn')
+      btn.disabled = true
+      btn.textContent = 'Submitting...'
+
+      const { error } = await db.from('admin_applications').insert({
+        user_id: currentUser.id,
+        position: document.getElementById('adminPosition').value,
+        reason: document.getElementById('adminReason').value,
+        qualifications: document.getElementById('adminQualifications').value,
+        whatsapp: document.getElementById('adminWhatsapp').value,
+        status: 'pending'
+      })
+
+      btn.disabled = false
+      btn.textContent = 'Submit Application'
+
+      if (error) {
+        alert('Error: ' + error.message)
+        return
+      }
+
+      alert('Application submitted! Admin will review your request.')
+      toggleAdminApplicationPopup()
+      this.reset()
+    })
   </script>
 </body>
 </html>

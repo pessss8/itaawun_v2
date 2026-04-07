@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Service - IT'aawun</title>
+  <title>Create Service - iTa'awun</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* Body & Gradient Background */
@@ -70,6 +70,16 @@
 
     .profile-container {
       position: relative;
+      display: inline-block;
+    }
+    .profile-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      z-index: -1;
     }
 
     .profile-pic {
@@ -78,30 +88,44 @@
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid white;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
+    }
+    .profile-container:hover .profile-pic {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
     }
 
     .dropdown {
       display: none;
       position: absolute;
       right: 0;
-      top: 50px;
+      top: 48px;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-    }
-
-    .dropdown a {
-      display: block;
-      padding: 10px;
-      text-decoration: none;
       color: #333;
-      font-size: 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      min-width: 160px;
+      z-index: 100;
+      overflow: hidden;
+      animation: fadeIn 0.15s ease;
     }
-
-    .dropdown a:hover {
-      background: #f0f0f0;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    .profile-container:hover .dropdown { display: block; }
+    .dropdown:hover { display: block; }
+    .dropdown a {
+      display: block; padding: 11px 16px;
+      text-decoration: none; color: #333; font-size: 14px;
+      transition: background 0.15s;
+    }
+    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+    .dropdown .logout-link { color: #dc2626 !important; }
+    .dropdown .logout-link:hover { background: #fef2f2 !important; }
+    .vendor-link.hidden { display: none; }
 
     /* Container */
     .container {
@@ -165,13 +189,14 @@
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
-    <div class="profile-container">
-      <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" onclick="toggleDropdown()">
-      <div class="dropdown" id="dropdownMenu">
-        <a href="profile.html">My Profile</a>
-        <a href="#">Settings</a>
-        <a href="#" onclick="doLogout()">Logout</a>
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+    <div class="profile-container" id="profileContainer">
+      <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
+      <div class="dropdown">
+        <a href="profile.html">👤 My Profile</a>
+        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">🏪 Vendor Dashboard</a>
+        <hr class="divider">
+        <a href="#" onclick="doLogout()">🚪 Logout</a>
       </div>
     </div>
   </header>
@@ -190,7 +215,7 @@
         <option value="needed">Service Needed</option>
       </select>
 
-      <label for="title">Service Title</label>
+      <label for="title">Title</label>
       <input type="text" id="title" required>
 
       <label for="desc">Description</label>
@@ -202,25 +227,39 @@
       <label for="category">Category</label>
       <select id="category" required>
         <option value="">Select Category</option>
+        <option value="food">Food & Drinks</option>
+        <option value="runner">Runner</option>
+        <option value="printing">Printing</option>
+        <option value="cleaning">Cleaning</option>
+        <option value="laundry">Laundry</option>
+        <option value="delivery">Delivery</option>
+        <option value="tutoring">Tutoring</option>
         <option value="design">Design</option>
         <option value="coding">Coding</option>
-        <option value="writing">Writing</option>
-        <option value="tutoring">Tutoring</option>
         <option value="photography">Photography</option>
+        <option value="repair">Repair</option>
+        <option value="other">Other</option>
       </select>
 
       <label for="location">Location</label>
       <input type="text" id="location" placeholder="City, Area, etc." required>
 
-      <label for="time">Time Available / Needed</label>
-      <select id="time" required>
-        <option value="">Select Time</option>
-        <option value="Mon-Fri 9am-5pm">Mon-Fri 9am-5pm</option>
-        <option value="Mon-Fri 10am-6pm">Mon-Fri 10am-6pm</option>
-        <option value="Weekends">Weekends</option>
-        <option value="Evenings">Evenings</option>
-        <option value="Flexible">Flexible</option>
-      </select>
+      <label for="time">Time Available</label>
+      <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:13px;color:#555;min-width:80px;">Weekday:</span>
+          <input type="time" id="weekdayStart" value="09:00" style="flex:1;margin:0;">
+          <span>-</span>
+          <input type="time" id="weekdayEnd" value="17:00" style="flex:1;margin:0;">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;color:#555;min-width:80px;">Weekend:</span>
+          <input type="time" id="weekendStart" value="10:00" style="flex:1;margin:0;">
+          <span>-</span>
+          <input type="time" id="weekendEnd" value="18:00" style="flex:1;margin:0;">
+        </div>
+      </div>
+      <input type="hidden" id="time" value="">
 
       <label for="whatsapp">WhatsApp Number *</label>
       <input type="text" id="whatsapp" placeholder="60123456789" required>
@@ -228,8 +267,12 @@
       <label for="telegram">Telegram Username *</label>
       <input type="text" id="telegram" placeholder="username" required>
 
-      <label for="image">Image URL</label>
-      <input type="text" id="image" placeholder="https://example.com/image.jpg">
+      <label for="image">Image</label>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="text" id="imageUrl" placeholder="Image URL">
+        <span style="font-size:12px;color:#888;text-align:center;">- OR -</span>
+        <input type="file" id="imageFile" accept="image/*" style="padding:8px;">
+      </div>
 
       <label for="contact">Email (optional)</label>
       <input type="email" id="contact" placeholder="your@email.com">
@@ -246,31 +289,25 @@
 
     let currentUser = null
 
-    // Auth check - redirect to login if not logged in
-    db.auth.getSession().then(({ data: { session } }) => {
+    // Auth check
+    (async function initCreate() {
+      const { data: { session } } = await db.auth.getSession()
       if (!session) { window.location.href = 'index.html'; return }
       currentUser = session.user
-      // Load profile picture
-      db.from('profiles').select('avatar_url').eq('id', session.user.id).single()
-        .then(({ data }) => {
-          if (data?.avatar_url) document.querySelector('.profile-pic').src = data.avatar_url
-        })
-    })
+
+      // Load profile
+      const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
+      if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
+      if (profile?.role === 'vendor' || profile?.role === 'admin') {
+        const vendorLink = document.getElementById('vendorDropdownLink')
+        if (vendorLink) vendorLink.classList.remove('hidden')
+      }
+    })()
 
     async function doLogout() {
       const { error } = await db.auth.signOut()
       if (error) console.error('Logout error:', error)
       window.location.replace('index.html?logged=out')
-    }
-
-    function toggleDropdown() {
-      const m = document.getElementById("dropdownMenu");
-      m.style.display = (m.style.display === "block") ? "none" : "block";
-    }
-    window.onclick = function (e) {
-      if (!e.target.matches('.profile-pic')) {
-        document.getElementById("dropdownMenu").style.display = "none";
-      }
     }
 
     document.getElementById("serviceForm").addEventListener("submit", async function (e) {
@@ -284,17 +321,35 @@
       const price = parseFloat(document.getElementById("price").value);
       const category = document.getElementById("category").value;
       const location = document.getElementById("location").value;
-      const time = document.getElementById("time").value;
+      const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`;
+      const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`;
+      const time = `${weekdayTime}, ${weekendTime}`;
       const contact = document.getElementById("contact").value || null;
       const whatsapp = document.getElementById("whatsapp").value;
       const telegram = document.getElementById("telegram").value;
-      let image = document.getElementById("image").value;
-      if (!image) image = "https://via.placeholder.com/220x120";
 
       const btn = this.querySelector('button[type="submit"]');
       const originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Submitting...';
+
+      // Handle image upload
+      let image = document.getElementById("imageUrl").value;
+      const imageFile = document.getElementById("imageFile").files[0];
+      if (imageFile) {
+        try {
+          const fileExt = imageFile.name.split('.').pop();
+          const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
+          const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile);
+          if (!uploadError) {
+            const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName);
+            image = publicUrl;
+          }
+        } catch (err) {
+          console.error('Image upload error:', err);
+        }
+      }
+      if (!image) image = "https://via.placeholder.com/220x120";
 
       // Insert into Supabase services table
       const serviceData = {
@@ -310,23 +365,21 @@
         telegram: telegram,
         image: image,
         type: type,
-        status: 'active'
+        status: 'pending' // Requires admin approval
       }
 
-      console.log('Submitting service data:', serviceData)
-
-      const { data, error } = await db.from('services').insert(serviceData).select()
+      const { error } = await db.from('services').insert(serviceData)
 
       btn.disabled = false;
       btn.textContent = originalText;
 
       if (error) {
         console.error('Supabase error details:', error)
-        alert('Error submitting service: ' + error.message + '\n\nCheck browser console (F12) for column name details.');
+        alert('Error submitting service: ' + error.message);
         return;
       }
 
-      alert('Service submitted successfully!');
+      alert('Service submitted! Waiting for admin approval.');
       document.getElementById("serviceForm").reset();
 
       // Redirect based on service type

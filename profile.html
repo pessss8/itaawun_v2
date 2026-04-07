@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile - IT'aawun</title>
+  <title>My Profile - iTa'awun</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -51,6 +51,28 @@
       }
     }
 
+    /* Theme variants */
+    body.theme-purple {
+      background: linear-gradient(-45deg, #6b21a8, #ffffff, #3F00FF);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    body.theme-blue {
+      background: linear-gradient(-45deg, #0066cc, #ffffff, #00cc99);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    body.theme-green {
+      background: linear-gradient(-45deg, #006644, #ffffff, #99cc00);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    body.theme-sunset {
+      background: linear-gradient(-45deg, #ff6600, #ffffff, #cc3366);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
     header {
       background: rgba(0, 0, 0, 0.2);
       color: white;
@@ -69,17 +91,16 @@
 
     .profile-card {
       background: rgba(255, 255, 255, 0.95);
-      max-width: 500px;
-      margin: 50px auto;
+      max-width: 600px;
+      margin: 30px auto;
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      transition: transform 0.3s;
     }
 
-    .profile-card:hover {
-      transform: translateY(-5px);
+    .profile-header {
+      text-align: center;
+      margin-bottom: 25px;
     }
 
     .profile-card img {
@@ -107,19 +128,136 @@
       margin-bottom: 10px;
     }
 
-    .info {
-      text-align: left;
-      margin-top: 20px;
-    }
-
-    .info p {
-      font-size: 15px;
-      margin: 10px 0;
-      color: #333;
-    }
-
-    .info strong {
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
       color: #001f3f;
+      margin: 20px 0 10px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #6b21a8;
+    }
+
+    .info {
+      margin-top: 15px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .info-value {
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .edit-btn {
+      background: #6b21a8;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-top: 15px;
+      transition: 0.2s;
+    }
+
+    .edit-btn:hover {
+      background: #5b1a8a;
+    }
+
+    .theme-selector {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .theme-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .theme-btn.active {
+      border-color: #001f3f;
+    }
+
+    .theme-purple-btn { background: linear-gradient(135deg, #6b21a8, #3F00FF); }
+    .theme-blue-btn { background: linear-gradient(135deg, #0066cc, #00cc99); }
+    .theme-green-btn { background: linear-gradient(135deg, #006644, #99cc00); }
+    .theme-sunset-btn { background: linear-gradient(135deg, #ff6600, #cc3366); }
+
+    .edit-form {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .edit-form.active {
+      display: block;
+    }
+
+    .edit-form label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .edit-form input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .edit-form .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .save-btn {
+      flex: 1;
+      background: #16a34a;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .cancel-btn {
+      flex: 1;
+      background: #666;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
     }
 
     .logout-btn {
@@ -132,6 +270,7 @@
       font-size: 16px;
       cursor: pointer;
       transition: 0.3s;
+      width: 100%;
     }
 
     .logout-btn:hover {
@@ -148,7 +287,7 @@
 
     @media (max-width: 600px) {
       .profile-card {
-        margin: 30px 20px;
+        margin: 20px;
         padding: 20px;
       }
 
@@ -163,7 +302,7 @@
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
   </header>
 
   <div class="back-button" onclick="window.location.href='home.html'">
@@ -171,22 +310,80 @@
   </div>
 
   <div class="profile-card">
-    <img id="pfp" src="assets/images/ipey.jpeg" alt="Profile Picture">
-    <button id="uploadBtn" onclick="triggerFileUpload()" style="margin-top:10px;padding:8px 16px;background:#6b21a8;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;">📷 Change Photo</button>
-    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
-    <div id="uploadStatus" style="margin-top:10px;font-size:13px;"></div>
-    <h2 id="displayName">Loading...</h2>
-    <span class="role-badge" id="roleBadge">student</span>
-    <div class="info">
-      <p><strong>Email:</strong> <span id="userEmail">—</span></p>
-      <p><strong>Student ID:</strong> <span id="studentId">—</span></p>
-      <p><strong>Phone:</strong> <span id="userPhone">—</span></p>
+    <div class="profile-header">
+      <img id="pfp" src="assets/images/ipey.jpeg" alt="Profile Picture">
+      <br>
+      <button id="uploadBtn" onclick="triggerFileUpload()" class="edit-btn">📷 Change Photo</button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+      <div id="uploadStatus" style="margin-top:10px;font-size:13px;"></div>
+      <h2 id="displayName">Loading...</h2>
+      <span class="role-badge" id="roleBadge">student</span>
     </div>
-    <button class="logout-btn" onclick="doLogout()">Logout</button>
+
+    <div class="section-title">📋 Profile Information</div>
+    <div class="info">
+      <div class="info-row">
+        <span class="info-label">Email</span>
+        <span class="info-value" id="userEmail">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Full Name</span>
+        <span class="info-value" id="fullNameDisplay">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Student ID</span>
+        <span class="info-value" id="studentId">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Phone</span>
+        <span class="info-value" id="userPhone">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Room Address</span>
+        <span class="info-value" id="roomAddress">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Gender</span>
+        <span class="info-value" id="gender">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Member Since</span>
+        <span class="info-value" id="memberSince">—</span>
+      </div>
+    </div>
+
+    <button class="edit-btn" onclick="toggleEditForm()">✏️ Edit Profile</button>
+
+    <div class="edit-form" id="editForm">
+      <label>Full Name</label>
+      <input type="text" id="editFullName">
+      <label>Student ID</label>
+      <input type="text" id="editStudentId">
+      <label>Phone</label>
+      <input type="text" id="editPhone">
+      <label>Room Address</label>
+      <input type="text" id="editRoomAddress" placeholder="Mahallah X, Block A, Level 1, Room 101">
+      <label>New Password (leave blank to keep current)</label>
+      <input type="password" id="editPassword" placeholder="Min 6 characters">
+      <div class="form-actions">
+        <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+        <button class="cancel-btn" onclick="toggleEditForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="section-title">🎨 Theme</div>
+    <div class="theme-selector">
+      <button class="theme-btn theme-purple-btn active" onclick="setTheme('purple')" title="Purple"></button>
+      <button class="theme-btn theme-blue-btn" onclick="setTheme('blue')" title="Blue"></button>
+      <button class="theme-btn theme-green-btn" onclick="setTheme('green')" title="Green"></button>
+      <button class="theme-btn theme-sunset-btn" onclick="setTheme('sunset')" title="Sunset"></button>
+    </div>
+
+    <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
   </div>
 
   <footer>
-    <p>© 2025 IT'aawun | Student Freelance Collaboration</p>
+    <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
   </footer>
 
   <script>
@@ -194,9 +391,14 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
+    let currentUser = null
+
     // Protect page
-    db.auth.getSession().then(async ({ data: { session } }) => {
+    (async function initProfile() {
+      const { data: { session } } = await db.auth.getSession()
       if (!session) { window.location.href = 'index.html'; return }
+
+      currentUser = session.user
 
       // Load auth email
       document.getElementById('userEmail').textContent = session.user.email
@@ -210,19 +412,100 @@
 
       if (profile) {
         document.getElementById('displayName').textContent = profile.full_name || 'No name set'
+        document.getElementById('fullNameDisplay').textContent = profile.full_name || '—'
         document.getElementById('studentId').textContent = profile.student_id || '—'
         document.getElementById('userPhone').textContent = profile.phone || '—'
+        document.getElementById('roomAddress').textContent = profile.room_address || '—'
+        document.getElementById('gender').textContent = profile.gender || '—'
         document.getElementById('roleBadge').textContent = profile.role || 'student'
+
+        // Member since
+        if (profile.created_at) {
+          const date = new Date(profile.created_at)
+          document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        }
+
         if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url
+
+        // Pre-fill edit form
+        document.getElementById('editFullName').value = profile.full_name || ''
+        document.getElementById('editStudentId').value = profile.student_id || ''
+        document.getElementById('editPhone').value = profile.phone || ''
+        document.getElementById('editRoomAddress').value = profile.room_address || ''
       } else {
         document.getElementById('displayName').textContent = session.user.email
       }
-    })
+
+      // Load saved theme
+      const savedTheme = localStorage.getItem('itaawun_theme') || 'purple'
+      setTheme(savedTheme)
+    })()
 
     async function doLogout() {
       const { error } = await db.auth.signOut()
       if (error) { console.error('Logout error:', error) }
       window.location.replace('index.html?logged=out')
+    }
+
+    function toggleEditForm() {
+      const form = document.getElementById('editForm')
+      form.classList.toggle('active')
+    }
+
+    async function saveProfile() {
+      const fullName = document.getElementById('editFullName').value.trim()
+      const studentId = document.getElementById('editStudentId').value.trim()
+      const phone = document.getElementById('editPhone').value.trim()
+      const roomAddress = document.getElementById('editRoomAddress').value.trim()
+      const newPassword = document.getElementById('editPassword').value
+
+      if (!fullName || !studentId) {
+        alert('Full Name and Student ID are required.')
+        return
+      }
+
+      const updates = {
+        full_name: fullName,
+        student_id: studentId,
+        phone: phone,
+        room_address: roomAddress
+      }
+
+      // Update password if provided
+      if (newPassword && newPassword.length >= 6) {
+        const { error: pwError } = await db.auth.updateUser({ password: newPassword })
+        if (pwError) {
+          alert('Error updating password: ' + pwError.message)
+          return
+        }
+      } else if (newPassword && newPassword.length < 6) {
+        alert('Password must be at least 6 characters.')
+        return
+      }
+
+      const { error } = await db
+        .from('profiles')
+        .update(updates)
+        .eq('id', currentUser.id)
+
+      if (error) {
+        alert('Error saving profile: ' + error.message)
+        return
+      }
+
+      alert('Profile updated successfully!')
+      toggleEditForm()
+      window.location.reload()
+    }
+
+    function setTheme(themeName) {
+      document.body.className = ''
+      if (themeName !== 'purple') {
+        document.body.classList.add('theme-' + themeName)
+      }
+      localStorage.setItem('itaawun_theme', themeName)
+      document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'))
+      document.querySelector('.theme-' + themeName + '-btn').classList.add('active')
     }
 
     // Profile picture upload functions

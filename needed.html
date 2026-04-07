@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Service Needed - IT'aawun</title>
+  <title>Service Needed - iTa'awun</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
@@ -50,6 +50,16 @@
 
     .profile-container {
       position: relative;
+      display: inline-block;
+    }
+    .profile-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      z-index: -1;
     }
 
     .profile-pic {
@@ -58,30 +68,44 @@
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid white;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
+    }
+    .profile-container:hover .profile-pic {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
     }
 
     .dropdown {
       display: none;
       position: absolute;
       right: 0;
-      top: 50px;
+      top: 48px;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-    }
-
-    .dropdown a {
-      display: block;
-      padding: 10px;
-      text-decoration: none;
       color: #333;
-      font-size: 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      min-width: 160px;
+      z-index: 100;
+      overflow: hidden;
+      animation: fadeIn 0.15s ease;
     }
-
-    .dropdown a:hover {
-      background: #f0f0f0;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    .profile-container:hover .dropdown { display: block; }
+    .dropdown:hover { display: block; }
+    .dropdown a {
+      display: block; padding: 11px 16px;
+      text-decoration: none; color: #333; font-size: 14px;
+      transition: background 0.15s;
+    }
+    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+    .dropdown .logout-link { color: #dc2626 !important; }
+    .dropdown .logout-link:hover { background: #fef2f2 !important; }
+    .vendor-link.hidden { display: none; }
 
     .back-button {
       padding: 10px 40px;
@@ -382,6 +406,76 @@
       background: #004f80;
     }
 
+    /* FAB button for adding sample data */
+    .fab-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #6b21a8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(107,33,168,0.4);
+      transition: 0.3s;
+      z-index: 500;
+      border: none;
+    }
+    .fab-btn:hover {
+      transform: scale(1.1);
+      background: #7c3aed;
+    }
+    .fab-panel {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 350px;
+      max-width: 90%;
+      height: 100vh;
+      background: white;
+      z-index: 501;
+      box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+      overflow-y: auto;
+    }
+    .fab-panel.active { display: block; animation: slideIn 0.3s ease; }
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .fab-panel-content { padding: 25px; }
+    .close-fab {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #666;
+    }
+    .close-fab:hover { color: #333; }
+    .fab-panel h2 { color: #6b21a8; margin-bottom: 20px; }
+    .fab-panel p { color: #555; margin-bottom: 15px; }
+    .fab-btn-action {
+      width: 100%;
+      padding: 12px;
+      background: #6b21a8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: 0.2s;
+    }
+    .fab-btn-action:hover { background: #5b1a8a; }
+
     footer {
       background: rgba(0, 0, 0, 0.2);
       color: white;
@@ -410,13 +504,14 @@
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
-    <div class="profile-container">
-      <img src="assets/images/ipey.jpeg" class="profile-pic" id="profilePic" onclick="toggleDropdown()">
-      <div class="dropdown" id="dropdownMenu">
-        <a href="profile.html">My Profile</a>
-        <a href="bookings.html">My Bookings</a>
-        <a href="#" onclick="doLogout()" style="color:#dc2626">Logout</a>
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+    <div class="profile-container" id="profileContainer">
+      <img src="assets/images/ipey.jpeg" class="profile-pic" id="profilePic">
+      <div class="dropdown">
+        <a href="profile.html">👤 My Profile</a>
+        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">🏪 Vendor Dashboard</a>
+        <hr class="divider">
+        <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
       </div>
     </div>
   </header>
@@ -436,6 +531,18 @@
 
   <div class="request-list" id="requestList">
     <div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">Loading requests...</div>
+  </div>
+
+  <!-- FAB button for admin/sample data -->
+  <button class="fab-btn" onclick="toggleFabPanel()">+</button>
+  <div id="fabPanel" class="fab-panel">
+    <div class="fab-panel-content">
+      <span class="close-fab" onclick="toggleFabPanel()">&times;</span>
+      <h2>Developer Tools</h2>
+      <p>Add sample service needed requests for testing:</p>
+      <button class="fab-btn-action" onclick="addSampleNeededServices()">📦 Add Sample Requests</button>
+      <p style="font-size:12px;color:#888;margin-top:15px;">Note: Only admins can add sample data.</p>
+    </div>
   </div>
 
   <!-- Filter Popup -->
@@ -573,9 +680,20 @@
       return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"')
     }
 
-    // Profile dropdown
-    function toggleDropdown() { document.getElementById("dropdownMenu").style.display = document.getElementById("dropdownMenu").style.display === "block" ? "none" : "block"; }
-    window.onclick = function (event) { if (!event.target.matches('.profile-pic')) { document.getElementById("dropdownMenu").style.display = "none"; } }
+    // Auth check with vendor link
+    (async function initNeeded() {
+      const { data: { session } } = await db.auth.getSession()
+      if (!session) { window.location.href = 'index.html'; return }
+      currentUser = session.user
+
+      const { data: profile } = await db.from('profiles').select('role').eq('id', session.user.id).single()
+      if (profile?.role === 'vendor' || profile?.role === 'admin') {
+        const vendorLink = document.getElementById('vendorDropdownLink')
+        if (vendorLink) vendorLink.classList.remove('hidden')
+      }
+
+      loadRequests()
+    })()
 
     // Description toggle
     function toggleDesc(btn) { const desc = btn.previousElementSibling; desc.classList.toggle('expanded'); btn.textContent = desc.classList.contains('expanded') ? 'Less' : 'More'; }
@@ -651,6 +769,67 @@
       const { error } = await db.auth.signOut()
       if (error) { console.error('Logout error:', error) }
       window.location.replace('index.html?logged=out')
+    }
+
+    // FAB Panel toggle
+    function toggleFabPanel() {
+      const panel = document.getElementById('fabPanel')
+      panel.classList.toggle('active')
+    }
+
+    // Add sample needed services
+    async function addSampleNeededServices() {
+      if (!currentUser) { alert('Please login first'); return }
+
+      // Check if user is admin
+      const { data: profile } = await db.from('profiles').select('role').eq('id', currentUser.id).single()
+      if (profile?.role !== 'admin') {
+        alert('Only admins can add sample data.')
+        return
+      }
+
+      const btn = event.target
+      btn.disabled = true
+      btn.textContent = 'Adding...'
+
+      const sampleNeeded = [
+        { title: 'Need someone to design a logo', category: 'design', price: 30 },
+        { title: 'Looking for Python coding help', category: 'coding', price: 25 },
+        { title: 'Need essay proofreading', category: 'writing', price: 15 },
+        { title: 'Mathematics tutoring needed', category: 'tutoring', price: 40 },
+        { title: 'Event photography needed', category: 'photography', price: 80 },
+        { title: 'Need food delivery from canteen', category: 'food', price: 5 },
+        { title: 'Looking for runner to print documents', category: 'runner', price: 8 },
+        { title: 'Need help with PowerPoint slides', category: 'design', price: 20 },
+        { title: 'Chemistry tutoring needed', category: 'tutoring', price: 35 },
+        { title: 'Need someone to fix my laptop', category: 'repair', price: 50 }
+      ]
+
+      let count = 0
+      for (const item of sampleNeeded) {
+        const { error } = await db.from('services').insert({
+          vendor_id: currentUser.id,
+          type: 'needed',
+          title: item.title,
+          category: item.category,
+          description: item.title + ' - urgent requirement!',
+          price: item.price,
+          location: 'Mahallah Z, B15',
+          time: 'Weekdays 09:00-17:00, Weekends 10:00-18:00',
+          whatsapp: '60123456789',
+          telegram: 'student_' + (count + 1),
+          contact: 'student' + (count + 1) + '@example.com',
+          image: 'https://via.placeholder.com/300x120',
+          status: 'active'
+        })
+        if (!error) count++
+      }
+
+      btn.disabled = false
+      btn.textContent = '📦 Add Sample Requests'
+      alert(`Added ${count} sample service needed requests!`)
+      toggleFabPanel()
+      loadRequests()
     }
   </script>
 </body>

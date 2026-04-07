@@ -177,3 +177,58 @@ Check that all 5 tables have proper RLS:
 
 **End of Session Summary**
 *iTa'awun — Cooperation in Action*
+
+
+----------------------------------------------------
+
+User's Scrutinization - TO BE SOLVE.
+
+Profile picture hover button
+1. Standardize the profile picture hover button please throughout all .html files. To normal user, a profile and log out is enough. But to vendors, add the managed vendors and then redirect to vendor.html.
+
+The correct letter for top left is iTa'awun. Change and standardize throughout all.
+
+Standardize the filtering options throughout all .html files. 
+
+Regarding the new .html files such as live-gigs, my-gigs, post-gig, tasker-apply and etc., put them in a new folder first and make sure it is clean, no .html on the main file is linked to them to avoid confusions.
+
+Find.html
+1. Remove the bookings.html. We will use vendor.html only for now on. Follow up the changes from booking.html to vendor.html
+2. I dont want the vendor profile to be the same. is it because we lacked data? Use their respected pfp.
+
+
+needed.html
+1. Data is to be created
+
+profile.html
+1. Add complete profile segments, user details, status, history, etc.
+2. Add section to change the details such as profile picture, password, or name. Remove the hard-coded profile picture.
+3. Give option to change theme (background gradient, etc.) for the UI colour.
+4. When I upload my picture, this come 'Upload failed: currentUser is not defined'
+
+signup.html
+1. When I enter my name at 'full name' at the box, the supabase read as null. The supabase column is title is 'full-name'
+2. Add box asking for their room address in this format: Mahallah *name*, Block * one alphabet caps*, Level *number*, Room Number *3 digits*
+3. Add box asking their gender
+
+home.html
+1. The pop up button when hover over profile picture (pfp) is good, but need to extend the cursor range around the pfp because it's hard for me to reach the logout button.
+2. The logout button on the pfp is not functioning, it's not bringing me back to the login page.
+3. Remove the Live Gigs button, let's stay with the 3 button just for now. With 'Service Offered' and 'Service Needed' side by side on top while create service is a bit smaller. Change the create service button to a + pop up button that when clicked, the create service form will pop up from the right side of the website. 
+4. For users with the 'role' of 'vendor', give them the 'Vendor Dashboard' button on their pfp that will bring to vendor.html. Only user with the authority of vendor.
+5. On the right side bar to, put a button for application to the administrations to become a vendor or applying for official works. Maybe similar concept to the create service + button.
+
+create.html
+1. Change 'service title' to 'Title'
+2. As this is a labour-based job, please redefine back your category. (Food and drinks, runner, printing, etc.)
+3. Select time would be on clock format, and they can  add multiple time based on their day (weekend and weekday timing different)
+4. For the image URL, give option to upload image too.
+5. Looks like the application is directly published to the category. IMPORTANT - make the vendor get approval first.
+
+
+admin.html
+1. Logout button is not functioning.
+2. Hide developer tools using the same concept of the + pop up button.
+3. Looks like the logic in here is not settled yet, there are at least 10 vendors and 2 users but only dash are appearing.
+4. Admin cannot access users .html. They can only wander through the admin.html to avoid data confusion. Or is there no affect? 
+

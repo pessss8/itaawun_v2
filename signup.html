@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT'aawun - Create Account</title>
+  <title>iTa'awun - Create Account</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
@@ -121,7 +121,7 @@
 
 <body>
   <div class="container">
-    <div class="logo">IT'aawun</div>
+    <div class="logo">iTa'awun</div>
     <div class="tagline">Student Freelance Collaboration</div>
     <h2>Create Account</h2>
 
@@ -131,6 +131,19 @@
     <input id="email" type="email" placeholder="Student Email">
     <input id="pass" type="password" placeholder="Password (min. 6 characters)">
     <input id="pass2" type="password" placeholder="Confirm Password">
+
+    <div style="text-align:left;margin-top:15px;margin-bottom:5px;font-size:13px;color:#555;"><strong>Room Address</strong></div>
+    <input id="mahallah" type="text" placeholder="Mahallah (e.g. Z, F, D)">
+    <input id="block" type="text" placeholder="Block (e.g. A)" style="text-transform:uppercase;">
+    <input id="level" type="number" placeholder="Level (e.g. 1)">
+    <input id="room" type="text" placeholder="Room No. (e.g. 01)">
+
+    <label style="display:block;text-align:left;margin-top:15px;margin-bottom:5px;font-size:13px;color:#555;"><strong>Gender</strong></label>
+    <div style="display:flex;gap:15px;justify-content:flex-start;padding:8px 0;">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="gender" value="male" style="width:auto;margin:0;"> Male</label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="gender" value="female" style="width:auto;margin:0;"> Female</label>
+    </div>
+
     <button id="btn-signup" onclick="doSignup()">Create Account</button>
 
     <div class="links">
@@ -156,11 +169,25 @@
       const pass = document.getElementById('pass').value
       const pass2 = document.getElementById('pass2').value
 
+      const mahallah = document.getElementById('mahallah').value.trim()
+      const block = document.getElementById('block').value.trim().toUpperCase()
+      const level = document.getElementById('level').value.trim()
+      const room = document.getElementById('room').value.trim().padStart(2, '0')
+
+      const genderEl = document.querySelector('input[name="gender"]:checked')
+      const gender = genderEl ? genderEl.value : ''
+
       if (!fullname || !studentid || !email || !pass || !pass2) {
-        setMsg('Please fill in all fields.'); return
+        setMsg('Please fill in all required fields.'); return
       }
       if (pass.length < 6) { setMsg('Password must be at least 6 characters.'); return }
       if (pass !== pass2) { setMsg('Passwords do not match.'); return }
+      if (!mahallah || !block || !level || !room) {
+        setMsg('Please fill in all room address fields.'); return
+      }
+      if (!gender) {
+        setMsg('Please select your gender.'); return
+      }
 
       document.getElementById('btn-signup').disabled = true
       setMsg('Creating your account...', 'success')
@@ -174,11 +201,14 @@
 
       // 2. Save profile info to profiles table
       if (data.user) {
+        const roomAddress = `Mahallah ${mahallah}, Block ${block}, Level ${level}, Room ${room}`
         await db.from('profiles').insert({
           id: data.user.id,
           full_name: fullname,
           student_id: studentid,
           role: 'student',
+          room_address: roomAddress,
+          gender: gender,
           is_approved: false
         })
       }

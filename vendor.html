@@ -63,12 +63,20 @@
       text-decoration: underline;
     }
 
-    /* Profile dropdown */
+    /* Profile dropdown - hover-based with extended hit area */
     .profile-container {
       position: relative;
       display: inline-block;
     }
-
+    .profile-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      z-index: -1;
+    }
     .profile-pic {
       width: 40px;
       height: 40px;
@@ -78,12 +86,10 @@
       transition: transform 0.2s, box-shadow 0.2s;
       display: block;
     }
-
     .profile-container:hover .profile-pic {
       transform: scale(1.1);
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
     }
-
     .dropdown {
       display: none;
       position: absolute;
@@ -92,60 +98,28 @@
       background: white;
       color: #333;
       border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
       min-width: 160px;
       z-index: 100;
       overflow: hidden;
       animation: fadeIn 0.15s ease;
     }
-
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-6px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    .profile-container:hover .dropdown {
-      display: block;
-    }
-
-    .dropdown:hover {
-      display: block;
-    }
-
+    .profile-container:hover .dropdown { display: block; }
+    .dropdown:hover { display: block; }
     .dropdown a {
-      display: block;
-      padding: 11px 16px;
-      text-decoration: none;
-      color: #333;
-      font-size: 14px;
+      display: block; padding: 11px 16px;
+      text-decoration: none; color: #333; font-size: 14px;
       transition: background 0.15s;
     }
-
-    .dropdown a:hover {
-      background: #f5f0ff;
-      color: #6b21a8;
-    }
-
-    .dropdown .divider {
-      border: none;
-      border-top: 1px solid #eee;
-      margin: 0;
-    }
-
-    .dropdown .logout-link {
-      color: #dc2626 !important;
-    }
-
-    .dropdown .logout-link:hover {
-      background: #fef2f2 !important;
-    }
+    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+    .dropdown .logout-link { color: #dc2626 !important; }
+    .dropdown .logout-link:hover { background: #fef2f2 !important; }
+    .vendor-link.hidden { display: none; }
 
     /* Main Content */
     .container {
@@ -536,17 +510,17 @@
 <body>
 
   <header>
-    <div class="logo" onclick="window.location.href='home.html'">IT'aawun</div>
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
     <nav>
       <a href="home.html">Home</a>
       <a href="find.html">Browse</a>
       <a href="bookings.html">My Bookings</a>
     </nav>
-    <div class="profile-container">
+    <div class="profile-container" id="profileContainer">
       <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
       <div class="dropdown">
         <a href="profile.html">👤 My Profile</a>
-        <a href="vendor.html">🏪 Vendor Dashboard</a>
+        <a href="profile.html" class="vendor-link hidden" id="manageVendorLink">🏪 Manage Vendors</a>
         <hr class="divider">
         <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
       </div>
@@ -664,7 +638,7 @@
   </div>
 
   <footer>
-    <p>© 2025 IT'aawun | Vendor Dashboard</p>
+    <p>© 2025 iTa'awun | Vendor Dashboard</p>
   </footer>
 
   <script>
@@ -710,6 +684,12 @@
         // Load profile picture
         if (profile.avatar_url) {
           document.getElementById('profilePic').src = profile.avatar_url
+        }
+
+        // Show manage vendors link for admin users
+        if (profile.role === 'admin') {
+          const manageVendorLink = document.getElementById('manageVendorLink')
+          if (manageVendorLink) manageVendorLink.classList.remove('hidden')
         }
 
         // Load all data
