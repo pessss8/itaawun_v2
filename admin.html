@@ -2,1335 +2,1335 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - iTa'awun</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      color: #333;
-    }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Admin Dashboard - iTa'awun</title>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ <style>
+ body {
+ margin: 0;
+ font-family: 'Segoe UI', sans-serif;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+ background-size: 400% 400%;
+ animation: gradientBG 15s ease infinite;
+ color: #333;
+ }
 
-    @keyframes gradientBG {
-      0% {
-        background-position: 0% 50%;
-      }
+ @keyframes gradientBG {
+ 0% {
+ background-position: 0% 50%;
+ }
 
-      50% {
-        background-position: 100% 50%;
-      }
+ 50% {
+ background-position: 100% 50%;
+ }
 
-      100% {
-        background-position: 0% 50%;
-      }
-    }
+ 100% {
+ background-position: 0% 50%;
+ }
+ }
 
-    header {
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+ header {
+ background: rgba(0, 0, 0, 0.2);
+ color: white;
+ padding: 15px 30px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
 
-    header .logo {
-      font-size: 22px;
-      font-weight: bold;
-      cursor: pointer;
-      color: white;
-    }
+ header .logo {
+ font-size: 22px;
+ font-weight: bold;
+ cursor: pointer;
+ color: white;
+ }
 
-    .admin-badge {
-      background: #fbbf24;
-      color: #78350f;
-      padding: 3px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-    }
+ .admin-badge {
+ background: #fbbf24;
+ color: #78350f;
+ padding: 3px 12px;
+ border-radius: 20px;
+ font-size: 12px;
+ font-weight: bold;
+ }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+ .header-right {
+ display: flex;
+ align-items: center;
+ gap: 14px;
+ }
 
-    .logout-btn-top {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      padding: 7px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      transition: 0.2s;
-    }
+ .logout-btn-top {
+ background: rgba(255, 255, 255, 0.2);
+ color: white;
+ border: 1px solid rgba(255, 255, 255, 0.4);
+ padding: 7px 16px;
+ border-radius: 8px;
+ cursor: pointer;
+ font-size: 13px;
+ transition: 0.2s;
+ }
 
-    .logout-btn-top:hover {
-      background: rgba(255, 255, 255, 0.35);
-    }
+ .logout-btn-top:hover {
+ background: rgba(255, 255, 255, 0.35);
+ }
 
-    .page-title {
-      text-align: center;
-      padding: 20px;
-      color: #001f3f;
-      font-size: 26px;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
-    }
+ .page-title {
+ text-align: center;
+ padding: 20px;
+ color: #001f3f;
+ font-size: 26px;
+ font-weight: bold;
+ text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+ }
 
-    /* Stats row */
-    .stats-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 14px;
-      padding: 0 20px 20px;
-    }
+ /* Stats row */
+ .stats-row {
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 14px;
+ padding: 0 20px 20px;
+ }
 
-    .stat-card {
-      background: rgba(255, 255, 255, 0.92);
-      border-radius: 12px;
-      padding: 18px 24px;
-      text-align: center;
-      min-width: 130px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+ .stat-card {
+ background: rgba(255, 255, 255, 0.92);
+ border-radius: 12px;
+ padding: 18px 24px;
+ text-align: center;
+ min-width: 130px;
+ box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+ }
 
-    .stat-card .num {
-      font-size: 30px;
-      font-weight: bold;
-      color: #6b21a8;
-    }
+ .stat-card .num {
+ font-size: 30px;
+ font-weight: bold;
+ color: #6b21a8;
+ }
 
-    .stat-card .lbl {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
+ .stat-card .lbl {
+ font-size: 12px;
+ color: #666;
+ margin-top: 4px;
+ }
 
-    /* Tabs */
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding: 0 20px 20px;
-    }
+ /* Tabs */
+ .tabs {
+ display: flex;
+ justify-content: center;
+ gap: 8px;
+ flex-wrap: wrap;
+ padding: 0 20px 20px;
+ }
 
-    .tab-btn {
-      padding: 9px 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.3);
-      color: #001f3f;
-      transition: 0.2s;
-    }
+ .tab-btn {
+ padding: 9px 20px;
+ border: none;
+ border-radius: 8px;
+ font-size: 13px;
+ font-weight: bold;
+ cursor: pointer;
+ background: rgba(255, 255, 255, 0.3);
+ color: #001f3f;
+ transition: 0.2s;
+ }
 
-    .tab-btn.active {
-      background: #001f3f;
-      color: white;
-    }
+ .tab-btn.active {
+ background: #001f3f;
+ color: white;
+ }
 
-    .tab-btn:hover:not(.active) {
-      background: rgba(255, 255, 255, 0.6);
-    }
+ .tab-btn:hover:not(.active) {
+ background: rgba(255, 255, 255, 0.6);
+ }
 
-    /* Content panels */
-    .panel {
-      display: none;
-      padding: 0 20px 30px;
-    }
+ /* Content panels */
+ .panel {
+ display: none;
+ padding: 0 20px 30px;
+ }
 
-    .panel.active {
-      display: block;
-    }
+ .panel.active {
+ display: block;
+ }
 
-    /* Table */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+ /* Table */
+ .data-table {
+ width: 100%;
+ border-collapse: collapse;
+ background: rgba(255, 255, 255, 0.95);
+ border-radius: 12px;
+ overflow: hidden;
+ box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+ }
 
-    .data-table th {
-      background: #001f3f;
-      color: white;
-      padding: 11px 14px;
-      text-align: left;
-      font-size: 13px;
-    }
+ .data-table th {
+ background: #001f3f;
+ color: white;
+ padding: 11px 14px;
+ text-align: left;
+ font-size: 13px;
+ }
 
-    .data-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #eee;
-      font-size: 13px;
-      vertical-align: middle;
-    }
+ .data-table td {
+ padding: 10px 14px;
+ border-bottom: 1px solid #eee;
+ font-size: 13px;
+ vertical-align: middle;
+ }
 
-    .data-table tr:last-child td {
-      border-bottom: none;
-    }
+ .data-table tr:last-child td {
+ border-bottom: none;
+ }
 
-    .data-table tr:hover td {
-      background: #f8f4ff;
-    }
+ .data-table tr:hover td {
+ background: #f8f4ff;
+ }
 
-    .status-badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-    }
+ .status-badge {
+ display: inline-block;
+ padding: 2px 10px;
+ border-radius: 20px;
+ font-size: 11px;
+ font-weight: bold;
+ }
 
-    .s-student {
-      background: #dbeafe;
-      color: #1e40af;
-    }
+ .s-student {
+ background: #dbeafe;
+ color: #1e40af;
+ }
 
-    .s-vendor {
-      background: #dcfce7;
-      color: #166534;
-    }
+ .s-vendor {
+ background: #dcfce7;
+ color: #166534;
+ }
 
-    .s-admin {
-      background: #fef9c3;
-      color: #854d0e;
-    }
+ .s-admin {
+ background: #fef9c3;
+ color: #854d0e;
+ }
 
-    .s-pending {
-      background: #fef9c3;
-      color: #854d0e;
-    }
+ .s-pending {
+ background: #fef9c3;
+ color: #854d0e;
+ }
 
-    .s-accepted {
-      background: #dcfce7;
-      color: #166534;
-    }
+ .s-accepted {
+ background: #dcfce7;
+ color: #166534;
+ }
 
-    .s-done {
-      background: #dbeafe;
-      color: #1e40af;
-    }
+ .s-done {
+ background: #dbeafe;
+ color: #1e40af;
+ }
 
-    .s-cancelled {
-      background: #fee2e2;
-      color: #991b1b;
-    }
+ .s-cancelled {
+ background: #fee2e2;
+ color: #991b1b;
+ }
 
-    .s-active {
-      background: #dcfce7;
-      color: #166534;
-    }
+ .s-active {
+ background: #dcfce7;
+ color: #166534;
+ }
 
-    .s-inactive {
-      background: #fee2e2;
-      color: #991b1b;
-    }
+ .s-inactive {
+ background: #fee2e2;
+ color: #991b1b;
+ }
 
-    .s-b40 {
-      background: #fef9c3;
-      color: #854d0e;
-    }
+ .s-b40 {
+ background: #fef9c3;
+ color: #854d0e;
+ }
 
-    .btn-sm {
-      padding: 5px 12px;
-      border: none;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-      margin: 2px;
-    }
+ .btn-sm {
+ padding: 5px 12px;
+ border: none;
+ border-radius: 6px;
+ font-size: 12px;
+ font-weight: bold;
+ cursor: pointer;
+ transition: 0.2s;
+ margin: 2px;
+ }
 
-    .btn-approve {
-      background: #166534;
-      color: white;
-    }
+ .btn-approve {
+ background: #166534;
+ color: white;
+ }
 
-    .btn-approve:hover {
-      background: #14532d;
-    }
+ .btn-approve:hover {
+ background: #14532d;
+ }
 
-    .btn-suspend {
-      background: #dc2626;
-      color: white;
-    }
+ .btn-suspend {
+ background: #dc2626;
+ color: white;
+ }
 
-    .btn-suspend:hover {
-      background: #b91c1c;
-    }
+ .btn-suspend:hover {
+ background: #b91c1c;
+ }
 
-    .btn-save {
-      background: #1d4ed8;
-      color: white;
-    }
+ .btn-save {
+ background: #1d4ed8;
+ color: white;
+ }
 
-    .btn-save:hover {
-      background: #1e3a8a;
-    }
+ .btn-save:hover {
+ background: #1e3a8a;
+ }
 
-    .cgpa-input {
-      width: 60px;
-      padding: 4px 6px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 13px;
-      text-align: center;
-    }
+ .cgpa-input {
+ width: 60px;
+ padding: 4px 6px;
+ border: 1px solid #ccc;
+ border-radius: 5px;
+ font-size: 13px;
+ text-align: center;
+ }
 
-    .empty-row td {
-      text-align: center;
-      color: #999;
-      padding: 30px;
-    }
+ .empty-row td {
+ text-align: center;
+ color: #999;
+ padding: 30px;
+ }
 
-    .section-title {
-      font-size: 15px;
-      font-weight: bold;
-      color: #001f3f;
-      margin: 20px 0 10px;
-      padding-left: 4px;
-    }
+ .section-title {
+ font-size: 15px;
+ font-weight: bold;
+ color: #001f3f;
+ margin: 20px 0 10px;
+ padding-left: 4px;
+ }
 
-    .flag-badge {
-      background: #fee2e2;
-      color: #991b1b;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-    }
+ .flag-badge {
+ background: #fee2e2;
+ color: #991b1b;
+ padding: 2px 8px;
+ border-radius: 20px;
+ font-size: 11px;
+ font-weight: bold;
+ }
 
-    footer {
-      margin-top: auto;
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      text-align: center;
-      padding: 15px;
-    }
+ footer {
+ margin-top: auto;
+ background: rgba(0, 0, 0, 0.2);
+ color: white;
+ text-align: center;
+ padding: 15px;
+ }
 
-    @media (max-width: 700px) {
-      .data-table {
-        font-size: 12px;
-      }
+ @media (max-width: 700px) {
+ .data-table {
+ font-size: 12px;
+ }
 
-      .data-table th,
-      .data-table td {
-        padding: 8px 8px;
-      }
+ .data-table th,
+ .data-table td {
+ padding: 8px 8px;
+ }
 
-      .stats-row {
-        gap: 10px;
-      }
+ .stats-row {
+ gap: 10px;
+ }
 
-      .stat-card {
-        min-width: 100px;
-        padding: 14px 16px;
-      }
-    }
-  </style>
+ .stat-card {
+ min-width: 100px;
+ padding: 14px 16px;
+ }
+ }
+ </style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
-    <div class="header-right">
-      <span class="admin-badge">⚙️ Admin</span>
-      <button class="logout-btn-top" onclick="doLogout()">🚪 Logout</button>
-    </div>
-  </header>
-
-  <div class="page-title">Admin Dashboard</div>
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="num" id="stat-users">—</div>
-      <div class="lbl">Total Users</div>
-    </div>
-    <div class="stat-card">
-      <div class="num" id="stat-vendors">—</div>
-      <div class="lbl">Active Vendors</div>
-    </div>
-    <div class="stat-card">
-      <div class="num" id="stat-pending">—</div>
-      <div class="lbl">Pending Approvals</div>
-    </div>
-    <div class="stat-card">
-      <div class="num" id="stat-bookings">—</div>
-      <div class="lbl">Total Bookings</div>
-    </div>
-    <div class="stat-card">
-      <div class="num" id="stat-reports">—</div>
-      <div class="lbl">Reports</div>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('taskers', this)">🎯 Tasker Approvals</button>
-    <button class="tab-btn" onclick="showTab('asnaf', this)">🤲 Asnaf Verification</button>
-    <button class="tab-btn" onclick="showTab('gigs', this)">📋 Live Gigs</button>
-    <button class="tab-btn" onclick="showTab('vendors', this)">👥 Vendor Approvals</button>
-    <button class="tab-btn" onclick="showTab('services', this)">📦 Services</button>
-    <button class="tab-btn" onclick="showTab('users', this)">🎓 All Users</button>
-    <button class="tab-btn" onclick="showTab('bookings', this)">📋 Bookings</button>
-    <button class="tab-btn" onclick="showTab('reports', this)">🚩 Reports</button>
-    <button class="tab-btn" onclick="showTab('impact', this)">📊 Impact Report</button>
-  </div>
-
-  <!-- Panel: Tasker Approvals -->
-  <div id="panel-taskers" class="panel active">
-    <div class="section-title">⏳ Pending Tasker Applications</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Reason</th>
-          <th>Applied</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-tasker-pending">
-        <tr class="empty-row">
-          <td colspan="5">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: Asnaf Verification -->
-  <div id="panel-asnaf" class="panel">
-    <div class="section-title">🤲 Pending Asnaf Verifications</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Student ID</th>
-          <th>Income Doc</th>
-          <th>Submitted</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-asnaf-pending">
-        <tr class="empty-row">
-          <td colspan="5">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="section-title" style="margin-top:28px">✅ Verified Asnaf Members</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Student ID</th>
-          <th>Verified By</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-asnaf-verified">
-        <tr class="empty-row">
-          <td colspan="4">No verified Asnaf members yet.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: Live Gigs Management -->
-  <div id="panel-gigs" class="panel">
-    <div class="section-title">⏳ Pending Review</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Requester</th>
-          <th>Reward</th>
-          <th>Reason</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-gigs-pending">
-        <tr class="empty-row">
-          <td colspan="5">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="section-title" style="margin-top:28px">🟢 Active Live Gigs</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Requester</th>
-          <th>Tasker</th>
-          <th>Reward</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-gigs-active">
-        <tr class="empty-row">
-          <td colspan="6">No active gigs.</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="section-title" style="margin-top:28px">⚠️ Flagged Gigs</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Flags</th>
-          <th>Reason</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-gigs-flagged">
-        <tr class="empty-row">
-          <td colspan="4">No flagged gigs.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: Services -->
-  <div id="panel-services" class="panel">
-    <div class="section-title">📦 All Services</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Vendor</th>
-          <th>Type</th>
-          <th>Price</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-services">
-        <tr class="empty-row">
-          <td colspan="6">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: Vendor Approvals -->
-  <div id="panel-vendors" class="panel">
-    <div class="section-title">⏳ Pending Vendor Applications</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Student ID</th>
-          <th>Email</th>
-          <th>B40</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-pending">
-        <tr class="empty-row">
-          <td colspan="5">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="section-title" style="margin-top:28px">✅ Approved Vendors</div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Student ID</th>
-          <th>CGPA</th>
-          <th>B40</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-vendors">
-        <tr class="empty-row">
-          <td colspan="6">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: All Users -->
-  <div id="panel-users" class="panel">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Student ID</th>
-          <th>Role</th>
-          <th>CGPA</th>
-          <th>Update CGPA</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-users">
-        <tr class="empty-row">
-          <td colspan="5">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: Bookings -->
-  <div id="panel-bookings" class="panel">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Service</th>
-          <th>Student</th>
-          <th>Vendor</th>
-          <th>Status</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-bookings">
-        <tr class="empty-row">
-          <td colspan="5">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: Reports -->
-  <div id="panel-reports" class="panel">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Reported By</th>
-          <th>Service ID</th>
-          <th>Reason</th>
-          <th>Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-reports">
-        <tr class="empty-row">
-          <td colspan="5">Loading...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Panel: Impact Report -->
-  <div id="panel-impact" class="panel">
-    <div class="section-title">📊 Student Impact Report Generator</div>
-    <p style="color:#666;font-size:14px;margin-bottom:20px">
-      Generate monthly reports for Zakat/Baitulmal authorities. This report includes Asnaf members,
-      tasks completed, earnings, and income brackets.
-    </p>
-    <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-width:500px;margin:0 auto;">
-      <label style="display:block;margin-bottom:8px;font-weight:600;color:#001f3f">Select Month</label>
-      <input type="month" id="reportMonth" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-bottom:15px">
-
-      <label style="display:block;margin-bottom:8px;font-weight:600;color:#001f3f">Report Format</label>
-      <select id="reportFormat" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-bottom:15px">
-        <option value="pdf">PDF Document</option>
-        <option value="excel">Excel Spreadsheet</option>
-        <option value="both">Both PDF + Excel</option>
-      </select>
-
-      <button class="btn-approve" style="width:100%;padding:12px;font-size:15px" onclick="generateImpactReport()">
-        📄 Generate Report
-      </button>
-
-      <div id="reportPreview" style="margin-top:20px;display:none">
-        <h4 style="margin-bottom:10px;color:#001f3f">Report Preview</h4>
-        <div style="background:#f9fafb;padding:15px;border-radius:8px;font-size:13px" id="reportStats"></div>
-        <button class="btn-save" style="width:100%;padding:10px;margin-top:10px" onclick="downloadReport()">
-          ⬇️ Download Report
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Developer Tools - Hidden behind + button -->
-  <div class="dev-tools-fab" onclick="toggleDevTools()">+</div>
-  <div id="devToolsPanel" class="slide-panel">
-    <div class="slide-panel-content">
-      <span class="close-panel" onclick="toggleDevTools()">&times;</span>
-      <h3 style="color:#001f3f;margin-bottom:10px;">🔧 Developer Tools</h3>
-      <p style="color:#666;font-size:14px;margin-bottom:15px;">Add sample data for testing and demonstration.</p>
-      <button class="btn-approve" onclick="seedDummyData()">📦 Add Sample Services (50 listings)</button>
-      <button class="btn-suspend" onclick="seedDummyUsers()" style="margin-left:10px;">👥 Add Sample Users</button>
-      <div id="seedStatus" style="margin-top:15px;font-size:14px;"></div>
-    </div>
-  </div>
-
-  <footer>&copy; 2025 iTa'awun | Admin Panel</footer>
-
-  <style>
-    /* Developer Tools FAB */
-    .dev-tools-fab {
-      position: fixed;
-      bottom: 80px;
-      right: 30px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #6b21a8;
-      color: white;
-      font-size: 28px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(107,33,168,0.4);
-      transition: 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .dev-tools-fab:hover {
-      transform: scale(1.1);
-      background: #7c3aed;
-    }
-    /* Slide panel */
-    .slide-panel {
-      display: none;
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 400px;
-      max-width: 90%;
-      height: 100vh;
-      background: white;
-      z-index: 1000;
-      box-shadow: -5px 0 25px rgba(0,0,0,0.3);
-      overflow-y: auto;
-    }
-    .slide-panel.active { display: block; animation: slideIn 0.3s ease; }
-    @keyframes slideIn {
-      from { transform: translateX(100%); }
-      to { transform: translateX(0); }
-    }
-    .slide-panel-content { padding: 25px; }
-    .close-panel {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      cursor: pointer;
-      color: #666;
-    }
-    .close-panel:hover { color: #333; }
-  </style>
-
-  <script>
-    function toggleDevTools() {
-      const panel = document.getElementById('devToolsPanel')
-      panel.classList.toggle('active')
-    }
-  </script>
-
-  <script>
-    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-
-    let currentUser = null
-
-      // ── Auth + Admin Gate ──────────────────────────────────
-      (async function initAdmin() {
-        const { data: { session } } = await db.auth.getSession()
-        if (!session) { window.location.href = 'index.html'; return }
-
-        currentUser = session.user
-
-        const { data: profile, error } = await db
-          .from('profiles').select('role').eq('id', session.user.id).single()
-
-        if (error || !profile || profile.role !== 'admin') {
-          alert('Access denied. Admins only.')
-          window.location.href = 'home.html'
-          return
-        }
-
-        loadAll()
-      })()
-
-    function loadAll() {
-      loadStats()
-      loadServices()
-      loadPendingVendors()
-      loadApprovedVendors()
-      loadAllUsers()
-      loadBookings()
-      loadReports()
-      loadTaskerApplications()
-      loadAsnafVerifications()
-      loadLiveGigs()
-    }
-
-    // ── Tabs ──────────────────────────────────────────────
-    function showTab(tab, btn) {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
-      document.getElementById('panel-' + tab).classList.add('active')
-      btn.classList.add('active')
-    }
-
-    // ── Services ───────────────────────────────────────────
-    async function loadServices() {
-      const { data, error } = await db
-        .from('services')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50)
-
-      const tb = document.getElementById('tbody-services')
-      if (error || !data || data.length === 0) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="6">No services yet.</td></tr>'; return
-      }
-
-      // Fetch vendor names
-      const vendorIds = [...new Set(data.map(s => s.vendor_id))]
-      const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', vendorIds)
-      const nameMap = {}
-      if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
-
-      tb.innerHTML = data.map(s => `
-      <tr>
-        <td>${s.title || '—'}</td>
-        <td>${nameMap[s.vendor_id] || s.vendor_id?.slice(0, 8) + '…'}</td>
-        <td><span class="status-badge s-${s.type === 'offered' ? 'vendor' : 'student'}">${s.type}</span></td>
-        <td>RM${parseFloat(s.price || 0).toFixed(2)}</td>
-        <td><span class="status-badge s-${s.status}">${s.status}</span></td>
-        <td>
-          ${s.status === 'active'
-          ? `<button class="btn-sm btn-suspend" onclick="deactivateService('${s.id}')">Deactivate</button>`
-          : `<button class="btn-sm btn-approve" onclick="activateService('${s.id}')">Activate</button>`}
-          <button class="btn-sm btn-suspend" onclick="deleteService('${s.id}')">Delete</button>
-        </td>
-      </tr>`).join('')
-    }
-
-    async function activateService(id) {
-      await db.from('services').update({ status: 'active' }).eq('id', id)
-      loadServices()
-    }
-    async function deactivateService(id) {
-      await db.from('services').update({ status: 'inactive' }).eq('id', id)
-      loadServices()
-    }
-    async function deleteService(id) {
-      if (!confirm('Delete this service permanently?')) return
-      await db.from('services').delete().eq('id', id)
-      loadServices()
-    }
-
-    // ── Stats ──────────────────────────────────────────────
-    async function loadStats() {
-      const [users, bookings, reports, pending] = await Promise.all([
-        db.from('profiles').select('id', { count: 'exact', head: true }),
-        db.from('bookings').select('id', { count: 'exact', head: true }),
-        db.from('reports').select('id', { count: 'exact', head: true }),
-        db.from('profiles').select('id', { count: 'exact', head: true })
-          .eq('role', 'vendor').eq('is_approved', false)
-      ])
-      const vendors = await db.from('profiles').select('id', { count: 'exact', head: true })
-        .eq('role', 'vendor').eq('is_approved', true)
-
-      document.getElementById('stat-users').textContent = users.count ?? '—'
-      document.getElementById('stat-bookings').textContent = bookings.count ?? '—'
-      document.getElementById('stat-reports').textContent = reports.count ?? '—'
-      document.getElementById('stat-pending').textContent = pending.count ?? '—'
-      document.getElementById('stat-vendors').textContent = vendors.count ?? '—'
-    }
-
-    // ── Pending vendor approvals ───────────────────────────
-    async function loadPendingVendors() {
-      const { data } = await db.from('profiles').select('*')
-        .eq('role', 'vendor').eq('is_approved', false)
-      const tb = document.getElementById('tbody-pending')
-      if (!data || data.length === 0) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No pending applications.</td></tr>'; return
-      }
-      tb.innerHTML = data.map(u => `
-      <tr>
-        <td>${u.full_name || '—'}</td>
-        <td>${u.student_id || '—'}</td>
-        <td>${u.email || '—'}</td>
-        <td>${u.is_b40 ? '<span class="s-b40">B40</span>' : '—'}</td>
-        <td>
-          <button class="btn-sm btn-approve" onclick="approveVendor('${u.id}')">✓ Approve</button>
-          <button class="btn-sm btn-suspend" onclick="rejectVendor('${u.id}')">✗ Reject</button>
-        </td>
-      </tr>`).join('')
-    }
-
-    // ── Approved vendors ───────────────────────────────────
-    async function loadApprovedVendors() {
-      const { data } = await db.from('profiles').select('*')
-        .eq('role', 'vendor').eq('is_approved', true)
-      const tb = document.getElementById('tbody-vendors')
-      if (!data || data.length === 0) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="6">No approved vendors yet.</td></tr>'; return
-      }
-      tb.innerHTML = data.map(u => `
-      <tr>
-        <td>${u.full_name || '—'}</td>
-        <td>${u.student_id || '—'}</td>
-        <td>
-          <input class="cgpa-input" id="cgpa-${u.id}" type="number" min="0" max="4" step="0.01"
-            value="${u.cgpa || ''}" placeholder="0.00">
-          <button class="btn-sm btn-save" onclick="saveCgpa('${u.id}')">Save</button>
-        </td>
-        <td>${u.is_b40 ? '<span class="s-b40">B40</span>' : '—'}</td>
-        <td>
-          ${u.cgpa && parseFloat(u.cgpa) < 2.0
-          ? '<span class="flag-badge">⚠️ Low CGPA</span>'
-          : '<span class="status-badge s-active">OK</span>'}
-        </td>
-        <td>
-          <button class="btn-sm btn-suspend" onclick="suspendVendor('${u.id}')">Suspend</button>
-        </td>
-      </tr>`).join('')
-    }
-
-    // ── All users ──────────────────────────────────────────
-    async function loadAllUsers() {
-      const { data } = await db.from('profiles').select('*').order('created_at', { ascending: false })
-      const tb = document.getElementById('tbody-users')
-      if (!data || data.length === 0) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No users found.</td></tr>'; return
-      }
-      tb.innerHTML = data.map(u => `
-      <tr>
-        <td>${u.full_name || '—'}</td>
-        <td>${u.student_id || '—'}</td>
-        <td><span class="status-badge s-${u.role}">${u.role}</span></td>
-        <td>${u.cgpa || '—'}</td>
-        <td>
-          <input class="cgpa-input" id="cgpau-${u.id}" type="number" min="0" max="4" step="0.01"
-            value="${u.cgpa || ''}" placeholder="0.00">
-          <button class="btn-sm btn-save" onclick="saveCgpaUser('${u.id}')">Save</button>
-        </td>
-      </tr>`).join('')
-    }
-
-    // ── Bookings ───────────────────────────────────────────
-    async function loadBookings() {
-      const { data } = await db.from('bookings')
-        .select('*, services(title)')
-        .order('created_at', { ascending: false })
-        .limit(50)
-      const tb = document.getElementById('tbody-bookings')
-      if (!data || data.length === 0) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No bookings yet.</td></tr>'; return
-      }
-
-      // Fetch names for student + vendor IDs
-      const ids = [...new Set([...data.map(b => b.student_id), ...data.map(b => b.vendor_id)])]
-      const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', ids)
-      const nameMap = {}
-      if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
-
-      tb.innerHTML = data.map(b => `
-      <tr>
-        <td>${b.services?.title || '(deleted)'}</td>
-        <td>${nameMap[b.student_id] || b.student_id?.slice(0, 8) + '…'}</td>
-        <td>${nameMap[b.vendor_id] || b.vendor_id?.slice(0, 8) + '…'}</td>
-        <td><span class="status-badge s-${b.status}">${b.status}</span></td>
-        <td>${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-      </tr>`).join('')
-    }
-
-    // ── Reports ────────────────────────────────────────────
-    async function loadReports() {
-      const { data } = await db.from('reports').select('*').order('created_at', { ascending: false })
-      const tb = document.getElementById('tbody-reports')
-      if (!data || data.length === 0) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No reports filed.</td></tr>'; return
-      }
-      tb.innerHTML = data.map(r => `
-      <tr>
-        <td>${r.reporter_id?.slice(0, 8)}…</td>
-        <td>${r.service_id?.slice(0, 8)}…</td>
-        <td>${r.reason || '—'}</td>
-        <td>${new Date(r.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short' })}</td>
-        <td><button class="btn-sm btn-suspend" onclick="dismissReport('${r.id}')">Dismiss</button></td>
-      </tr>`).join('')
-    }
-
-    // ── Actions ────────────────────────────────────────────
-    async function approveVendor(id) {
-      await db.from('profiles').update({ is_approved: true }).eq('id', id)
-      loadAll()
-    }
-    async function rejectVendor(id) {
-      if (!confirm('Reject and remove this vendor application?')) return
-      await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
-      loadAll()
-    }
-    async function suspendVendor(id) {
-      if (!confirm('Suspend this vendor? They will lose vendor access.')) return
-      await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
-      loadAll()
-    }
-    async function saveCgpa(id) {
-      const val = parseFloat(document.getElementById('cgpa-' + id).value)
-      if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
-      await db.from('profiles').update({ cgpa: val }).eq('id', id)
-      loadApprovedVendors()
-    }
-    async function saveCgpaUser(id) {
-      const val = parseFloat(document.getElementById('cgpau-' + id).value)
-      if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
-      await db.from('profiles').update({ cgpa: val }).eq('id', id)
-      alert('CGPA updated.')
-    }
-    async function dismissReport(id) {
-      await db.from('reports').delete().eq('id', id)
-      loadReports()
-      loadStats()
-    }
-    async function doLogout() {
-      const { error } = await db.auth.signOut()
-      if (error) { console.error('Logout error:', error) }
-      window.location.replace('index.html?logged=out')
-    }
-
-    // ── Tasker Applications ────────────────────────────────
-    async function loadTaskerApplications() {
-      const { data, error } = await db
-        .from('admin_applications')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-
-      const tb = document.getElementById('tbody-tasker-pending')
-      if (error || !data || data.length === 0) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="5">No pending applications.</td></tr>'; return
-      }
-
-      // Fetch applicant names
-      const ids = [...new Set(data.map(a => a.user_id))]
-      const { data: profiles } = await db.from('profiles').select('id, full_name, email').in('id', ids)
-      const nameMap = {}
-      if (profiles) profiles.forEach(p => { nameMap[p.id] = p })
-
-      tb.innerHTML = data.map(a => `
-      <tr>
-        <td>${nameMap[a.user_id]?.full_name || '—'}</td>
-        <td>${nameMap[a.user_id]?.email || '—'}</td>
-        <td>${a.position || '—'}: ${a.reason || '—'}</td>
-        <td>${new Date(a.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-        <td>
-          <button class="btn-sm btn-approve" onclick="approveTasker('${a.user_id}', '${a.id}', '${a.position}')">✓ Approve</button>
-          <button class="btn-sm btn-suspend" onclick="rejectTasker('${a.id}')">✗ Reject</button>
-        </td>
-      </tr>`).join('')
-    }
-
-    async function approveTasker(userId, appId, position) {
-      const newRole = (position === 'admin') ? 'admin' : 'vendor'
-      await db.from('profiles').update({ role: newRole, is_approved: true }).eq('id', userId)
-      await db.from('admin_applications').update({ status: 'approved' }).eq('id', appId)
-      loadTaskerApplications()
-      loadStats()
-    }
-
-    async function rejectTasker(appId) {
-      if (!confirm('Reject this application?')) return
-      await db.from('admin_applications').update({ status: 'rejected' }).eq('id', appId)
-      loadTaskerApplications()
-    }
-
-    // ── Asnaf Verifications ────────────────────────────────
-    async function loadAsnafVerifications() {
-      const { data: pending } = await db
-        .from('verifications')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-
-      const tbPending = document.getElementById('tbody-asnaf-pending')
-      if (!pending || pending.length === 0) {
-        tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending verifications.</td></tr>'
-      } else {
-        const ids = [...new Set(pending.map(v => v.user_id))]
-        const { data: profiles } = await db.from('profiles').select('id, full_name, student_id').in('id', ids)
-        const nameMap = {}
-        if (profiles) profiles.forEach(p => { nameMap[p.id] = p })
-
-        tbPending.innerHTML = pending.map(v => `
-        <tr>
-          <td>${nameMap[v.user_id]?.full_name || '—'}</td>
-          <td>${nameMap[v.user_id]?.student_id || '—'}</td>
-          <td><a href="${v.doc_url}" target="_blank" style="color:#6b21a8">View Doc</a></td>
-          <td>${new Date(v.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-          <td>
-            <button class="btn-sm btn-approve" onclick="approveAsnaf('${v.id}','${v.user_id}')">✓ Verify</button>
-            <button class="btn-sm btn-suspend" onclick="rejectAsnaf('${v.id}')">✗ Reject</button>
-          </td>
-        </tr>`).join('')
-      }
-
-      const { data: verified } = await db
-        .from('profiles').select('full_name, student_id, updated_at')
-        .eq('is_asnaf', true).order('updated_at', { ascending: false })
-
-      const tbVerified = document.getElementById('tbody-asnaf-verified')
-      if (!verified || verified.length === 0) {
-        tbVerified.innerHTML = '<tr class="empty-row"><td colspan="4">No verified Asnaf members yet.</td></tr>'
-      } else {
-        tbVerified.innerHTML = verified.map(u => `
-        <tr>
-          <td>${u.full_name || '—'}</td>
-          <td>${u.student_id || '—'}</td>
-          <td>Admin</td>
-          <td>${new Date(u.updated_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-        </tr>`).join('')
-      }
-    }
-
-    async function approveAsnaf(verificationId, userId) {
-      await db.from('verifications').update({ status: 'approved', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', verificationId)
-      await db.from('profiles').update({ is_asnaf: true }).eq('id', userId)
-      loadAsnafVerifications()
-    }
-
-    async function rejectAsnaf(verificationId) {
-      const reason = prompt('Reason for rejection (optional):') || ''
-      await db.from('verifications').update({ status: 'rejected', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString(), rejection_reason: reason }).eq('id', verificationId)
-      loadAsnafVerifications()
-    }
-
-    // ── Live Gigs ──────────────────────────────────────────
-    async function loadLiveGigs() {
-      // Pending
-      const { data: pending } = await db.from('gigs').select('*').eq('status', 'pending_review').order('created_at', { ascending: false })
-      const tbPending = document.getElementById('tbody-gigs-pending')
-      if (!pending || pending.length === 0) {
-        tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending gigs.</td></tr>'
-      } else {
-        const ids = [...new Set(pending.map(g => g.requester_id))]
-        const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', ids)
-        const nameMap = {}
-        if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
-        tbPending.innerHTML = pending.map(g => `
-        <tr>
-          <td>${g.title}</td>
-          <td>${nameMap[g.requester_id] || '—'}</td>
-          <td>RM${parseFloat(g.reward_amount || 0).toFixed(2)}</td>
-          <td>${g.flag_count > 0 ? '<span class="flag-badge">Flagged (' + g.flag_count + ')</span>' : 'Clean'}</td>
-          <td>
-            <button class="btn-sm btn-approve" onclick="approveGig('${g.id}')">✓ Approve</button>
-            <button class="btn-sm btn-suspend" onclick="rejectGig('${g.id}')">✗ Reject</button>
-          </td>
-        </tr>`).join('')
-      }
-
-      // Active
-      const { data: active } = await db.from('gigs').select('*').in('status', ['live', 'grabbed', 'completed']).order('created_at', { ascending: false }).limit(20)
-      const tbActive = document.getElementById('tbody-gigs-active')
-      if (!active || active.length === 0) {
-        tbActive.innerHTML = '<tr class="empty-row"><td colspan="6">No active gigs.</td></tr>'
-      } else {
-        tbActive.innerHTML = active.map(g => `
-        <tr>
-          <td>${g.title}</td>
-          <td>${g.requester_id?.slice(0, 8)}…</td>
-          <td>—</td>
-          <td>RM${parseFloat(g.reward_amount || 0).toFixed(2)}</td>
-          <td><span class="status-badge s-${g.status === 'live' ? 'active' : g.status === 'grabbed' ? 'accepted' : 'done'}">${g.status}</span></td>
-          <td><button class="btn-sm btn-suspend" onclick="removeGig('${g.id}')">Remove</button></td>
-        </tr>`).join('')
-      }
-
-      // Flagged
-      const { data: flagged } = await db.from('gigs').select('*').eq('status', 'flagged').order('flag_count', { ascending: false })
-      const tbFlagged = document.getElementById('tbody-gigs-flagged')
-      if (!flagged || flagged.length === 0) {
-        tbFlagged.innerHTML = '<tr class="empty-row"><td colspan="4">No flagged gigs.</td></tr>'
-      } else {
-        tbFlagged.innerHTML = flagged.map(g => `
-        <tr>
-          <td>${g.title}</td>
-          <td><span class="flag-badge">${g.flag_count} reports</span></td>
-          <td>${g.requester_id?.slice(0, 8)}…</td>
-          <td>
-            <button class="btn-sm btn-approve" onclick="approveGig('${g.id}')">Restore</button>
-            <button class="btn-sm btn-suspend" onclick="removeGig('${g.id}')">Remove</button>
-          </td>
-        </tr>`).join('')
-      }
-    }
-
-    async function approveGig(id) {
-      await db.from('gigs').update({ status: 'live' }).eq('id', id)
-      loadLiveGigs()
-    }
-    async function rejectGig(id) {
-      if (!confirm('Reject this gig?')) return
-      await db.from('gigs').update({ status: 'rejected' }).eq('id', id)
-      loadLiveGigs()
-    }
-    async function removeGig(id) {
-      if (!confirm('Remove this gig permanently?')) return
-      await db.from('gigs').delete().eq('id', id)
-      loadLiveGigs()
-    }
-
-    // ── Impact Report ──────────────────────────────────────
-    async function generateImpactReport() {
-      const month = document.getElementById('reportMonth').value
-      if (!month) { alert('Please select a month.'); return }
-
-      const [year, mon] = month.split('-')
-      const startDate = `${year}-${mon}-01`
-      const lastDay = new Date(parseInt(year), parseInt(mon), 0).getDate()
-      const endDate = `${year}-${mon}-${String(lastDay).padStart(2, '0')}`
-
-      const [bookings, asnafUsers, completedGigs] = await Promise.all([
-        db.from('bookings').select('id', { count: 'exact', head: true }).eq('status', 'done').gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59'),
-        db.from('profiles').select('id', { count: 'exact', head: true }).eq('is_asnaf', true),
-        db.from('gigs').select('id, reward_amount').eq('status', 'completed').gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59')
-      ])
-
-      const totalEarnings = completedGigs.data?.reduce((sum, g) => sum + parseFloat(g.reward_amount || 0), 0) || 0
-
-      document.getElementById('reportStats').innerHTML = `
-        <p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString('en-MY', { month: 'long', year: 'numeric' })}</p>
-        <p><strong>Bookings Completed:</strong> ${bookings.count ?? 0}</p>
-        <p><strong>Gigs Completed:</strong> ${completedGigs.data?.length ?? 0}</p>
-        <p><strong>Total Student Earnings (Gigs):</strong> RM${totalEarnings.toFixed(2)}</p>
-        <p><strong>Total Asnaf Members:</strong> ${asnafUsers.count ?? 0}</p>
-      `
-      document.getElementById('reportPreview').style.display = 'block'
-    }
-
-    function downloadReport() {
-      const content = document.getElementById('reportStats').innerText
-      const month = document.getElementById('reportMonth').value
-      const blob = new Blob([`iTa'awun Impact Report\n${month}\n\n` + content], { type: 'text/plain' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `itaawun-impact-${month}.txt`
-      a.click()
-      URL.revokeObjectURL(url)
-    }
-
-    // ── Seed Data Functions ─────────────────────────────────
-    async function seedDummyData() {
-      const statusEl = document.getElementById('seedStatus')
-      statusEl.textContent = '⏳ Adding sample services...'
-      statusEl.style.color = '#666'
-
-      const sampleServices = [
-        { title: 'Note Printing Service', desc: 'Print your notes and assignments. Black & white or color.', price: 0.10, category: 'service', location: 'Library Ground Floor', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456701', telegram: 'printpro_ahmad', type: 'offered' },
-        { title: 'Assignment Binding', desc: 'Professional binding for assignments and reports.', price: 3.00, category: 'service', location: 'Library Ground Floor', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456701', telegram: 'printpro_ahmad', type: 'offered' },
-        { title: 'Math Tutoring', desc: 'Experienced tutor for Calculus and Algebra. CFS Mathematics.', price: 30.00, category: 'tutoring', location: 'Online or Library', time: 'Weekends', whatsapp: '60123456702', telegram: 'math_tutor_sarah', type: 'offered' },
-        { title: 'Physics Tutoring', desc: 'Physics fundamentals and problem solving. All topics covered.', price: 35.00, category: 'tutoring', location: 'Online or Cafe', time: 'Evenings', whatsapp: '60123456703', telegram: 'physics_helper', type: 'offered' },
-        { title: 'Photography Service', desc: 'Event and portrait photography. Professional editing included.', price: 50.00, category: 'photography', location: 'Campus-wide', time: 'Flexible', whatsapp: '60123456704', telegram: 'lens_master', type: 'offered' },
-        { title: 'Food Runner - Kuliyyah', desc: 'Food delivery from Kuliyyah cafe to your location.', price: 3.00, category: 'runner', location: 'Kuliyyah to anywhere', time: 'Mon-Fri 10am-6pm', whatsapp: '60123456705', telegram: 'food_runner_ali', type: 'offered' },
-        { title: 'Food Runner - Cafeteria', desc: 'Quick food delivery from main cafeteria.', price: 2.00, category: 'runner', location: 'Cafeteria to anywhere', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456706', telegram: 'caf_runner', type: 'offered' },
-        { title: 'Laundry Service', desc: 'Wash, dry, and fold. Pick up and delivery included.', price: 8.00, category: 'service', location: 'Residential College', time: 'Weekends', whatsapp: '60123456707', telegram: 'laundry_pro', type: 'offered' },
-        { title: 'Graphic Design', desc: 'Logo, poster, and social media design. Portfolio available.', price: 25.00, category: 'design', location: 'Online', time: 'Flexible', whatsapp: '60123456708', telegram: 'design_by_nina', type: 'offered' },
-        { title: 'Resume Writing', desc: 'Professional resume and CV writing service.', price: 20.00, category: 'writing', location: 'Online', time: 'Flexible', whatsapp: '60123456709', telegram: 'resume_writer', type: 'offered' },
-        { title: 'Coding Help - Python', desc: 'Python programming assistance. Assignments and projects.', price: 40.00, category: 'coding', location: 'Online', time: 'Evenings', whatsapp: '60123456710', telegram: 'python_helper', type: 'offered' },
-        { title: 'Coding Help - Web Dev', desc: 'HTML, CSS, JavaScript help. Website building.', price: 45.00, category: 'coding', location: 'Online', time: 'Flexible', whatsapp: '60123456711', telegram: 'web_dev_pro', type: 'offered' },
-        { title: 'Barber Service', desc: 'Home haircut service. Bring the barbershop to you.', price: 15.00, category: 'service', location: 'Residential Colleges', time: 'Weekends', whatsapp: '60123456712', telegram: 'mobile_barber', type: 'offered' },
-        { title: 'Sewing & Alterations', desc: 'Clothing repairs, hemming, and alterations.', price: 10.00, category: 'service', location: 'RC Common Room', time: 'Evenings', whatsapp: '60123456713', telegram: 'sewing_sis', type: 'offered' },
-        { title: 'Slide Presentation Design', desc: 'Professional PowerPoint slides for presentations.', price: 15.00, category: 'design', location: 'Online', time: 'Flexible', whatsapp: '60123456714', telegram: 'slide_designer', type: 'offered' },
-        { title: 'Parcel Delivery', desc: 'Campus parcel pickup and delivery service.', price: 4.00, category: 'runner', location: 'Campus-wide', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456715', telegram: 'parcel_runner', type: 'offered' },
-        { title: 'Ironing Service', desc: 'Clothes ironing. Pick up and delivery.', price: 5.00, category: 'service', location: 'Residential College', time: 'Weekends', whatsapp: '60123456716', telegram: 'iron_helper', type: 'offered' },
-        { title: 'English Tutoring', desc: 'Improve your English speaking and writing.', price: 25.00, category: 'tutoring', location: 'Library or Online', time: 'Evenings', whatsapp: '60123456717', telegram: 'english_tutor', type: 'offered' },
-        { title: 'Arabic Tutoring', desc: 'Classical and conversational Arabic lessons.', price: 30.00, category: 'tutoring', location: 'Online', time: 'Flexible', whatsapp: '60123456718', telegram: 'arabic_teacher', type: 'offered' },
-        { title: 'Video Editing', desc: 'Edit your videos for assignments or social media.', price: 35.00, category: 'design', location: 'Online', time: 'Flexible', whatsapp: '60123456719', telegram: 'video_editor', type: 'offered' },
-        { title: 'Need Calculus Tutor', desc: 'Looking for a Calculus tutor for midterms.', price: 30.00, category: 'tutoring', location: 'Library', time: 'Weekends', whatsapp: '60123456720', telegram: 'calc_student', type: 'needed' },
-        { title: 'Need Group Study Partner', desc: 'Study partner for Economics revision.', price: 0.00, category: 'tutoring', location: 'Library', time: 'Evenings', whatsapp: '60123456721', telegram: 'econ_student', type: 'needed' },
-        { title: 'Need Food Delivery', desc: 'Need someone to bring food from Kuliyyah to KIRCS.', price: 5.00, category: 'runner', location: 'Kuliyyah to KIRCS', time: 'Mon-Fri 1pm', whatsapp: '60123456722', telegram: 'hungry_student', type: 'needed' },
-        { title: 'Need Printing Service', desc: 'Urgent printing needed - 50 pages color.', price: 10.00, category: 'service', location: 'Library', time: 'Today 3pm', whatsapp: '60123456723', telegram: 'urgent_print', type: 'needed' },
-        { title: 'Need Assignment Typing', desc: 'Handwritten assignment needs to be typed.', price: 15.00, category: 'writing', location: 'Online', time: '2 days', whatsapp: '60123456724', telegram: 'typing_needed', type: 'needed' },
-        { title: 'Photography for Event', desc: 'Need photographer for club event.', price: 80.00, category: 'photography', location: 'Main Hall', time: 'Next Saturday', whatsapp: '60123456725', telegram: 'club_organizer', type: 'needed' },
-        { title: 'Need Web Developer', desc: 'Looking for someone to build a simple website.', price: 100.00, category: 'coding', location: 'Online', time: '1 week', whatsapp: '60123456726', telegram: 'website_seeker', type: 'needed' },
-        { title: 'Need Laundry Help', desc: 'Laundry service needed urgently.', price: 10.00, category: 'service', location: 'KIRCS', time: 'This weekend', whatsapp: '60123456727', telegram: 'laundry_help', type: 'needed' },
-        { title: 'Need Graphic Designer', desc: 'Need poster design for workshop.', price: 30.00, category: 'design', location: 'Online', time: '3 days', whatsapp: '60123456728', telegram: 'poster_needed', type: 'needed' },
-        { title: 'Need Python Helper', desc: 'Stuck with Python assignment. Need guidance.', price: 25.00, category: 'coding', location: 'Online', time: 'Tonight', whatsapp: '60123456729', telegram: 'python_stuck', type: 'needed' },
-        { title: 'Note Printing Bulk', desc: 'Bulk printing - 500 pages. Discount please.', price: 40.00, category: 'service', location: 'Library', time: 'This week', whatsapp: '60123456730', telegram: 'bulk_print', type: 'offered' },
-        { title: 'Weekend Food Runner', desc: 'Food delivery service on weekends only.', price: 4.00, category: 'runner', location: 'Cafeteria', time: 'Sat-Sun', whatsapp: '60123456731', telegram: 'weekend_runner', type: 'offered' },
-        { title: 'Chemistry Tutoring', desc: 'Chemistry fundamentals and lab report help.', price: 35.00, category: 'tutoring', location: 'Science Lab', time: 'Tue-Thu', whatsapp: '60123456732', telegram: 'chem_tutor', type: 'offered' },
-        { title: 'Biology Tutoring', desc: 'Biology and life sciences tutoring.', price: 30.00, category: 'tutoring', location: 'Online', time: 'Flexible', whatsapp: '60123456733', telegram: 'bio_helper', type: 'offered' },
-        { title: 'Accounting Help', desc: 'Financial accounting and bookkeeping help.', price: 40.00, category: 'tutoring', location: 'Library', time: 'Weekends', whatsapp: '60123456734', telegram: 'account_helper', type: 'offered' },
-        { title: 'Essay Proofreading', desc: 'Proofread and edit your essays.', price: 10.00, category: 'writing', location: 'Online', time: 'Flexible', whatsapp: '60123456735', telegram: 'proof_reader', type: 'offered' },
-        { title: 'Translation Service', desc: 'English-Malay translation service.', price: 20.00, category: 'writing', location: 'Online', time: 'Flexible', whatsapp: '60123456736', telegram: 'translator_ms', type: 'offered' },
-        { title: 'Need Chemistry Tutor', desc: 'Struggling with organic chemistry.', price: 35.00, category: 'tutoring', location: 'Science Lab', time: 'Weekdays', whatsapp: '60123456737', telegram: 'chem_student', type: 'needed' },
-        { title: 'Need Roommate', desc: 'Looking for a roommate for next semester.', price: 0.00, category: 'service', location: 'KIRCS', time: 'Next semester', whatsapp: '60123456738', telegram: 'roommate_search', type: 'needed' },
-        { title: 'Need Bike Repair', desc: 'Bicycle needs repair. Can someone help?', price: 20.00, category: 'service', location: 'Campus', time: 'This weekend', whatsapp: '60123456739', telegram: 'bike_repair', type: 'needed' },
-        { title: 'Personal Shopping', desc: 'Grocery and essentials shopping service.', price: 10.00, category: 'runner', location: 'Campus to RC', time: 'Daily', whatsapp: '60123456740', telegram: 'shop_runner', type: 'offered' },
-        { title: 'Carpet Cleaning', desc: 'RC room carpet cleaning service.', price: 25.00, category: 'service', location: 'Residential Colleges', time: 'Weekends', whatsapp: '60123456741', telegram: 'clean_pro', type: 'offered' },
-        { title: 'Need Math Assignment Help', desc: 'Statistics assignment due Monday.', price: 20.00, category: 'tutoring', location: 'Online', time: 'This weekend', whatsapp: '60123456742', telegram: 'stats_help', type: 'needed' },
-        { title: 'Need Presentation Coach', desc: 'Help with public speaking for presentation.', price: 30.00, category: 'tutoring', location: 'Library', time: 'Evenings', whatsapp: '60123456743', telegram: 'speak_coach', type: 'needed' },
-        { title: 'Shoe Repair Service', desc: 'Repair and restore your shoes.', price: 15.00, category: 'service', location: 'RC Common Room', time: 'Weekends', whatsapp: '60123456744', telegram: 'shoe_repair', type: 'offered' },
-        { title: 'Bag Repair', desc: 'Fix zippers and tears in bags.', price: 12.00, category: 'service', location: 'Online pickup', time: 'Flexible', whatsapp: '60123456745', telegram: 'bag_fixer', type: 'offered' },
-        { title: 'Need Escort Service', desc: 'Need someone to walk with at night for safety.', price: 5.00, category: 'runner', location: 'Campus', time: 'Night only', whatsapp: '60123456746', telegram: 'safety_first', type: 'needed' },
-        { title: 'Computer Troubleshooting', desc: 'Fix software issues and virus removal.', price: 30.00, category: 'coding', location: 'On-site', time: 'Weekends', whatsapp: '60123456747', telegram: 'tech_fixer', type: 'offered' },
-        { title: 'Phone Screen Repair', desc: 'Replace cracked phone screens.', price: 50.00, category: 'service', location: 'Library Lobby', time: 'Sat-Sun', whatsapp: '60123456748', telegram: 'phone_fixer', type: 'offered' },
-        { title: 'Need Mover Helper', desc: 'Help moving to new room.', price: 15.00, category: 'runner', location: 'KIRCS to KMC', time: 'Sunday morning', whatsapp: '60123456749', telegram: 'moving_help', type: 'needed' }
-      ]
-
-      let inserted = 0
-      let errors = 0
-
-      for (const svc of sampleServices) {
-        const { error } = await db.from('services').insert({
-          vendor_id: currentUser.id,
-          title: svc.title,
-          description: svc.desc,
-          price: svc.price,
-          category: svc.category,
-          location: svc.location,
-          time: svc.time,
-          whatsapp: svc.whatsapp,
-          telegram: svc.telegram,
-          image: 'https://via.placeholder.com/300x120?text=' + encodeURIComponent(svc.title),
-          type: svc.type,
-          status: 'active'
-        })
-        if (error) errors++
-        else inserted++
-      }
-
-      if (errors === 0) {
-        statusEl.textContent = `✅ Successfully added ${inserted} sample services!`
-        statusEl.style.color = '#16a34a'
-        loadServices()
-      } else {
-        statusEl.textContent = `⚠️ Added ${inserted} services, ${errors} failed.`
-        statusEl.style.color = '#dc2626'
-      }
-    }
-
-    async function seedDummyUsers() {
-      const statusEl = document.getElementById('seedStatus')
-      statusEl.textContent = 'ℹ️ To add sample users, use Supabase Auth panel or share this link with test users.'
-      statusEl.style.color = '#666'
-    }
-  </script>
+ <header>
+ <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+ <div class="header-right">
+ <span class="admin-badge"> Admin</span>
+ <button class="logout-btn-top" onclick="doLogout()"> Logout</button>
+ </div>
+ </header>
+
+ <div class="page-title">Admin Dashboard</div>
+
+ <!-- Stats -->
+ <div class="stats-row">
+ <div class="stat-card">
+ <div class="num" id="stat-users">—</div>
+ <div class="lbl">Total Users</div>
+ </div>
+ <div class="stat-card">
+ <div class="num" id="stat-vendors">—</div>
+ <div class="lbl">Active Vendors</div>
+ </div>
+ <div class="stat-card">
+ <div class="num" id="stat-pending">—</div>
+ <div class="lbl">Pending Approvals</div>
+ </div>
+ <div class="stat-card">
+ <div class="num" id="stat-bookings">—</div>
+ <div class="lbl">Total Bookings</div>
+ </div>
+ <div class="stat-card">
+ <div class="num" id="stat-reports">—</div>
+ <div class="lbl">Reports</div>
+ </div>
+ </div>
+
+ <!-- Tabs -->
+ <div class="tabs">
+ <button class="tab-btn active" onclick="showTab('taskers', this)"> Tasker Approvals</button>
+ <button class="tab-btn" onclick="showTab('asnaf', this)"> Asnaf Verification</button>
+ <button class="tab-btn" onclick="showTab('gigs', this)"> Live Gigs</button>
+ <button class="tab-btn" onclick="showTab('vendors', this)"> Vendor Approvals</button>
+ <button class="tab-btn" onclick="showTab('services', this)"> Services</button>
+ <button class="tab-btn" onclick="showTab('users', this)"> All Users</button>
+ <button class="tab-btn" onclick="showTab('bookings', this)"> Bookings</button>
+ <button class="tab-btn" onclick="showTab('reports', this)"> Reports</button>
+ <button class="tab-btn" onclick="showTab('impact', this)"> Impact Report</button>
+ </div>
+
+ <!-- Panel: Tasker Approvals -->
+ <div id="panel-taskers" class="panel active">
+ <div class="section-title">⏳ Pending Tasker Applications</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Name</th>
+ <th>Email</th>
+ <th>Reason</th>
+ <th>Applied</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-tasker-pending">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: Asnaf Verification -->
+ <div id="panel-asnaf" class="panel">
+ <div class="section-title"> Pending Asnaf Verifications</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Name</th>
+ <th>Student ID</th>
+ <th>Income Doc</th>
+ <th>Submitted</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-asnaf-pending">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ <div class="section-title" style="margin-top:28px"> Verified Asnaf Members</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Name</th>
+ <th>Student ID</th>
+ <th>Verified By</th>
+ <th>Date</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-asnaf-verified">
+ <tr class="empty-row">
+ <td colspan="4">No verified Asnaf members yet.</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: Live Gigs Management -->
+ <div id="panel-gigs" class="panel">
+ <div class="section-title">⏳ Pending Review</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Title</th>
+ <th>Requester</th>
+ <th>Reward</th>
+ <th>Reason</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-gigs-pending">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ <div class="section-title" style="margin-top:28px"> Active Live Gigs</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Title</th>
+ <th>Requester</th>
+ <th>Tasker</th>
+ <th>Reward</th>
+ <th>Status</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-gigs-active">
+ <tr class="empty-row">
+ <td colspan="6">No active gigs.</td>
+ </tr>
+ </tbody>
+ </table>
+ <div class="section-title" style="margin-top:28px"> Flagged Gigs</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Title</th>
+ <th>Flags</th>
+ <th>Reason</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-gigs-flagged">
+ <tr class="empty-row">
+ <td colspan="4">No flagged gigs.</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: Services -->
+ <div id="panel-services" class="panel">
+ <div class="section-title"> All Services</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Title</th>
+ <th>Vendor</th>
+ <th>Type</th>
+ <th>Price</th>
+ <th>Status</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-services">
+ <tr class="empty-row">
+ <td colspan="6">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: Vendor Approvals -->
+ <div id="panel-vendors" class="panel">
+ <div class="section-title">⏳ Pending Vendor Applications</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Name</th>
+ <th>Student ID</th>
+ <th>Email</th>
+ <th>B40</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-pending">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <div class="section-title" style="margin-top:28px"> Approved Vendors</div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Name</th>
+ <th>Student ID</th>
+ <th>CGPA</th>
+ <th>B40</th>
+ <th>Status</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-vendors">
+ <tr class="empty-row">
+ <td colspan="6">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: All Users -->
+ <div id="panel-users" class="panel">
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Name</th>
+ <th>Student ID</th>
+ <th>Role</th>
+ <th>CGPA</th>
+ <th>Update CGPA</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-users">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: Bookings -->
+ <div id="panel-bookings" class="panel">
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Service</th>
+ <th>Student</th>
+ <th>Vendor</th>
+ <th>Status</th>
+ <th>Date</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-bookings">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: Reports -->
+ <div id="panel-reports" class="panel">
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Reported By</th>
+ <th>Service ID</th>
+ <th>Reason</th>
+ <th>Date</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-reports">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Panel: Impact Report -->
+ <div id="panel-impact" class="panel">
+ <div class="section-title"> Student Impact Report Generator</div>
+ <p style="color:#666;font-size:14px;margin-bottom:20px">
+ Generate monthly reports for Zakat/Baitulmal authorities. This report includes Asnaf members,
+ tasks completed, earnings, and income brackets.
+ </p>
+ <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-width:500px;margin:0 auto;">
+ <label style="display:block;margin-bottom:8px;font-weight:600;color:#001f3f">Select Month</label>
+ <input type="month" id="reportMonth" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-bottom:15px">
+
+ <label style="display:block;margin-bottom:8px;font-weight:600;color:#001f3f">Report Format</label>
+ <select id="reportFormat" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-bottom:15px">
+ <option value="pdf">PDF Document</option>
+ <option value="excel">Excel Spreadsheet</option>
+ <option value="both">Both PDF + Excel</option>
+ </select>
+
+ <button class="btn-approve" style="width:100%;padding:12px;font-size:15px" onclick="generateImpactReport()">
+ Generate Report
+ </button>
+
+ <div id="reportPreview" style="margin-top:20px;display:none">
+ <h4 style="margin-bottom:10px;color:#001f3f">Report Preview</h4>
+ <div style="background:#f9fafb;padding:15px;border-radius:8px;font-size:13px" id="reportStats"></div>
+ <button class="btn-save" style="width:100%;padding:10px;margin-top:10px" onclick="downloadReport()">
+ Download Report
+ </button>
+ </div>
+ </div>
+ </div>
+
+ <!-- Developer Tools - Hidden behind + button -->
+ <div class="dev-tools-fab" onclick="toggleDevTools()">+</div>
+ <div id="devToolsPanel" class="slide-panel">
+ <div class="slide-panel-content">
+ <span class="close-panel" onclick="toggleDevTools()">&times;</span>
+ <h3 style="color:#001f3f;margin-bottom:10px;"> Developer Tools</h3>
+ <p style="color:#666;font-size:14px;margin-bottom:15px;">Add sample data for testing and demonstration.</p>
+ <button class="btn-approve" onclick="seedDummyData()"> Add Sample Services (50 listings)</button>
+ <button class="btn-suspend" onclick="seedDummyUsers()" style="margin-left:10px;"> Add Sample Users</button>
+ <div id="seedStatus" style="margin-top:15px;font-size:14px;"></div>
+ </div>
+ </div>
+
+ <footer>&copy; 2025 iTa'awun | Admin Panel</footer>
+
+ <style>
+ /* Developer Tools FAB */
+ .dev-tools-fab {
+ position: fixed;
+ bottom: 80px;
+ right: 30px;
+ width: 50px;
+ height: 50px;
+ border-radius: 50%;
+ background: #6b21a8;
+ color: white;
+ font-size: 28px;
+ font-weight: bold;
+ border: none;
+ cursor: pointer;
+ box-shadow: 0 4px 15px rgba(107,33,168,0.4);
+ transition: 0.3s;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ }
+ .dev-tools-fab:hover {
+ transform: scale(1.1);
+ background: #7c3aed;
+ }
+ /* Slide panel */
+ .slide-panel {
+ display: none;
+ position: fixed;
+ top: 0;
+ right: 0;
+ width: 400px;
+ max-width: 90%;
+ height: 100vh;
+ background: white;
+ z-index: 1000;
+ box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+ overflow-y: auto;
+ }
+ .slide-panel.active { display: block; animation: slideIn 0.3s ease; }
+ @keyframes slideIn {
+ from { transform: translateX(100%); }
+ to { transform: translateX(0); }
+ }
+ .slide-panel-content { padding: 25px; }
+ .close-panel {
+ position: absolute;
+ top: 15px;
+ right: 20px;
+ font-size: 28px;
+ cursor: pointer;
+ color: #666;
+ }
+ .close-panel:hover { color: #333; }
+ </style>
+
+ <script>
+ function toggleDevTools() {
+ const panel = document.getElementById('devToolsPanel')
+ panel.classList.toggle('active')
+ }
+ </script>
+
+ <script>
+ const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+ let currentUser = null
+
+ // Auth + Admin Gate 
+ (async function initAdmin() {
+ const { data: { session } } = await db.auth.getSession()
+ if (!session) { window.location.href = 'index.html'; return }
+
+ currentUser = session.user
+
+ const { data: profile, error } = await db
+ .from('profiles').select('role').eq('id', session.user.id).single()
+
+ if (error || !profile || profile.role !== 'admin') {
+ alert('Access denied. Admins only.')
+ window.location.href = 'home.html'
+ return
+ }
+
+ loadAll()
+ })()
+
+ function loadAll() {
+ loadStats()
+ loadServices()
+ loadPendingVendors()
+ loadApprovedVendors()
+ loadAllUsers()
+ loadBookings()
+ loadReports()
+ loadTaskerApplications()
+ loadAsnafVerifications()
+ loadLiveGigs()
+ }
+
+ // Tabs 
+ function showTab(tab, btn) {
+ document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+ document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+ document.getElementById('panel-' + tab).classList.add('active')
+ btn.classList.add('active')
+ }
+
+ // Services 
+ async function loadServices() {
+ const { data, error } = await db
+ .from('services')
+ .select('*')
+ .order('created_at', { ascending: false })
+ .limit(50)
+
+ const tb = document.getElementById('tbody-services')
+ if (error || !data || data.length === 0) {
+ tb.innerHTML = '<tr class="empty-row"><td colspan="6">No services yet.</td></tr>'; return
+ }
+
+ // Fetch vendor names
+ const vendorIds = [...new Set(data.map(s => s.vendor_id))]
+ const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', vendorIds)
+ const nameMap = {}
+ if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+
+ tb.innerHTML = data.map(s => `
+ <tr>
+ <td>${s.title || '—'}</td>
+ <td>${nameMap[s.vendor_id] || s.vendor_id?.slice(0, 8) + '…'}</td>
+ <td><span class="status-badge s-${s.type === 'offered' ? 'vendor' : 'student'}">${s.type}</span></td>
+ <td>RM${parseFloat(s.price || 0).toFixed(2)}</td>
+ <td><span class="status-badge s-${s.status}">${s.status}</span></td>
+ <td>
+ ${s.status === 'active'
+ ? `<button class="btn-sm btn-suspend" onclick="deactivateService('${s.id}')">Deactivate</button>`
+ : `<button class="btn-sm btn-approve" onclick="activateService('${s.id}')">Activate</button>`}
+ <button class="btn-sm btn-suspend" onclick="deleteService('${s.id}')">Delete</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ async function activateService(id) {
+ await db.from('services').update({ status: 'active' }).eq('id', id)
+ loadServices()
+ }
+ async function deactivateService(id) {
+ await db.from('services').update({ status: 'inactive' }).eq('id', id)
+ loadServices()
+ }
+ async function deleteService(id) {
+ if (!confirm('Delete this service permanently?')) return
+ await db.from('services').delete().eq('id', id)
+ loadServices()
+ }
+
+ // Stats 
+ async function loadStats() {
+ const [users, bookings, reports, pending] = await Promise.all([
+ db.from('profiles').select('id', { count: 'exact', head: true }),
+ db.from('bookings').select('id', { count: 'exact', head: true }),
+ db.from('reports').select('id', { count: 'exact', head: true }),
+ db.from('profiles').select('id', { count: 'exact', head: true })
+ .eq('role', 'vendor').eq('is_approved', false)
+ ])
+ const vendors = await db.from('profiles').select('id', { count: 'exact', head: true })
+ .eq('role', 'vendor').eq('is_approved', true)
+
+ document.getElementById('stat-users').textContent = users.count ?? '—'
+ document.getElementById('stat-bookings').textContent = bookings.count ?? '—'
+ document.getElementById('stat-reports').textContent = reports.count ?? '—'
+ document.getElementById('stat-pending').textContent = pending.count ?? '—'
+ document.getElementById('stat-vendors').textContent = vendors.count ?? '—'
+ }
+
+ // Pending vendor approvals 
+ async function loadPendingVendors() {
+ const { data } = await db.from('profiles').select('*')
+ .eq('role', 'vendor').eq('is_approved', false)
+ const tb = document.getElementById('tbody-pending')
+ if (!data || data.length === 0) {
+ tb.innerHTML = '<tr class="empty-row"><td colspan="5">No pending applications.</td></tr>'; return
+ }
+ tb.innerHTML = data.map(u => `
+ <tr>
+ <td>${u.full_name || '—'}</td>
+ <td>${u.student_id || '—'}</td>
+ <td>${u.email || '—'}</td>
+ <td>${u.is_b40 ? '<span class="s-b40">B40</span>' : '—'}</td>
+ <td>
+ <button class="btn-sm btn-approve" onclick="approveVendor('${u.id}')"> Approve</button>
+ <button class="btn-sm btn-suspend" onclick="rejectVendor('${u.id}')"> Reject</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ // Approved vendors 
+ async function loadApprovedVendors() {
+ const { data } = await db.from('profiles').select('*')
+ .eq('role', 'vendor').eq('is_approved', true)
+ const tb = document.getElementById('tbody-vendors')
+ if (!data || data.length === 0) {
+ tb.innerHTML = '<tr class="empty-row"><td colspan="6">No approved vendors yet.</td></tr>'; return
+ }
+ tb.innerHTML = data.map(u => `
+ <tr>
+ <td>${u.full_name || '—'}</td>
+ <td>${u.student_id || '—'}</td>
+ <td>
+ <input class="cgpa-input" id="cgpa-${u.id}" type="number" min="0" max="4" step="0.01"
+ value="${u.cgpa || ''}" placeholder="0.00">
+ <button class="btn-sm btn-save" onclick="saveCgpa('${u.id}')">Save</button>
+ </td>
+ <td>${u.is_b40 ? '<span class="s-b40">B40</span>' : '—'}</td>
+ <td>
+ ${u.cgpa && parseFloat(u.cgpa) < 2.0
+ ? '<span class="flag-badge"> Low CGPA</span>'
+ : '<span class="status-badge s-active">OK</span>'}
+ </td>
+ <td>
+ <button class="btn-sm btn-suspend" onclick="suspendVendor('${u.id}')">Suspend</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ // All users 
+ async function loadAllUsers() {
+ const { data } = await db.from('profiles').select('*').order('created_at', { ascending: false })
+ const tb = document.getElementById('tbody-users')
+ if (!data || data.length === 0) {
+ tb.innerHTML = '<tr class="empty-row"><td colspan="5">No users found.</td></tr>'; return
+ }
+ tb.innerHTML = data.map(u => `
+ <tr>
+ <td>${u.full_name || '—'}</td>
+ <td>${u.student_id || '—'}</td>
+ <td><span class="status-badge s-${u.role}">${u.role}</span></td>
+ <td>${u.cgpa || '—'}</td>
+ <td>
+ <input class="cgpa-input" id="cgpau-${u.id}" type="number" min="0" max="4" step="0.01"
+ value="${u.cgpa || ''}" placeholder="0.00">
+ <button class="btn-sm btn-save" onclick="saveCgpaUser('${u.id}')">Save</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ // Bookings 
+ async function loadBookings() {
+ const { data } = await db.from('bookings')
+ .select('*, services(title)')
+ .order('created_at', { ascending: false })
+ .limit(50)
+ const tb = document.getElementById('tbody-bookings')
+ if (!data || data.length === 0) {
+ tb.innerHTML = '<tr class="empty-row"><td colspan="5">No bookings yet.</td></tr>'; return
+ }
+
+ // Fetch names for student + vendor IDs
+ const ids = [...new Set([...data.map(b => b.student_id), ...data.map(b => b.vendor_id)])]
+ const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', ids)
+ const nameMap = {}
+ if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+
+ tb.innerHTML = data.map(b => `
+ <tr>
+ <td>${b.services?.title || '(deleted)'}</td>
+ <td>${nameMap[b.student_id] || b.student_id?.slice(0, 8) + '…'}</td>
+ <td>${nameMap[b.vendor_id] || b.vendor_id?.slice(0, 8) + '…'}</td>
+ <td><span class="status-badge s-${b.status}">${b.status}</span></td>
+ <td>${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+ </tr>`).join('')
+ }
+
+ // Reports 
+ async function loadReports() {
+ const { data } = await db.from('reports').select('*').order('created_at', { ascending: false })
+ const tb = document.getElementById('tbody-reports')
+ if (!data || data.length === 0) {
+ tb.innerHTML = '<tr class="empty-row"><td colspan="5">No reports filed.</td></tr>'; return
+ }
+ tb.innerHTML = data.map(r => `
+ <tr>
+ <td>${r.reporter_id?.slice(0, 8)}…</td>
+ <td>${r.service_id?.slice(0, 8)}…</td>
+ <td>${r.reason || '—'}</td>
+ <td>${new Date(r.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short' })}</td>
+ <td><button class="btn-sm btn-suspend" onclick="dismissReport('${r.id}')">Dismiss</button></td>
+ </tr>`).join('')
+ }
+
+ // Actions 
+ async function approveVendor(id) {
+ await db.from('profiles').update({ is_approved: true }).eq('id', id)
+ loadAll()
+ }
+ async function rejectVendor(id) {
+ if (!confirm('Reject and remove this vendor application?')) return
+ await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
+ loadAll()
+ }
+ async function suspendVendor(id) {
+ if (!confirm('Suspend this vendor? They will lose vendor access.')) return
+ await db.from('profiles').update({ role: 'student', is_approved: false }).eq('id', id)
+ loadAll()
+ }
+ async function saveCgpa(id) {
+ const val = parseFloat(document.getElementById('cgpa-' + id).value)
+ if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
+ await db.from('profiles').update({ cgpa: val }).eq('id', id)
+ loadApprovedVendors()
+ }
+ async function saveCgpaUser(id) {
+ const val = parseFloat(document.getElementById('cgpau-' + id).value)
+ if (isNaN(val) || val < 0 || val > 4) { alert('CGPA must be between 0.00 and 4.00'); return }
+ await db.from('profiles').update({ cgpa: val }).eq('id', id)
+ alert('CGPA updated.')
+ }
+ async function dismissReport(id) {
+ await db.from('reports').delete().eq('id', id)
+ loadReports()
+ loadStats()
+ }
+ async function doLogout() {
+ const { error } = await db.auth.signOut()
+ if (error) { console.error('Logout error:', error) }
+ window.location.replace('index.html?logged=out')
+ }
+
+ // Tasker Applications 
+ async function loadTaskerApplications() {
+ const { data, error } = await db
+ .from('admin_applications')
+ .select('*')
+ .eq('status', 'pending')
+ .order('created_at', { ascending: false })
+
+ const tb = document.getElementById('tbody-tasker-pending')
+ if (error || !data || data.length === 0) {
+ tb.innerHTML = '<tr class="empty-row"><td colspan="5">No pending applications.</td></tr>'; return
+ }
+
+ // Fetch applicant names
+ const ids = [...new Set(data.map(a => a.user_id))]
+ const { data: profiles } = await db.from('profiles').select('id, full_name, email').in('id', ids)
+ const nameMap = {}
+ if (profiles) profiles.forEach(p => { nameMap[p.id] = p })
+
+ tb.innerHTML = data.map(a => `
+ <tr>
+ <td>${nameMap[a.user_id]?.full_name || '—'}</td>
+ <td>${nameMap[a.user_id]?.email || '—'}</td>
+ <td>${a.position || '—'}: ${a.reason || '—'}</td>
+ <td>${new Date(a.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+ <td>
+ <button class="btn-sm btn-approve" onclick="approveTasker('${a.user_id}', '${a.id}', '${a.position}')"> Approve</button>
+ <button class="btn-sm btn-suspend" onclick="rejectTasker('${a.id}')"> Reject</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ async function approveTasker(userId, appId, position) {
+ const newRole = (position === 'admin') ? 'admin' : 'vendor'
+ await db.from('profiles').update({ role: newRole, is_approved: true }).eq('id', userId)
+ await db.from('admin_applications').update({ status: 'approved' }).eq('id', appId)
+ loadTaskerApplications()
+ loadStats()
+ }
+
+ async function rejectTasker(appId) {
+ if (!confirm('Reject this application?')) return
+ await db.from('admin_applications').update({ status: 'rejected' }).eq('id', appId)
+ loadTaskerApplications()
+ }
+
+ // Asnaf Verifications 
+ async function loadAsnafVerifications() {
+ const { data: pending } = await db
+ .from('verifications')
+ .select('*')
+ .eq('status', 'pending')
+ .order('created_at', { ascending: false })
+
+ const tbPending = document.getElementById('tbody-asnaf-pending')
+ if (!pending || pending.length === 0) {
+ tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending verifications.</td></tr>'
+ } else {
+ const ids = [...new Set(pending.map(v => v.user_id))]
+ const { data: profiles } = await db.from('profiles').select('id, full_name, student_id').in('id', ids)
+ const nameMap = {}
+ if (profiles) profiles.forEach(p => { nameMap[p.id] = p })
+
+ tbPending.innerHTML = pending.map(v => `
+ <tr>
+ <td>${nameMap[v.user_id]?.full_name || '—'}</td>
+ <td>${nameMap[v.user_id]?.student_id || '—'}</td>
+ <td><a href="${v.doc_url}" target="_blank" style="color:#6b21a8">View Doc</a></td>
+ <td>${new Date(v.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+ <td>
+ <button class="btn-sm btn-approve" onclick="approveAsnaf('${v.id}','${v.user_id}')"> Verify</button>
+ <button class="btn-sm btn-suspend" onclick="rejectAsnaf('${v.id}')"> Reject</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ const { data: verified } = await db
+ .from('profiles').select('full_name, student_id, updated_at')
+ .eq('is_asnaf', true).order('updated_at', { ascending: false })
+
+ const tbVerified = document.getElementById('tbody-asnaf-verified')
+ if (!verified || verified.length === 0) {
+ tbVerified.innerHTML = '<tr class="empty-row"><td colspan="4">No verified Asnaf members yet.</td></tr>'
+ } else {
+ tbVerified.innerHTML = verified.map(u => `
+ <tr>
+ <td>${u.full_name || '—'}</td>
+ <td>${u.student_id || '—'}</td>
+ <td>Admin</td>
+ <td>${new Date(u.updated_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+ </tr>`).join('')
+ }
+ }
+
+ async function approveAsnaf(verificationId, userId) {
+ await db.from('verifications').update({ status: 'approved', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', verificationId)
+ await db.from('profiles').update({ is_asnaf: true }).eq('id', userId)
+ loadAsnafVerifications()
+ }
+
+ async function rejectAsnaf(verificationId) {
+ const reason = prompt('Reason for rejection (optional):') || ''
+ await db.from('verifications').update({ status: 'rejected', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString(), rejection_reason: reason }).eq('id', verificationId)
+ loadAsnafVerifications()
+ }
+
+ // Live Gigs 
+ async function loadLiveGigs() {
+ // Pending
+ const { data: pending } = await db.from('gigs').select('*').eq('status', 'pending_review').order('created_at', { ascending: false })
+ const tbPending = document.getElementById('tbody-gigs-pending')
+ if (!pending || pending.length === 0) {
+ tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending gigs.</td></tr>'
+ } else {
+ const ids = [...new Set(pending.map(g => g.requester_id))]
+ const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', ids)
+ const nameMap = {}
+ if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+ tbPending.innerHTML = pending.map(g => `
+ <tr>
+ <td>${g.title}</td>
+ <td>${nameMap[g.requester_id] || '—'}</td>
+ <td>RM${parseFloat(g.reward_amount || 0).toFixed(2)}</td>
+ <td>${g.flag_count > 0 ? '<span class="flag-badge">Flagged (' + g.flag_count + ')</span>' : 'Clean'}</td>
+ <td>
+ <button class="btn-sm btn-approve" onclick="approveGig('${g.id}')"> Approve</button>
+ <button class="btn-sm btn-suspend" onclick="rejectGig('${g.id}')"> Reject</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ // Active
+ const { data: active } = await db.from('gigs').select('*').in('status', ['live', 'grabbed', 'completed']).order('created_at', { ascending: false }).limit(20)
+ const tbActive = document.getElementById('tbody-gigs-active')
+ if (!active || active.length === 0) {
+ tbActive.innerHTML = '<tr class="empty-row"><td colspan="6">No active gigs.</td></tr>'
+ } else {
+ tbActive.innerHTML = active.map(g => `
+ <tr>
+ <td>${g.title}</td>
+ <td>${g.requester_id?.slice(0, 8)}…</td>
+ <td>—</td>
+ <td>RM${parseFloat(g.reward_amount || 0).toFixed(2)}</td>
+ <td><span class="status-badge s-${g.status === 'live' ? 'active' : g.status === 'grabbed' ? 'accepted' : 'done'}">${g.status}</span></td>
+ <td><button class="btn-sm btn-suspend" onclick="removeGig('${g.id}')">Remove</button></td>
+ </tr>`).join('')
+ }
+
+ // Flagged
+ const { data: flagged } = await db.from('gigs').select('*').eq('status', 'flagged').order('flag_count', { ascending: false })
+ const tbFlagged = document.getElementById('tbody-gigs-flagged')
+ if (!flagged || flagged.length === 0) {
+ tbFlagged.innerHTML = '<tr class="empty-row"><td colspan="4">No flagged gigs.</td></tr>'
+ } else {
+ tbFlagged.innerHTML = flagged.map(g => `
+ <tr>
+ <td>${g.title}</td>
+ <td><span class="flag-badge">${g.flag_count} reports</span></td>
+ <td>${g.requester_id?.slice(0, 8)}…</td>
+ <td>
+ <button class="btn-sm btn-approve" onclick="approveGig('${g.id}')">Restore</button>
+ <button class="btn-sm btn-suspend" onclick="removeGig('${g.id}')">Remove</button>
+ </td>
+ </tr>`).join('')
+ }
+ }
+
+ async function approveGig(id) {
+ await db.from('gigs').update({ status: 'live' }).eq('id', id)
+ loadLiveGigs()
+ }
+ async function rejectGig(id) {
+ if (!confirm('Reject this gig?')) return
+ await db.from('gigs').update({ status: 'rejected' }).eq('id', id)
+ loadLiveGigs()
+ }
+ async function removeGig(id) {
+ if (!confirm('Remove this gig permanently?')) return
+ await db.from('gigs').delete().eq('id', id)
+ loadLiveGigs()
+ }
+
+ // Impact Report 
+ async function generateImpactReport() {
+ const month = document.getElementById('reportMonth').value
+ if (!month) { alert('Please select a month.'); return }
+
+ const [year, mon] = month.split('-')
+ const startDate = `${year}-${mon}-01`
+ const lastDay = new Date(parseInt(year), parseInt(mon), 0).getDate()
+ const endDate = `${year}-${mon}-${String(lastDay).padStart(2, '0')}`
+
+ const [bookings, asnafUsers, completedGigs] = await Promise.all([
+ db.from('bookings').select('id', { count: 'exact', head: true }).eq('status', 'done').gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59'),
+ db.from('profiles').select('id', { count: 'exact', head: true }).eq('is_asnaf', true),
+ db.from('gigs').select('id, reward_amount').eq('status', 'completed').gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59')
+ ])
+
+ const totalEarnings = completedGigs.data?.reduce((sum, g) => sum + parseFloat(g.reward_amount || 0), 0) || 0
+
+ document.getElementById('reportStats').innerHTML = `
+ <p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString('en-MY', { month: 'long', year: 'numeric' })}</p>
+ <p><strong>Bookings Completed:</strong> ${bookings.count ?? 0}</p>
+ <p><strong>Gigs Completed:</strong> ${completedGigs.data?.length ?? 0}</p>
+ <p><strong>Total Student Earnings (Gigs):</strong> RM${totalEarnings.toFixed(2)}</p>
+ <p><strong>Total Asnaf Members:</strong> ${asnafUsers.count ?? 0}</p>
+ `
+ document.getElementById('reportPreview').style.display = 'block'
+ }
+
+ function downloadReport() {
+ const content = document.getElementById('reportStats').innerText
+ const month = document.getElementById('reportMonth').value
+ const blob = new Blob([`iTa'awun Impact Report\n${month}\n\n` + content], { type: 'text/plain' })
+ const url = URL.createObjectURL(blob)
+ const a = document.createElement('a')
+ a.href = url
+ a.download = `itaawun-impact-${month}.txt`
+ a.click()
+ URL.revokeObjectURL(url)
+ }
+
+ // Seed Data Functions 
+ async function seedDummyData() {
+ const statusEl = document.getElementById('seedStatus')
+ statusEl.textContent = '⏳ Adding sample services...'
+ statusEl.style.color = '#666'
+
+ const sampleServices = [
+ { title: 'Note Printing Service', desc: 'Print your notes and assignments. Black & white or color.', price: 0.10, category: 'service', location: 'Library Ground Floor', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456701', telegram: 'printpro_ahmad', type: 'offered' },
+ { title: 'Assignment Binding', desc: 'Professional binding for assignments and reports.', price: 3.00, category: 'service', location: 'Library Ground Floor', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456701', telegram: 'printpro_ahmad', type: 'offered' },
+ { title: 'Math Tutoring', desc: 'Experienced tutor for Calculus and Algebra. CFS Mathematics.', price: 30.00, category: 'tutoring', location: 'Online or Library', time: 'Weekends', whatsapp: '60123456702', telegram: 'math_tutor_sarah', type: 'offered' },
+ { title: 'Physics Tutoring', desc: 'Physics fundamentals and problem solving. All topics covered.', price: 35.00, category: 'tutoring', location: 'Online or Cafe', time: 'Evenings', whatsapp: '60123456703', telegram: 'physics_helper', type: 'offered' },
+ { title: 'Photography Service', desc: 'Event and portrait photography. Professional editing included.', price: 50.00, category: 'photography', location: 'Campus-wide', time: 'Flexible', whatsapp: '60123456704', telegram: 'lens_master', type: 'offered' },
+ { title: 'Food Runner - Kuliyyah', desc: 'Food delivery from Kuliyyah cafe to your location.', price: 3.00, category: 'runner', location: 'Kuliyyah to anywhere', time: 'Mon-Fri 10am-6pm', whatsapp: '60123456705', telegram: 'food_runner_ali', type: 'offered' },
+ { title: 'Food Runner - Cafeteria', desc: 'Quick food delivery from main cafeteria.', price: 2.00, category: 'runner', location: 'Cafeteria to anywhere', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456706', telegram: 'caf_runner', type: 'offered' },
+ { title: 'Laundry Service', desc: 'Wash, dry, and fold. Pick up and delivery included.', price: 8.00, category: 'service', location: 'Residential College', time: 'Weekends', whatsapp: '60123456707', telegram: 'laundry_pro', type: 'offered' },
+ { title: 'Graphic Design', desc: 'Logo, poster, and social media design. Portfolio available.', price: 25.00, category: 'design', location: 'Online', time: 'Flexible', whatsapp: '60123456708', telegram: 'design_by_nina', type: 'offered' },
+ { title: 'Resume Writing', desc: 'Professional resume and CV writing service.', price: 20.00, category: 'writing', location: 'Online', time: 'Flexible', whatsapp: '60123456709', telegram: 'resume_writer', type: 'offered' },
+ { title: 'Coding Help - Python', desc: 'Python programming assistance. Assignments and projects.', price: 40.00, category: 'coding', location: 'Online', time: 'Evenings', whatsapp: '60123456710', telegram: 'python_helper', type: 'offered' },
+ { title: 'Coding Help - Web Dev', desc: 'HTML, CSS, JavaScript help. Website building.', price: 45.00, category: 'coding', location: 'Online', time: 'Flexible', whatsapp: '60123456711', telegram: 'web_dev_pro', type: 'offered' },
+ { title: 'Barber Service', desc: 'Home haircut service. Bring the barbershop to you.', price: 15.00, category: 'service', location: 'Residential Colleges', time: 'Weekends', whatsapp: '60123456712', telegram: 'mobile_barber', type: 'offered' },
+ { title: 'Sewing & Alterations', desc: 'Clothing repairs, hemming, and alterations.', price: 10.00, category: 'service', location: 'RC Common Room', time: 'Evenings', whatsapp: '60123456713', telegram: 'sewing_sis', type: 'offered' },
+ { title: 'Slide Presentation Design', desc: 'Professional PowerPoint slides for presentations.', price: 15.00, category: 'design', location: 'Online', time: 'Flexible', whatsapp: '60123456714', telegram: 'slide_designer', type: 'offered' },
+ { title: 'Parcel Delivery', desc: 'Campus parcel pickup and delivery service.', price: 4.00, category: 'runner', location: 'Campus-wide', time: 'Mon-Fri 9am-5pm', whatsapp: '60123456715', telegram: 'parcel_runner', type: 'offered' },
+ { title: 'Ironing Service', desc: 'Clothes ironing. Pick up and delivery.', price: 5.00, category: 'service', location: 'Residential College', time: 'Weekends', whatsapp: '60123456716', telegram: 'iron_helper', type: 'offered' },
+ { title: 'English Tutoring', desc: 'Improve your English speaking and writing.', price: 25.00, category: 'tutoring', location: 'Library or Online', time: 'Evenings', whatsapp: '60123456717', telegram: 'english_tutor', type: 'offered' },
+ { title: 'Arabic Tutoring', desc: 'Classical and conversational Arabic lessons.', price: 30.00, category: 'tutoring', location: 'Online', time: 'Flexible', whatsapp: '60123456718', telegram: 'arabic_teacher', type: 'offered' },
+ { title: 'Video Editing', desc: 'Edit your videos for assignments or social media.', price: 35.00, category: 'design', location: 'Online', time: 'Flexible', whatsapp: '60123456719', telegram: 'video_editor', type: 'offered' },
+ { title: 'Need Calculus Tutor', desc: 'Looking for a Calculus tutor for midterms.', price: 30.00, category: 'tutoring', location: 'Library', time: 'Weekends', whatsapp: '60123456720', telegram: 'calc_student', type: 'needed' },
+ { title: 'Need Group Study Partner', desc: 'Study partner for Economics revision.', price: 0.00, category: 'tutoring', location: 'Library', time: 'Evenings', whatsapp: '60123456721', telegram: 'econ_student', type: 'needed' },
+ { title: 'Need Food Delivery', desc: 'Need someone to bring food from Kuliyyah to KIRCS.', price: 5.00, category: 'runner', location: 'Kuliyyah to KIRCS', time: 'Mon-Fri 1pm', whatsapp: '60123456722', telegram: 'hungry_student', type: 'needed' },
+ { title: 'Need Printing Service', desc: 'Urgent printing needed - 50 pages color.', price: 10.00, category: 'service', location: 'Library', time: 'Today 3pm', whatsapp: '60123456723', telegram: 'urgent_print', type: 'needed' },
+ { title: 'Need Assignment Typing', desc: 'Handwritten assignment needs to be typed.', price: 15.00, category: 'writing', location: 'Online', time: '2 days', whatsapp: '60123456724', telegram: 'typing_needed', type: 'needed' },
+ { title: 'Photography for Event', desc: 'Need photographer for club event.', price: 80.00, category: 'photography', location: 'Main Hall', time: 'Next Saturday', whatsapp: '60123456725', telegram: 'club_organizer', type: 'needed' },
+ { title: 'Need Web Developer', desc: 'Looking for someone to build a simple website.', price: 100.00, category: 'coding', location: 'Online', time: '1 week', whatsapp: '60123456726', telegram: 'website_seeker', type: 'needed' },
+ { title: 'Need Laundry Help', desc: 'Laundry service needed urgently.', price: 10.00, category: 'service', location: 'KIRCS', time: 'This weekend', whatsapp: '60123456727', telegram: 'laundry_help', type: 'needed' },
+ { title: 'Need Graphic Designer', desc: 'Need poster design for workshop.', price: 30.00, category: 'design', location: 'Online', time: '3 days', whatsapp: '60123456728', telegram: 'poster_needed', type: 'needed' },
+ { title: 'Need Python Helper', desc: 'Stuck with Python assignment. Need guidance.', price: 25.00, category: 'coding', location: 'Online', time: 'Tonight', whatsapp: '60123456729', telegram: 'python_stuck', type: 'needed' },
+ { title: 'Note Printing Bulk', desc: 'Bulk printing - 500 pages. Discount please.', price: 40.00, category: 'service', location: 'Library', time: 'This week', whatsapp: '60123456730', telegram: 'bulk_print', type: 'offered' },
+ { title: 'Weekend Food Runner', desc: 'Food delivery service on weekends only.', price: 4.00, category: 'runner', location: 'Cafeteria', time: 'Sat-Sun', whatsapp: '60123456731', telegram: 'weekend_runner', type: 'offered' },
+ { title: 'Chemistry Tutoring', desc: 'Chemistry fundamentals and lab report help.', price: 35.00, category: 'tutoring', location: 'Science Lab', time: 'Tue-Thu', whatsapp: '60123456732', telegram: 'chem_tutor', type: 'offered' },
+ { title: 'Biology Tutoring', desc: 'Biology and life sciences tutoring.', price: 30.00, category: 'tutoring', location: 'Online', time: 'Flexible', whatsapp: '60123456733', telegram: 'bio_helper', type: 'offered' },
+ { title: 'Accounting Help', desc: 'Financial accounting and bookkeeping help.', price: 40.00, category: 'tutoring', location: 'Library', time: 'Weekends', whatsapp: '60123456734', telegram: 'account_helper', type: 'offered' },
+ { title: 'Essay Proofreading', desc: 'Proofread and edit your essays.', price: 10.00, category: 'writing', location: 'Online', time: 'Flexible', whatsapp: '60123456735', telegram: 'proof_reader', type: 'offered' },
+ { title: 'Translation Service', desc: 'English-Malay translation service.', price: 20.00, category: 'writing', location: 'Online', time: 'Flexible', whatsapp: '60123456736', telegram: 'translator_ms', type: 'offered' },
+ { title: 'Need Chemistry Tutor', desc: 'Struggling with organic chemistry.', price: 35.00, category: 'tutoring', location: 'Science Lab', time: 'Weekdays', whatsapp: '60123456737', telegram: 'chem_student', type: 'needed' },
+ { title: 'Need Roommate', desc: 'Looking for a roommate for next semester.', price: 0.00, category: 'service', location: 'KIRCS', time: 'Next semester', whatsapp: '60123456738', telegram: 'roommate_search', type: 'needed' },
+ { title: 'Need Bike Repair', desc: 'Bicycle needs repair. Can someone help?', price: 20.00, category: 'service', location: 'Campus', time: 'This weekend', whatsapp: '60123456739', telegram: 'bike_repair', type: 'needed' },
+ { title: 'Personal Shopping', desc: 'Grocery and essentials shopping service.', price: 10.00, category: 'runner', location: 'Campus to RC', time: 'Daily', whatsapp: '60123456740', telegram: 'shop_runner', type: 'offered' },
+ { title: 'Carpet Cleaning', desc: 'RC room carpet cleaning service.', price: 25.00, category: 'service', location: 'Residential Colleges', time: 'Weekends', whatsapp: '60123456741', telegram: 'clean_pro', type: 'offered' },
+ { title: 'Need Math Assignment Help', desc: 'Statistics assignment due Monday.', price: 20.00, category: 'tutoring', location: 'Online', time: 'This weekend', whatsapp: '60123456742', telegram: 'stats_help', type: 'needed' },
+ { title: 'Need Presentation Coach', desc: 'Help with public speaking for presentation.', price: 30.00, category: 'tutoring', location: 'Library', time: 'Evenings', whatsapp: '60123456743', telegram: 'speak_coach', type: 'needed' },
+ { title: 'Shoe Repair Service', desc: 'Repair and restore your shoes.', price: 15.00, category: 'service', location: 'RC Common Room', time: 'Weekends', whatsapp: '60123456744', telegram: 'shoe_repair', type: 'offered' },
+ { title: 'Bag Repair', desc: 'Fix zippers and tears in bags.', price: 12.00, category: 'service', location: 'Online pickup', time: 'Flexible', whatsapp: '60123456745', telegram: 'bag_fixer', type: 'offered' },
+ { title: 'Need Escort Service', desc: 'Need someone to walk with at night for safety.', price: 5.00, category: 'runner', location: 'Campus', time: 'Night only', whatsapp: '60123456746', telegram: 'safety_first', type: 'needed' },
+ { title: 'Computer Troubleshooting', desc: 'Fix software issues and virus removal.', price: 30.00, category: 'coding', location: 'On-site', time: 'Weekends', whatsapp: '60123456747', telegram: 'tech_fixer', type: 'offered' },
+ { title: 'Phone Screen Repair', desc: 'Replace cracked phone screens.', price: 50.00, category: 'service', location: 'Library Lobby', time: 'Sat-Sun', whatsapp: '60123456748', telegram: 'phone_fixer', type: 'offered' },
+ { title: 'Need Mover Helper', desc: 'Help moving to new room.', price: 15.00, category: 'runner', location: 'KIRCS to KMC', time: 'Sunday morning', whatsapp: '60123456749', telegram: 'moving_help', type: 'needed' }
+ ]
+
+ let inserted = 0
+ let errors = 0
+
+ for (const svc of sampleServices) {
+ const { error } = await db.from('services').insert({
+ vendor_id: currentUser.id,
+ title: svc.title,
+ description: svc.desc,
+ price: svc.price,
+ category: svc.category,
+ location: svc.location,
+ time: svc.time,
+ whatsapp: svc.whatsapp,
+ telegram: svc.telegram,
+ image: 'https://via.placeholder.com/300x120?text=' + encodeURIComponent(svc.title),
+ type: svc.type,
+ status: 'active'
+ })
+ if (error) errors++
+ else inserted++
+ }
+
+ if (errors === 0) {
+ statusEl.textContent = ` Successfully added ${inserted} sample services!`
+ statusEl.style.color = '#16a34a'
+ loadServices()
+ } else {
+ statusEl.textContent = ` Added ${inserted} services, ${errors} failed.`
+ statusEl.style.color = '#dc2626'
+ }
+ }
+
+ async function seedDummyUsers() {
+ const statusEl = document.getElementById('seedStatus')
+ statusEl.textContent = 'ℹ To add sample users, use Supabase Auth panel or share this link with test users.'
+ statusEl.style.color = '#666'
+ }
+ </script>
 </body>
 
 </html>

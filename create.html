@@ -2,394 +2,394 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Service - iTa'awun</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    /* Body & Gradient Background */
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      color: #333;
-    }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Create Service - iTa'awun</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ <style>
+ /* Body & Gradient Background */
+ body {
+ margin: 0;
+ font-family: 'Segoe UI', sans-serif;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+ background-size: 400% 400%;
+ animation: gradientBG 15s ease infinite;
+ color: #333;
+ }
 
-    @keyframes gradientBG {
-      0% {
-        background-position: 0% 50%;
-      }
+ @keyframes gradientBG {
+ 0% {
+ background-position: 0% 50%;
+ }
 
-      50% {
-        background-position: 100% 50%;
-      }
+ 50% {
+ background-position: 100% 50%;
+ }
 
-      100% {
-        background-position: 0% 50%;
-      }
-    }
+ 100% {
+ background-position: 0% 50%;
+ }
+ }
 
-    .back-button {
-      padding: 10px 40px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      font-weight: bold;
-      color: #001f3f;
-      font-size: 16px;
-    }
+ .back-button {
+ padding: 10px 40px;
+ display: flex;
+ align-items: center;
+ cursor: pointer;
+ font-weight: bold;
+ color: #001f3f;
+ font-size: 16px;
+ }
 
-    .back-button i {
-      margin-right: 8px;
-    }
+ .back-button i {
+ margin-right: 8px;
+ }
 
-    .back-button:hover {
-      color: #004f80;
-    }
+ .back-button:hover {
+ color: #004f80;
+ }
 
-    /* Header */
-    header {
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      padding: 15px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+ /* Header */
+ header {
+ background: rgba(0, 0, 0, 0.2);
+ color: white;
+ padding: 15px 40px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
 
-    header .logo {
-      font-size: 22px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+ header .logo {
+ font-size: 22px;
+ font-weight: bold;
+ cursor: pointer;
+ }
 
-    .profile-container {
-      position: relative;
-      display: inline-block;
-    }
-    .profile-container::before {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      z-index: -1;
-    }
+ .profile-container {
+ position: relative;
+ display: inline-block;
+ }
+ .profile-container::before {
+ content: '';
+ position: absolute;
+ top: -10px;
+ left: -10px;
+ right: -10px;
+ bottom: -10px;
+ z-index: -1;
+ }
 
-    .profile-pic {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid white;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: block;
-    }
-    .profile-container:hover .profile-pic {
-      transform: scale(1.1);
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
-    }
+ .profile-pic {
+ width: 40px;
+ height: 40px;
+ border-radius: 50%;
+ cursor: pointer;
+ border: 2px solid white;
+ transition: transform 0.2s, box-shadow 0.2s;
+ display: block;
+ }
+ .profile-container:hover .profile-pic {
+ transform: scale(1.1);
+ box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+ }
 
-    .dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 48px;
-      background: white;
-      color: #333;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      min-width: 160px;
-      z-index: 100;
-      overflow: hidden;
-      animation: fadeIn 0.15s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .profile-container:hover .dropdown { display: block; }
-    .dropdown:hover { display: block; }
-    .dropdown a {
-      display: block; padding: 11px 16px;
-      text-decoration: none; color: #333; font-size: 14px;
-      transition: background 0.15s;
-    }
-    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
-    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
-    .dropdown .logout-link { color: #dc2626 !important; }
-    .dropdown .logout-link:hover { background: #fef2f2 !important; }
-    .vendor-link.hidden { display: none; }
+ .dropdown {
+ display: none;
+ position: absolute;
+ right: 0;
+ top: 48px;
+ background: white;
+ color: #333;
+ border-radius: 10px;
+ box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+ min-width: 160px;
+ z-index: 100;
+ overflow: hidden;
+ animation: fadeIn 0.15s ease;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(-6px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ .profile-container:hover .dropdown { display: block; }
+ .dropdown:hover { display: block; }
+ .dropdown a {
+ display: block; padding: 11px 16px;
+ text-decoration: none; color: #333; font-size: 14px;
+ transition: background 0.15s;
+ }
+ .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+ .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+ .dropdown .logout-link { color: #dc2626 !important; }
+ .dropdown .logout-link:hover { background: #fef2f2 !important; }
+ .vendor-link.hidden { display: none; }
 
-    /* Container */
-    .container {
-      max-width: 500px;
-      width: 95%;
-      margin: 30px auto;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
+ /* Container */
+ .container {
+ max-width: 500px;
+ width: 95%;
+ margin: 30px auto;
+ background: rgba(255, 255, 255, 0.95);
+ padding: 20px;
+ border-radius: 12px;
+ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+ }
 
-    h2 {
-      color: #001f3f;
-      text-align: center;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
-    }
+ h2 {
+ color: #001f3f;
+ text-align: center;
+ margin-bottom: 20px;
+ text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+ }
 
-    label {
-      display: block;
-      margin: 12px 0 5px;
-      font-size: 14px;
-    }
+ label {
+ display: block;
+ margin: 12px 0 5px;
+ font-size: 14px;
+ }
 
-    input,
-    textarea,
-    select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
+ input,
+ textarea,
+ select {
+ width: 100%;
+ padding: 10px;
+ border-radius: 6px;
+ border: 1px solid #ccc;
+ font-size: 14px;
+ box-sizing: border-box;
+ }
 
-    textarea {
-      resize: none;
-    }
+ textarea {
+ resize: none;
+ }
 
-    button {
-      margin-top: 15px;
-      padding: 12px 15px;
-      border: none;
-      border-radius: 8px;
-      background: #001f3f;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-      font-weight: bold;
-      transition: .3s;
-    }
+ button {
+ margin-top: 15px;
+ padding: 12px 15px;
+ border: none;
+ border-radius: 8px;
+ background: #001f3f;
+ color: white;
+ font-size: 16px;
+ cursor: pointer;
+ width: 100%;
+ font-weight: bold;
+ transition: .3s;
+ }
 
-    button:hover {
-      background: #004f80;
-    }
-  </style>
+ button:hover {
+ background: #004f80;
+ }
+ </style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
-    <div class="profile-container" id="profileContainer">
-      <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
-      <div class="dropdown">
-        <a href="profile.html">👤 My Profile</a>
-        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">🏪 Vendor Dashboard</a>
-        <hr class="divider">
-        <a href="#" onclick="doLogout()">🚪 Logout</a>
-      </div>
-    </div>
-  </header>
+ <header>
+ <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+ <div class="profile-container" id="profileContainer">
+ <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
+ <div class="dropdown">
+ <a href="profile.html"> My Profile</a>
+ <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink"> Vendor Dashboard</a>
+ <hr class="divider">
+ <a href="#" onclick="doLogout()"> Logout</a>
+ </div>
+ </div>
+ </header>
 
-  <div class="back-button" onclick="window.location.href='home.html'">
-    <i class="fa-solid fa-arrow-left"></i> Back
-  </div>
+ <div class="back-button" onclick="window.location.href='home.html'">
+ <i class="fa-solid fa-arrow-left"></i> Back
+ </div>
 
-  <div class="container">
-    <h2>Create Your Service</h2>
-    <form id="serviceForm">
-      <label for="serviceType">Service Type</label>
-      <select id="serviceType" required>
-        <option value="">Select Type</option>
-        <option value="offered">Service Offered</option>
-        <option value="needed">Service Needed</option>
-      </select>
+ <div class="container">
+ <h2>Create Your Service</h2>
+ <form id="serviceForm">
+ <label for="serviceType">Service Type</label>
+ <select id="serviceType" required>
+ <option value="">Select Type</option>
+ <option value="offered">Service Offered</option>
+ <option value="needed">Service Needed</option>
+ </select>
 
-      <label for="title">Title</label>
-      <input type="text" id="title" required>
+ <label for="title">Title</label>
+ <input type="text" id="title" required>
 
-      <label for="desc">Description</label>
-      <textarea id="desc" rows="4" required></textarea>
+ <label for="desc">Description</label>
+ <textarea id="desc" rows="4" required></textarea>
 
-      <label for="price">Price (RM)</label>
-      <input type="number" id="price" required>
+ <label for="price">Price (RM)</label>
+ <input type="number" id="price" required>
 
-      <label for="category">Category</label>
-      <select id="category" required>
-        <option value="">Select Category</option>
-        <option value="food">Food & Drinks</option>
-        <option value="runner">Runner</option>
-        <option value="printing">Printing</option>
-        <option value="cleaning">Cleaning</option>
-        <option value="laundry">Laundry</option>
-        <option value="delivery">Delivery</option>
-        <option value="tutoring">Tutoring</option>
-        <option value="design">Design</option>
-        <option value="coding">Coding</option>
-        <option value="photography">Photography</option>
-        <option value="repair">Repair</option>
-        <option value="other">Other</option>
-      </select>
+ <label for="category">Category</label>
+ <select id="category" required>
+ <option value="">Select Category</option>
+ <option value="food">Food & Drinks</option>
+ <option value="runner">Runner</option>
+ <option value="printing">Printing</option>
+ <option value="cleaning">Cleaning</option>
+ <option value="laundry">Laundry</option>
+ <option value="delivery">Delivery</option>
+ <option value="tutoring">Tutoring</option>
+ <option value="design">Design</option>
+ <option value="coding">Coding</option>
+ <option value="photography">Photography</option>
+ <option value="repair">Repair</option>
+ <option value="other">Other</option>
+ </select>
 
-      <label for="location">Location</label>
-      <input type="text" id="location" placeholder="City, Area, etc." required>
+ <label for="location">Location</label>
+ <input type="text" id="location" placeholder="City, Area, etc." required>
 
-      <label for="time">Time Available</label>
-      <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="font-size:13px;color:#555;min-width:80px;">Weekday:</span>
-          <input type="time" id="weekdayStart" value="09:00" style="flex:1;margin:0;">
-          <span>-</span>
-          <input type="time" id="weekdayEnd" value="17:00" style="flex:1;margin:0;">
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:13px;color:#555;min-width:80px;">Weekend:</span>
-          <input type="time" id="weekendStart" value="10:00" style="flex:1;margin:0;">
-          <span>-</span>
-          <input type="time" id="weekendEnd" value="18:00" style="flex:1;margin:0;">
-        </div>
-      </div>
-      <input type="hidden" id="time" value="">
+ <label for="time">Time Available</label>
+ <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:10px;">
+ <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+ <span style="font-size:13px;color:#555;min-width:80px;">Weekday:</span>
+ <input type="time" id="weekdayStart" value="09:00" style="flex:1;margin:0;">
+ <span>-</span>
+ <input type="time" id="weekdayEnd" value="17:00" style="flex:1;margin:0;">
+ </div>
+ <div style="display:flex;align-items:center;gap:8px;">
+ <span style="font-size:13px;color:#555;min-width:80px;">Weekend:</span>
+ <input type="time" id="weekendStart" value="10:00" style="flex:1;margin:0;">
+ <span>-</span>
+ <input type="time" id="weekendEnd" value="18:00" style="flex:1;margin:0;">
+ </div>
+ </div>
+ <input type="hidden" id="time" value="">
 
-      <label for="whatsapp">WhatsApp Number *</label>
-      <input type="text" id="whatsapp" placeholder="60123456789" required>
+ <label for="whatsapp">WhatsApp Number *</label>
+ <input type="text" id="whatsapp" placeholder="60123456789" required>
 
-      <label for="telegram">Telegram Username *</label>
-      <input type="text" id="telegram" placeholder="username" required>
+ <label for="telegram">Telegram Username *</label>
+ <input type="text" id="telegram" placeholder="username" required>
 
-      <label for="image">Image</label>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <input type="text" id="imageUrl" placeholder="Image URL">
-        <span style="font-size:12px;color:#888;text-align:center;">- OR -</span>
-        <input type="file" id="imageFile" accept="image/*" style="padding:8px;">
-      </div>
+ <label for="image">Image</label>
+ <div style="display:flex;flex-direction:column;gap:8px;">
+ <input type="text" id="imageUrl" placeholder="Image URL">
+ <span style="font-size:12px;color:#888;text-align:center;">- OR -</span>
+ <input type="file" id="imageFile" accept="image/*" style="padding:8px;">
+ </div>
 
-      <label for="contact">Email (optional)</label>
-      <input type="email" id="contact" placeholder="your@email.com">
+ <label for="contact">Email (optional)</label>
+ <input type="email" id="contact" placeholder="your@email.com">
 
-      <button type="submit">Submit Service</button>
-    </form>
-  </div>
+ <button type="submit">Submit Service</button>
+ </form>
+ </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <script>
+ const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    let currentUser = null
+ let currentUser = null
 
-    // Auth check
-    (async function initCreate() {
-      const { data: { session } } = await db.auth.getSession()
-      if (!session) { window.location.href = 'index.html'; return }
-      currentUser = session.user
+ // Auth check
+ (async function initCreate() {
+ const { data: { session } } = await db.auth.getSession()
+ if (!session) { window.location.href = 'index.html'; return }
+ currentUser = session.user
 
-      // Load profile
-      const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
-      if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
-      if (profile?.role === 'vendor' || profile?.role === 'admin') {
-        const vendorLink = document.getElementById('vendorDropdownLink')
-        if (vendorLink) vendorLink.classList.remove('hidden')
-      }
-    })()
+ // Load profile
+ const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
+ if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
+ if (profile?.role === 'vendor' || profile?.role === 'admin') {
+ const vendorLink = document.getElementById('vendorDropdownLink')
+ if (vendorLink) vendorLink.classList.remove('hidden')
+ }
+ })()
 
-    async function doLogout() {
-      const { error } = await db.auth.signOut()
-      if (error) console.error('Logout error:', error)
-      window.location.replace('index.html?logged=out')
-    }
+ async function doLogout() {
+ const { error } = await db.auth.signOut()
+ if (error) console.error('Logout error:', error)
+ window.location.replace('index.html?logged=out')
+ }
 
-    document.getElementById("serviceForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
+ document.getElementById("serviceForm").addEventListener("submit", async function (e) {
+ e.preventDefault();
 
-      if (!currentUser) { alert('Please login first.'); return; }
+ if (!currentUser) { alert('Please login first.'); return; }
 
-      const type = document.getElementById("serviceType").value;
-      const title = document.getElementById("title").value;
-      const desc = document.getElementById("desc").value;
-      const price = parseFloat(document.getElementById("price").value);
-      const category = document.getElementById("category").value;
-      const location = document.getElementById("location").value;
-      const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`;
-      const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`;
-      const time = `${weekdayTime}, ${weekendTime}`;
-      const contact = document.getElementById("contact").value || null;
-      const whatsapp = document.getElementById("whatsapp").value;
-      const telegram = document.getElementById("telegram").value;
+ const type = document.getElementById("serviceType").value;
+ const title = document.getElementById("title").value;
+ const desc = document.getElementById("desc").value;
+ const price = parseFloat(document.getElementById("price").value);
+ const category = document.getElementById("category").value;
+ const location = document.getElementById("location").value;
+ const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`;
+ const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`;
+ const time = `${weekdayTime}, ${weekendTime}`;
+ const contact = document.getElementById("contact").value || null;
+ const whatsapp = document.getElementById("whatsapp").value;
+ const telegram = document.getElementById("telegram").value;
 
-      const btn = this.querySelector('button[type="submit"]');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Submitting...';
+ const btn = this.querySelector('button[type="submit"]');
+ const originalText = btn.textContent;
+ btn.disabled = true;
+ btn.textContent = 'Submitting...';
 
-      // Handle image upload
-      let image = document.getElementById("imageUrl").value;
-      const imageFile = document.getElementById("imageFile").files[0];
-      if (imageFile) {
-        try {
-          const fileExt = imageFile.name.split('.').pop();
-          const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
-          const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile);
-          if (!uploadError) {
-            const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName);
-            image = publicUrl;
-          }
-        } catch (err) {
-          console.error('Image upload error:', err);
-        }
-      }
-      if (!image) image = "https://via.placeholder.com/220x120";
+ // Handle image upload
+ let image = document.getElementById("imageUrl").value;
+ const imageFile = document.getElementById("imageFile").files[0];
+ if (imageFile) {
+ try {
+ const fileExt = imageFile.name.split('.').pop();
+ const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
+ const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile);
+ if (!uploadError) {
+ const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName);
+ image = publicUrl;
+ }
+ } catch (err) {
+ console.error('Image upload error:', err);
+ }
+ }
+ if (!image) image = "https://via.placeholder.com/220x120";
 
-      // Insert into Supabase services table
-      const serviceData = {
-        vendor_id: currentUser.id,
-        title: title,
-        description: desc,
-        price: price,
-        category: category,
-        location: location,
-        time: time,
-        contact: contact,
-        whatsapp: whatsapp,
-        telegram: telegram,
-        image: image,
-        type: type,
-        status: 'pending' // Requires admin approval
-      }
+ // Insert into Supabase services table
+ const serviceData = {
+ vendor_id: currentUser.id,
+ title: title,
+ description: desc,
+ price: price,
+ category: category,
+ location: location,
+ time: time,
+ contact: contact,
+ whatsapp: whatsapp,
+ telegram: telegram,
+ image: image,
+ type: type,
+ status: 'pending' // Requires admin approval
+ }
 
-      const { error } = await db.from('services').insert(serviceData)
+ const { error } = await db.from('services').insert(serviceData)
 
-      btn.disabled = false;
-      btn.textContent = originalText;
+ btn.disabled = false;
+ btn.textContent = originalText;
 
-      if (error) {
-        console.error('Supabase error details:', error)
-        alert('Error submitting service: ' + error.message);
-        return;
-      }
+ if (error) {
+ console.error('Supabase error details:', error)
+ alert('Error submitting service: ' + error.message);
+ return;
+ }
 
-      alert('Service submitted! Waiting for admin approval.');
-      document.getElementById("serviceForm").reset();
+ alert('Service submitted! Waiting for admin approval.');
+ document.getElementById("serviceForm").reset();
 
-      // Redirect based on service type
-      if (type === 'needed') {
-        window.location.href = 'needed.html';
-      } else {
-        window.location.href = 'find.html';
-      }
-    });
-  </script>
+ // Redirect based on service type
+ if (type === 'needed') {
+ window.location.href = 'needed.html';
+ } else {
+ window.location.href = 'find.html';
+ }
+ });
+ </script>
 
 </body>
 

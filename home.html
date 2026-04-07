@@ -1,562 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iTa'awun - Home</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      color: #fff;
-      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-    }
-    @keyframes gradientBG {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>iTa'awun - Home</title>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <style>
+ body {
+ margin: 0;
+ font-family: 'Segoe UI', sans-serif;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ color: #fff;
+ background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+ background-size: 400% 400%;
+ animation: gradientBG 15s ease infinite;
+ }
+ @keyframes gradientBG {
+ 0% { background-position: 0% 50%; }
+ 50% { background-position: 100% 50%; }
+ 100% { background-position: 0% 50%; }
+ }
 
-    /* Header */
-    header {
-      background: rgba(0,0,0,0.2);
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    header .logo {
-      font-size: 24px; font-weight: bold;
-      text-decoration: none; cursor: pointer;
-    }
-    nav a {
-      color: white; margin: 0 15px;
-      text-decoration: none; font-weight: 500;
-    }
-    nav a:hover { text-decoration: underline; }
+ /* Header */
+ header {
+ background: rgba(0,0,0,0.2);
+ color: white;
+ padding: 15px 20px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ flex-wrap: wrap;
+ }
+ header .logo {
+ font-size: 24px; font-weight: bold;
+ text-decoration: none; cursor: pointer;
+ }
+ nav a {
+ color: white; margin: 0 15px;
+ text-decoration: none; font-weight: 500;
+ }
+ nav a:hover { text-decoration: underline; }
 
-    /* Profile dropdown — hover-based, no JS needed */
-    .profile-container {
-      position: relative;
-      display: inline-block;
-    }
-    .profile-pic {
-      width: 40px; height: 40px;
-      border-radius: 50%; cursor: pointer;
-      border: 2px solid white;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: block;
-    }
-    /* Hover effect on profile pic */
-    .profile-container:hover .profile-pic {
-      transform: scale(1.1);
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
-    }
-    .dropdown {
-      display: none;
-      position: absolute;
-      right: 0; top: 48px;
-      background: white; color: #333;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      min-width: 160px;
-      z-index: 100;
-      overflow: hidden;
-      /* Smooth appear */
-      animation: fadeIn 0.15s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    /* Show dropdown on hover */
-    .profile-container:hover .dropdown { display: block; }
-    /* Keep open when hovering the dropdown itself */
-    .dropdown:hover { display: block; }
-    .dropdown a {
-      display: block; padding: 11px 16px;
-      text-decoration: none; color: #333; font-size: 14px;
-      transition: background 0.15s;
-    }
-    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
-    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
-    .dropdown .logout-link { color: #dc2626 !important; }
-    .dropdown .logout-link:hover { background: #fef2f2 !important; }
+ /* Profile dropdown — hover-based, no JS needed */
+ .profile-container {
+ position: relative;
+ display: inline-block;
+ }
+ .profile-pic {
+ width: 40px; height: 40px;
+ border-radius: 50%; cursor: pointer;
+ border: 2px solid white;
+ transition: transform 0.2s, box-shadow 0.2s;
+ display: block;
+ }
+ /* Hover effect on profile pic */
+ .profile-container:hover .profile-pic {
+ transform: scale(1.1);
+ box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+ }
+ .dropdown {
+ display: none;
+ position: absolute;
+ right: 0; top: 48px;
+ background: white; color: #333;
+ border-radius: 10px;
+ box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+ min-width: 160px;
+ z-index: 100;
+ overflow: hidden;
+ /* Smooth appear */
+ animation: fadeIn 0.15s ease;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(-6px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ /* Show dropdown on hover */
+ .profile-container:hover .dropdown { display: block; }
+ /* Keep open when hovering the dropdown itself */
+ .dropdown:hover { display: block; }
+ .dropdown a {
+ display: block; padding: 11px 16px;
+ text-decoration: none; color: #333; font-size: 14px;
+ transition: background 0.15s;
+ }
+ .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+ .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+ .dropdown .logout-link { color: #dc2626 !important; }
+ .dropdown .logout-link:hover { background: #fef2f2 !important; }
 
-    /* Hero */
-    .hero {
-      flex: 1; display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      text-align: center; padding: 50px 20px;
-    }
-    .hero h1 {
-      font-size: 42px; margin-bottom: 20px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.3); color: #ffffff;
-    }
-    .hero p {
-      font-size: 18px; margin-bottom: 40px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3); color: #ffffff;
-    }
-    .buttons {
-      display: flex; flex-wrap: wrap;
-      gap: 15px; justify-content: center;
-      max-width: 500px; margin: 0 auto;
-    }
-    .buttons a {
-      text-decoration: none; padding: 15px 30px;
-      font-size: 16px; font-weight: bold;
-      border-radius: 10px; transition: 0.3s;
-      min-width: 160px; text-align: center;
-    }
-    .find-btn   { background: #D8BFFD; color: #ffffff; }
-    .find-btn:hover   { background: #C29BFD; }
-    .create-btn { background: #4B0082; color: white; }
-    .create-btn:hover { background: #370066; }
-    .needed-btn { background: #8A2BE2; color: white; }
-    .needed-btn:hover { background: #7326C8; }
-    .vendor-btn { background: #059669; color: white; }
-    .vendor-btn:hover { background: #047857; }
-    .vendor-btn.hidden { display: none; }
-    .vendor-link.hidden { display: none; }
+ /* Hero */
+ .hero {
+ flex: 1; display: flex; flex-direction: column;
+ justify-content: center; align-items: center;
+ text-align: center; padding: 50px 20px;
+ }
+ .hero h1 {
+ font-size: 42px; margin-bottom: 20px;
+ text-shadow: 1px 1px 3px rgba(0,0,0,0.3); color: #ffffff;
+ }
+ .hero p {
+ font-size: 18px; margin-bottom: 40px;
+ text-shadow: 1px 1px 2px rgba(0,0,0,0.3); color: #ffffff;
+ }
+ .buttons {
+ display: flex; flex-wrap: wrap;
+ gap: 15px; justify-content: center;
+ max-width: 500px; margin: 0 auto;
+ }
+ .buttons a {
+ text-decoration: none; padding: 15px 30px;
+ font-size: 16px; font-weight: bold;
+ border-radius: 10px; transition: 0.3s;
+ min-width: 160px; text-align: center;
+ }
+ .find-btn { background: #D8BFFD; color: #ffffff; }
+ .find-btn:hover { background: #C29BFD; }
+ .create-btn { background: #4B0082; color: white; }
+ .create-btn:hover { background: #370066; }
+ .needed-btn { background: #8A2BE2; color: white; }
+ .needed-btn:hover { background: #7326C8; }
+ .vendor-btn { background: #059669; color: white; }
+ .vendor-btn:hover { background: #047857; }
+ .vendor-btn.hidden { display: none; }
+ .vendor-link.hidden { display: none; }
+ .admin-link.hidden { display: none; }
 
-    /* Apply for Role — right-center fixed button */
-    .apply-role-btn {
-      position: fixed;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(107,33,168,0.85);
-      color: white;
-      padding: 12px 10px;
-      border-radius: 10px 0 0 10px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      letter-spacing: 1px;
-      z-index: 50;
-      border: none;
-      transition: background 0.2s, padding 0.2s;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-    }
-    .apply-role-btn:hover {
-      background: rgba(107,33,168,1);
-      padding: 12px 14px;
-    }
+ /* Apply for Role — right-center fixed button */
+ .apply-role-btn {
+ position: fixed;
+ right: 0;
+ top: 50%;
+ transform: translateY(-50%);
+ background: rgba(107,33,168,0.85);
+ color: white;
+ padding: 12px 10px;
+ border-radius: 10px 0 0 10px;
+ font-size: 12px;
+ font-weight: bold;
+ cursor: pointer;
+ writing-mode: vertical-rl;
+ text-orientation: mixed;
+ letter-spacing: 1px;
+ z-index: 50;
+ border: none;
+ transition: background 0.2s, padding 0.2s;
+ box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+ }
+ .apply-role-btn:hover {
+ background: rgba(107,33,168,1);
+ padding: 12px 14px;
+ }
 
-    /* Extended hover area for profile container */
-    .profile-container::before {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      z-index: -1;
-    }
+ /* Extended hover area for profile container */
+ .profile-container::before {
+ content: '';
+ position: absolute;
+ top: -10px;
+ left: -10px;
+ right: -10px;
+ bottom: -10px;
+ z-index: -1;
+ }
 
-    /* Create FAB button */
-    .create-fab {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #6b21a8;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(107,33,168,0.4);
-      transition: 0.3s;
-      margin: 10px auto;
-    }
-    .create-fab:hover {
-      transform: scale(1.1);
-      background: #7c3aed;
-    }
-    .create-fab-label {
-      text-align: center;
-      font-size: 13px;
-      color: white;
-      margin-top: 5px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    }
+ /* Create FAB button */
+ .create-fab {
+ width: 60px;
+ height: 60px;
+ border-radius: 50%;
+ background: #6b21a8;
+ color: white;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 32px;
+ font-weight: bold;
+ cursor: pointer;
+ box-shadow: 0 4px 15px rgba(107,33,168,0.4);
+ transition: 0.3s;
+ margin: 10px auto;
+ }
+ .create-fab:hover {
+ transform: scale(1.1);
+ background: #7c3aed;
+ }
+ .create-fab-label {
+ text-align: center;
+ font-size: 13px;
+ color: white;
+ margin-top: 5px;
+ text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+ }
 
-    /* Slide-in Panel */
-    .slide-panel {
-      display: none;
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 400px;
-      max-width: 90%;
-      height: 100vh;
-      background: white;
-      z-index: 1000;
-      box-shadow: -5px 0 25px rgba(0,0,0,0.3);
-      overflow-y: auto;
-    }
-    .slide-panel.active { display: block; animation: slideIn 0.3s ease; }
-    @keyframes slideIn {
-      from { transform: translateX(100%); }
-      to { transform: translateX(0); }
-    }
-    .slide-panel-content { padding: 25px; }
-    .close-panel {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      cursor: pointer;
-      color: #666;
-    }
-    .close-panel:hover { color: #333; }
-    .slide-panel h2 { color: #6b21a8; margin-bottom: 20px; }
-    .slide-panel label {
-      display: block;
-      margin: 12px 0 5px;
-      font-size: 14px;
-      color: #333;
-    }
-    .slide-panel input,
-    .slide-panel select,
-    .slide-panel textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-    }
-    .slide-panel textarea { resize: vertical; }
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      background: #6b21a8;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    .submit-btn:hover { background: #5b1a8a; }
+ /* Slide-in Panel */
+ .slide-panel {
+ display: none;
+ position: fixed;
+ top: 0;
+ right: 0;
+ width: 400px;
+ max-width: 90%;
+ height: 100vh;
+ background: white;
+ z-index: 1000;
+ box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+ overflow-y: auto;
+ }
+ .slide-panel.active { display: block; animation: slideIn 0.3s ease; }
+ @keyframes slideIn {
+ from { transform: translateX(100%); }
+ to { transform: translateX(0); }
+ }
+ .slide-panel-content { padding: 25px; }
+ .close-panel {
+ position: absolute;
+ top: 15px;
+ right: 20px;
+ font-size: 28px;
+ cursor: pointer;
+ color: #666;
+ }
+ .close-panel:hover { color: #333; }
+ .slide-panel h2 { color: #6b21a8; margin-bottom: 20px; }
+ .slide-panel label {
+ display: block;
+ margin: 12px 0 5px;
+ font-size: 14px;
+ color: #333;
+ }
+ .slide-panel input,
+ .slide-panel select,
+ .slide-panel textarea {
+ width: 100%;
+ padding: 10px;
+ border: 1px solid #ddd;
+ border-radius: 6px;
+ font-size: 14px;
+ box-sizing: border-box;
+ margin-bottom: 10px;
+ }
+ .slide-panel textarea { resize: vertical; }
+ .submit-btn {
+ width: 100%;
+ padding: 12px;
+ background: #6b21a8;
+ color: white;
+ border: none;
+ border-radius: 8px;
+ font-size: 16px;
+ font-weight: bold;
+ cursor: pointer;
+ margin-top: 15px;
+ }
+ .submit-btn:hover { background: #5b1a8a; }
 
-    /* Time slots */
-    .time-slots { background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-    .time-slot { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .time-slot span { font-size: 13px; color: #555; min-width: 70px; }
-    .time-slot input[type="time"] { flex: 1; margin: 0; }
+ /* Time slots */
+ .time-slots { background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+ .time-slot { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+ .time-slot span { font-size: 13px; color: #555; min-width: 70px; }
+ .time-slot input[type="time"] { flex: 1; margin: 0; }
 
-    /* Image upload row */
-    .image-upload-row { display: flex; flex-direction: column; gap: 8px; }
-    .image-upload-row span { font-size: 12px; color: #888; text-align: center; }
+ /* Image upload row */
+ .image-upload-row { display: flex; flex-direction: column; gap: 8px; }
+ .image-upload-row span { font-size: 12px; color: #888; text-align: center; }
 
-    footer {
-      background: rgba(0,0,0,0.2); color: white;
-      text-align: center; padding: 15px;
-    }
+ footer {
+ background: rgba(0,0,0,0.2); color: white;
+ text-align: center; padding: 15px;
+ }
 
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 28px; }
-      .hero p  { font-size: 16px; }
-      header   { flex-direction: column; align-items: flex-start; }
-      .profile-container { align-self: flex-end; }
-    }
-  </style>
+ @media (max-width: 600px) {
+ .hero h1 { font-size: 28px; }
+ .hero p { font-size: 16px; }
+ header { flex-direction: column; align-items: flex-start; }
+ .profile-container { align-self: flex-end; }
+ }
+ </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
-    <div class="profile-container" id="profileContainer">
-      <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
-      <div class="dropdown">
-        <a href="profile.html">👤 My Profile</a>
-        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">🏪 Vendor Dashboard</a>
-        <hr class="divider">
-        <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
-      </div>
-    </div>
-  </header>
+ <header>
+ <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+ <div class="profile-container" id="profileContainer">
+ <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
+ <div class="dropdown">
+ <a href="profile.html">My Profile</a>
+ <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
+ <a href="admin.html" class="admin-link hidden" id="adminDropdownLink">Admin Dashboard</a>
+ <hr class="divider">
+ <a href="#" class="logout-link" onclick="doLogout()">Logout</a>
+ </div>
+ </div>
+ </header>
 
-  <section class="hero">
-    <h1>Welcome to iTa'awun</h1>
-    <p>A freelance platform specifically for CFS IIUM students</p>
+ <section class="hero">
+ <h1>Welcome to iTa'awun</h1>
+ <p>A freelance platform specifically for CFS IIUM students</p>
 
-    <div class="buttons" style="margin-top: 20px;">
-      <a href="find.html" class="find-btn">Service Offered</a>
-      <a href="needed.html" class="needed-btn">Service Needed</a>
-    </div>
+ <div class="buttons" style="margin-top: 20px;">
+ <a href="find.html" class="find-btn">Service Offered</a>
+ <a href="needed.html" class="needed-btn">Service Needed</a>
+ </div>
 
-    <div class="create-fab" onclick="toggleCreatePopup()">+</div>
-    <p class="create-fab-label">Create Service</p>
+ <div class="create-fab" onclick="toggleCreatePopup()">+</div>
+ <p class="create-fab-label">Create Service</p>
 
-    <div class="buttons" style="margin-top: 15px;">
-      <a href="vendor.html" class="vendor-btn hidden" id="vendorBtn">🏪 Vendor Dashboard</a>
-    </div>
-  </section>
+ <div class="buttons" style="margin-top: 15px;">
+ <a href="vendor.html" class="vendor-btn hidden" id="vendorBtn"> Vendor Dashboard</a>
+ </div>
+ </section>
 
-  <!-- Apply for a Role — right-center tab -->
-  <button class="apply-role-btn" onclick="toggleApplyPanel()">💼 Apply for a Role</button>
+ <!-- Apply for a Role — right-center tab -->
+ <button class="apply-role-btn" onclick="toggleApplyPanel()"> Apply for a Role</button>
 
-  <footer>
-    <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
-  </footer>
+ <footer>
+ <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
+ </footer>
 
-  <!-- Create Service Slide-in Panel -->
-  <div id="createPanel" class="slide-panel">
-    <div class="slide-panel-content">
-      <span class="close-panel" onclick="toggleCreatePopup()">&times;</span>
-      <h2>Create Service</h2>
-      <form id="quickCreateForm">
-        <label>Title</label>
-        <input type="text" id="quickTitle" required>
-        <label>Category</label>
-        <select id="quickCategory" required>
-          <option value="">Select Category</option>
-          <option value="food">Food & Drinks</option>
-          <option value="runner">Runner</option>
-          <option value="printing">Printing</option>
-          <option value="cleaning">Cleaning</option>
-          <option value="laundry">Laundry</option>
-          <option value="delivery">Delivery</option>
-          <option value="tutoring">Tutoring</option>
-          <option value="design">Design</option>
-          <option value="coding">Coding</option>
-          <option value="photography">Photography</option>
-          <option value="repair">Repair</option>
-          <option value="other">Other</option>
-        </select>
-        <label>Description</label>
-        <textarea id="quickDesc" rows="3" required></textarea>
-        <label>Price (RM)</label>
-        <input type="number" id="quickPrice" step="0.5" required>
-        <label>Location</label>
-        <input type="text" id="quickLocation" placeholder="e.g. Mahallah Z, B15" required>
-        <label>Available Time</label>
-        <div class="time-slots">
-          <div class="time-slot">
-            <span>Weekday:</span>
-            <input type="time" id="weekdayStart" value="09:00">
-            <span>-</span>
-            <input type="time" id="weekdayEnd" value="17:00">
-          </div>
-          <div class="time-slot">
-            <span>Weekend:</span>
-            <input type="time" id="weekendStart" value="10:00">
-            <span>-</span>
-            <input type="time" id="weekendEnd" value="18:00">
-          </div>
-        </div>
-        <label>WhatsApp *</label>
-        <input type="text" id="quickWhatsapp" placeholder="60123456789" required>
-        <label>Telegram *</label>
-        <input type="text" id="quickTelegram" placeholder="username" required>
-        <label>Email (optional)</label>
-        <input type="email" id="quickEmail">
-        <label>Image</label>
-        <div class="image-upload-row">
-          <input type="text" id="quickImageUrl" placeholder="Image URL">
-          <span>OR</span>
-          <input type="file" id="quickImageFile" accept="image/*">
-        </div>
-        <button type="submit" class="submit-btn">Submit for Approval</button>
-      </form>
-    </div>
-  </div>
+ <!-- Create Service Slide-in Panel -->
+ <div id="createPanel" class="slide-panel">
+ <div class="slide-panel-content">
+ <span class="close-panel" onclick="toggleCreatePopup()">&times;</span>
+ <h2>Create Service</h2>
+ <form id="quickCreateForm">
+ <label>Title</label>
+ <input type="text" id="quickTitle" required>
+ <label>Type</label>
+ <select id="quickType" required>
+ <option value="offered">Service Offered (I provide this)</option>
+ <option value="needed">Service Needed (I need this)</option>
+ </select>
+ <label>Category</label>
+ <select id="quickCategory" required>
+ <option value="">Select Category</option>
+ <option value="food">Food & Drinks</option>
+ <option value="runner">Runner</option>
+ <option value="printing">Printing</option>
+ <option value="cleaning">Cleaning</option>
+ <option value="laundry">Laundry</option>
+ <option value="delivery">Delivery</option>
+ <option value="tutoring">Tutoring</option>
+ <option value="design">Design</option>
+ <option value="coding">Coding</option>
+ <option value="photography">Photography</option>
+ <option value="repair">Repair</option>
+ <option value="other">Other</option>
+ </select>
+ <label>Description</label>
+ <textarea id="quickDesc" rows="3" required></textarea>
+ <label>Price (RM)</label>
+ <input type="number" id="quickPrice" step="0.5" required>
+ <label>Location</label>
+ <input type="text" id="quickLocation" placeholder="e.g. Mahallah Z, B15" required>
+ <label>Available Time</label>
+ <div class="time-slots">
+ <div class="time-slot">
+ <span>Weekday:</span>
+ <input type="time" id="weekdayStart" value="09:00">
+ <span>-</span>
+ <input type="time" id="weekdayEnd" value="17:00">
+ </div>
+ <div class="time-slot">
+ <span>Weekend:</span>
+ <input type="time" id="weekendStart" value="10:00">
+ <span>-</span>
+ <input type="time" id="weekendEnd" value="18:00">
+ </div>
+ </div>
+ <label>WhatsApp *</label>
+ <input type="text" id="quickWhatsapp" placeholder="60123456789" required>
+ <label>Telegram *</label>
+ <input type="text" id="quickTelegram" placeholder="username" required>
+ <label>Email (optional)</label>
+ <input type="email" id="quickEmail">
+ <label>Image</label>
+ <div class="image-upload-row">
+ <input type="text" id="quickImageUrl" placeholder="Image URL">
+ <span>OR</span>
+ <input type="file" id="quickImageFile" accept="image/*">
+ </div>
+ <button type="submit" class="submit-btn">Submit for Approval</button>
+ </form>
+ </div>
+ </div>
 
-  <!-- Apply for a Role Slide-in Panel -->
-  <div id="applyPanel" class="slide-panel">
-    <div class="slide-panel-content">
-      <span class="close-panel" onclick="toggleApplyPanel()">&times;</span>
-      <h2>Apply for a Role</h2>
-      <p style="font-size:13px;color:#666;margin-bottom:16px">Want to sell services or work at a campus outlet? Apply here and an admin will review your request.</p>
-      <form id="applyRoleForm">
-        <label>Role Applying For</label>
-        <select id="applyPosition" required>
-          <option value="">Select Role</option>
-          <option value="vendor">🛍️ Vendor (sell your services)</option>
-          <option value="barista">☕ Barista (campus cafe)</option>
-          <option value="parcel">📦 Parcel Hub Staff</option>
-          <option value="other">🔧 Other Official Work</option>
-        </select>
-        <label>Why do you want this role?</label>
-        <textarea id="applyReason" rows="4" placeholder="Tell us why you're interested..." required></textarea>
-        <label>Your Relevant Experience / Qualifications</label>
-        <textarea id="applyQualifications" rows="3" placeholder="Any related skills or experience..." required></textarea>
-        <label>WhatsApp Contact *</label>
-        <input type="text" id="applyWhatsapp" placeholder="60123456789" required>
-        <button type="submit" class="submit-btn">Submit Application</button>
-      </form>
-    </div>
-  </div>
+ <!-- Apply for a Role Slide-in Panel -->
+ <div id="applyPanel" class="slide-panel">
+ <div class="slide-panel-content">
+ <span class="close-panel" onclick="toggleApplyPanel()">&times;</span>
+ <h2>Apply for a Role</h2>
+ <p style="font-size:13px;color:#666;margin-bottom:16px">Want to sell services or work at a campus outlet? Apply here and an admin will review your request.</p>
+ <form id="applyRoleForm">
+ <label>Role Applying For</label>
+ <select id="applyPosition" required>
+ <option value="">Select Role</option>
+ <option value="vendor"> Vendor (sell your services)</option>
+ <option value="barista"> Barista (campus cafe)</option>
+ <option value="parcel"> Parcel Hub Staff</option>
+ <option value="other"> Other Official Work</option>
+ </select>
+ <label>Why do you want this role?</label>
+ <textarea id="applyReason" rows="4" placeholder="Tell us why you're interested..." required></textarea>
+ <label>Your Relevant Experience / Qualifications</label>
+ <textarea id="applyQualifications" rows="3" placeholder="Any related skills or experience..." required></textarea>
+ <label>WhatsApp Contact *</label>
+ <input type="text" id="applyWhatsapp" placeholder="60123456789" required>
+ <button type="submit" class="submit-btn">Submit Application</button>
+ </form>
+ </div>
+ </div>
 
-  <script>
-    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+ <script>
+ const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    let currentUser = null
+ let currentUser = null
 
-    // Protect page and check role
-    (async function initHome() {
-      const { data: { session } } = await db.auth.getSession()
-      if (!session) {
-        window.location.href = 'index.html'
-        return
-      }
+ // Protect page and check role
+ (async function initHome() {
+ const { data: { session } } = await db.auth.getSession()
+ if (!session) {
+ window.location.href = 'index.html'
+ return
+ }
 
-      currentUser = session.user
+ currentUser = session.user
 
-      // Load profile to check role
-      const { data: profile } = await db
-        .from('profiles')
-        .select('role, avatar_url')
-        .eq('id', session.user.id)
-        .single()
+ // Load profile to check role
+ const { data: profile } = await db
+ .from('profiles')
+ .select('role, avatar_url')
+ .eq('id', session.user.id)
+ .single()
 
-      // Redirect admin users to admin.html
-      if (profile?.role === 'admin') {
-        window.location.href = 'admin.html'
-        return
-      }
+ // Show role-based buttons and dropdown links
+ if (profile?.role === 'vendor') {
+ document.getElementById('vendorBtn')?.classList.remove('hidden')
+ document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
+ }
+ if (profile?.role === 'admin') {
+ document.getElementById('adminDropdownLink')?.classList.remove('hidden')
+ }
 
-      // Show Vendor button and link for vendor users
-      if (profile?.role === 'vendor' || profile?.role === 'admin') {
-        const vendorBtn = document.getElementById('vendorBtn')
-        const vendorLink = document.getElementById('vendorDropdownLink')
-        if (vendorBtn) vendorBtn.classList.remove('hidden')
-        if (vendorLink) vendorLink.classList.remove('hidden')
-      }
+ // Load profile picture
+ if (profile?.avatar_url) {
+ document.getElementById('profilePic').src = profile.avatar_url
+ }
+ })()
 
-      // Load profile picture
-      if (profile?.avatar_url) {
-        document.getElementById('profilePic').src = profile.avatar_url
-      }
-    })()
+ async function doLogout() {
+ const { error } = await db.auth.signOut()
+ if (error) console.error('Logout error:', error)
+ window.location.replace('index.html?logged=out')
+ }
 
-    async function doLogout() {
-      const { error } = await db.auth.signOut()
-      if (error) console.error('Logout error:', error)
-      window.location.replace('index.html?logged=out')
-    }
+ // Create service popup
+ function toggleCreatePopup() {
+ const panel = document.getElementById('createPanel')
+ panel.classList.toggle('active')
+ }
 
-    // Create service popup
-    function toggleCreatePopup() {
-      const panel = document.getElementById('createPanel')
-      panel.classList.toggle('active')
-    }
+ // Apply for a Role popup
+ function toggleApplyPanel() {
+ const panel = document.getElementById('applyPanel')
+ panel.classList.toggle('active')
+ }
 
-    // Apply for a Role popup
-    function toggleApplyPanel() {
-      const panel = document.getElementById('applyPanel')
-      panel.classList.toggle('active')
-    }
+ // Quick create form submission
+ document.getElementById('quickCreateForm')?.addEventListener('submit', async function(e) {
+ e.preventDefault()
+ if (!currentUser) { alert('Please login first'); return }
 
-    // Quick create form submission
-    document.getElementById('quickCreateForm')?.addEventListener('submit', async function(e) {
-      e.preventDefault()
-      if (!currentUser) { alert('Please login first'); return }
+ const btn = this.querySelector('.submit-btn')
+ btn.disabled = true
+ btn.textContent = 'Submitting...'
 
-      const btn = this.querySelector('.submit-btn')
-      btn.disabled = true
-      btn.textContent = 'Submitting...'
+ // Handle image upload
+ let imageUrl = document.getElementById('quickImageUrl').value || 'https://via.placeholder.com/300x120'
+ const imageFile = document.getElementById('quickImageFile').files[0]
+ if (imageFile) {
+ try {
+ const fileExt = imageFile.name.split('.').pop()
+ const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`
+ const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile)
+ if (!uploadError) {
+ const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName)
+ imageUrl = publicUrl
+ }
+ } catch (err) {
+ console.error('Image upload error:', err)
+ }
+ }
 
-      // Handle image upload
-      let imageUrl = document.getElementById('quickImageUrl').value || 'https://via.placeholder.com/300x120'
-      const imageFile = document.getElementById('quickImageFile').files[0]
-      if (imageFile) {
-        try {
-          const fileExt = imageFile.name.split('.').pop()
-          const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`
-          const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile)
-          if (!uploadError) {
-            const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName)
-            imageUrl = publicUrl
-          }
-        } catch (err) {
-          console.error('Image upload error:', err)
-        }
-      }
+ const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`
+ const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`
 
-      const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`
-      const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`
+ const serviceData = {
+ vendor_id: currentUser.id,
+ type: document.getElementById('quickType').value,
+ title: document.getElementById('quickTitle').value,
+ category: document.getElementById('quickCategory').value,
+ description: document.getElementById('quickDesc').value,
+ price: parseFloat(document.getElementById('quickPrice').value),
+ location: document.getElementById('quickLocation').value,
+ time: `${weekdayTime}, ${weekendTime}`,
+ whatsapp: document.getElementById('quickWhatsapp').value,
+ telegram: document.getElementById('quickTelegram').value,
+ contact: document.getElementById('quickEmail').value || null,
+ image: imageUrl,
+ status: 'pending' // Requires admin approval
+ }
 
-      const serviceData = {
-        vendor_id: currentUser.id,
-        type: 'offered',
-        title: document.getElementById('quickTitle').value,
-        category: document.getElementById('quickCategory').value,
-        description: document.getElementById('quickDesc').value,
-        price: parseFloat(document.getElementById('quickPrice').value),
-        location: document.getElementById('quickLocation').value,
-        time: `${weekdayTime}, ${weekendTime}`,
-        whatsapp: document.getElementById('quickWhatsapp').value,
-        telegram: document.getElementById('quickTelegram').value,
-        contact: document.getElementById('quickEmail').value || null,
-        image: imageUrl,
-        status: 'pending' // Requires admin approval
-      }
+ const { error } = await db.from('services').insert(serviceData)
 
-      const { error } = await db.from('services').insert(serviceData)
+ btn.disabled = false
+ btn.textContent = 'Submit for Approval'
 
-      btn.disabled = false
-      btn.textContent = 'Submit for Approval'
+ if (error) {
+ alert('Error: ' + error.message)
+ return
+ }
 
-      if (error) {
-        alert('Error: ' + error.message)
-        return
-      }
+ alert('Service submitted! Waiting for admin approval.')
+ toggleCreatePopup()
+ this.reset()
+ })
 
-      alert('Service submitted! Waiting for admin approval.')
-      toggleCreatePopup()
-      this.reset()
-    })
+ // Apply for a Role form submission
+ document.getElementById('applyRoleForm')?.addEventListener('submit', async function(e) {
+ e.preventDefault()
+ if (!currentUser) { alert('Please login first'); return }
 
-    // Apply for a Role form submission
-    document.getElementById('applyRoleForm')?.addEventListener('submit', async function(e) {
-      e.preventDefault()
-      if (!currentUser) { alert('Please login first'); return }
+ const btn = this.querySelector('.submit-btn')
+ btn.disabled = true
+ btn.textContent = 'Submitting...'
 
-      const btn = this.querySelector('.submit-btn')
-      btn.disabled = true
-      btn.textContent = 'Submitting...'
+ const { error } = await db.from('admin_applications').insert({
+ user_id: currentUser.id,
+ position: document.getElementById('applyPosition').value,
+ reason: document.getElementById('applyReason').value,
+ qualifications: document.getElementById('applyQualifications').value,
+ whatsapp: document.getElementById('applyWhatsapp').value,
+ status: 'pending'
+ })
 
-      const { error } = await db.from('admin_applications').insert({
-        user_id: currentUser.id,
-        position: document.getElementById('applyPosition').value,
-        reason: document.getElementById('applyReason').value,
-        qualifications: document.getElementById('applyQualifications').value,
-        whatsapp: document.getElementById('applyWhatsapp').value,
-        status: 'pending'
-      })
+ btn.disabled = false
+ btn.textContent = 'Submit Application'
 
-      btn.disabled = false
-      btn.textContent = 'Submit Application'
+ if (error) {
+ alert('Error: ' + error.message)
+ return
+ }
 
-      if (error) {
-        alert('Error: ' + error.message)
-        return
-      }
-
-      alert('Application submitted! Admin will review your request.')
-      toggleApplyPanel()
-      this.reset()
-    })
-  </script>
+ alert('Application submitted! Admin will review your request.')
+ toggleApplyPanel()
+ this.reset()
+ })
+ </script>
 </body>
 </html>

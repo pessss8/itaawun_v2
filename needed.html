@@ -2,844 +2,845 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Service Needed - iTa'awun</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      color: #333;
-    }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Service Needed - iTa'awun</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ <style>
+ body {
+ margin: 0;
+ font-family: 'Segoe UI', sans-serif;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+ background-size: 400% 400%;
+ animation: gradientBG 15s ease infinite;
+ color: #333;
+ }
 
-    @keyframes gradientBG {
-      0% {
-        background-position: 0% 50%;
-      }
+ @keyframes gradientBG {
+ 0% {
+ background-position: 0% 50%;
+ }
 
-      50% {
-        background-position: 100% 50%;
-      }
+ 50% {
+ background-position: 100% 50%;
+ }
 
-      100% {
-        background-position: 0% 50%;
-      }
-    }
+ 100% {
+ background-position: 0% 50%;
+ }
+ }
 
-    header {
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      padding: 15px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+ header {
+ background: rgba(0, 0, 0, 0.2);
+ color: white;
+ padding: 15px 40px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
 
-    header .logo {
-      font-size: 22px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+ header .logo {
+ font-size: 22px;
+ font-weight: bold;
+ cursor: pointer;
+ }
 
-    .profile-container {
-      position: relative;
-      display: inline-block;
-    }
-    .profile-container::before {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      z-index: -1;
-    }
+ .profile-container {
+ position: relative;
+ display: inline-block;
+ }
+ .profile-container::before {
+ content: '';
+ position: absolute;
+ top: -10px;
+ left: -10px;
+ right: -10px;
+ bottom: -10px;
+ z-index: -1;
+ }
 
-    .profile-pic {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid white;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: block;
-    }
-    .profile-container:hover .profile-pic {
-      transform: scale(1.1);
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
-    }
+ .profile-pic {
+ width: 40px;
+ height: 40px;
+ border-radius: 50%;
+ cursor: pointer;
+ border: 2px solid white;
+ transition: transform 0.2s, box-shadow 0.2s;
+ display: block;
+ }
+ .profile-container:hover .profile-pic {
+ transform: scale(1.1);
+ box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+ }
 
-    .dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 48px;
-      background: white;
-      color: #333;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      min-width: 160px;
-      z-index: 100;
-      overflow: hidden;
-      animation: fadeIn 0.15s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .profile-container:hover .dropdown { display: block; }
-    .dropdown:hover { display: block; }
-    .dropdown a {
-      display: block; padding: 11px 16px;
-      text-decoration: none; color: #333; font-size: 14px;
-      transition: background 0.15s;
-    }
-    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
-    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
-    .dropdown .logout-link { color: #dc2626 !important; }
-    .dropdown .logout-link:hover { background: #fef2f2 !important; }
-    .vendor-link.hidden { display: none; }
+ .dropdown {
+ display: none;
+ position: absolute;
+ right: 0;
+ top: 48px;
+ background: white;
+ color: #333;
+ border-radius: 10px;
+ box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+ min-width: 160px;
+ z-index: 100;
+ overflow: hidden;
+ animation: fadeIn 0.15s ease;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(-6px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ .profile-container:hover .dropdown { display: block; }
+ .dropdown:hover { display: block; }
+ .dropdown a {
+ display: block; padding: 11px 16px;
+ text-decoration: none; color: #333; font-size: 14px;
+ transition: background 0.15s;
+ }
+ .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+ .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+ .dropdown .logout-link { color: #dc2626 !important; }
+ .dropdown .logout-link:hover { background: #fef2f2 !important; }
+ .vendor-link.hidden { display: none; }
+ .admin-link.hidden { display: none; }
 
-    .back-button {
-      padding: 10px 40px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      font-weight: bold;
-      color: #001f3f;
-      font-size: 16px;
-    }
+ .back-button {
+ padding: 10px 40px;
+ display: flex;
+ align-items: center;
+ cursor: pointer;
+ font-weight: bold;
+ color: #001f3f;
+ font-size: 16px;
+ }
 
-    .back-button i {
-      margin-right: 8px;
-    }
+ .back-button i {
+ margin-right: 8px;
+ }
 
-    .back-button:hover {
-      color: #004f80;
-    }
+ .back-button:hover {
+ color: #004f80;
+ }
 
-    .page-title {
-      text-align: center;
-      padding: 20px;
-      color: #001f3f;
-      font-size: 28px;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
-    }
+ .page-title {
+ text-align: center;
+ padding: 20px;
+ color: #001f3f;
+ font-size: 28px;
+ font-weight: bold;
+ text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+ }
 
-    .filter-button {
-      display: block;
-      margin: 0 auto 20px auto;
-      padding: 12px 20px;
-      background: #001f3f;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-    }
+ .filter-button {
+ display: block;
+ margin: 0 auto 20px auto;
+ padding: 12px 20px;
+ background: #001f3f;
+ color: white;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-size: 16px;
+ font-weight: bold;
+ }
 
-    .filter-button:hover {
-      background: #004f80;
-    }
+ .filter-button:hover {
+ background: #004f80;
+ }
 
-    .search-bar {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+ .search-bar {
+ text-align: center;
+ margin-bottom: 20px;
+ }
 
-    .search-bar input {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      width: 60%;
-    }
+ .search-bar input {
+ padding: 10px;
+ font-size: 16px;
+ border-radius: 8px;
+ border: 1px solid #ccc;
+ width: 60%;
+ }
 
-    .search-bar button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #001f3f;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
+ .search-bar button {
+ padding: 12px 20px;
+ border: none;
+ border-radius: 8px;
+ background: #001f3f;
+ color: white;
+ font-size: 16px;
+ cursor: pointer;
+ }
 
-    .search-bar button:hover {
-      background: #004f80;
-    }
+ .search-bar button:hover {
+ background: #004f80;
+ }
 
-    .request-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px;
-    }
+ .request-list {
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 20px;
+ padding: 20px;
+ }
 
-    .request-card {
-      background: rgba(255, 255, 255, 0.95);
-      max-width: 300px;
-      width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-      transition: transform .3s;
-      display: flex;
-      flex-direction: column;
-    }
+ .request-card {
+ background: rgba(255, 255, 255, 0.95);
+ max-width: 300px;
+ width: 100%;
+ border-radius: 12px;
+ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+ overflow: hidden;
+ transition: transform .3s;
+ display: flex;
+ flex-direction: column;
+ }
 
-    .request-card:hover {
-      transform: scale(1.05);
-    }
+ .request-card:hover {
+ transform: scale(1.05);
+ }
 
-    .request-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-    }
+ .request-card img {
+ width: 100%;
+ height: 120px;
+ object-fit: cover;
+ }
 
-    .requester {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px 0 12px;
-    }
+ .requester {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ padding: 8px 12px 0 12px;
+ }
 
-    .requester img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1.5px solid #001f3f;
-    }
+ .requester img {
+ width: 30px;
+ height: 30px;
+ border-radius: 50%;
+ object-fit: cover;
+ border: 1.5px solid #001f3f;
+ }
 
-    .requester span {
-      font-size: 13px;
-      font-weight: 600;
-      color: #001f3f;
-    }
+ .requester span {
+ font-size: 13px;
+ font-weight: 600;
+ color: #001f3f;
+ }
 
-    .request-card .content {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
+ .request-card .content {
+ padding: 12px;
+ display: flex;
+ flex-direction: column;
+ flex: 1;
+ }
 
-    .request-card h3 {
-      font-size: 16px;
-      margin: 5px 0;
-      color: #001f3f;
-    }
+ .request-card h3 {
+ font-size: 16px;
+ margin: 5px 0;
+ color: #001f3f;
+ }
 
-    .request-card p.desc {
-      font-size: 13px;
-      margin: 5px 0;
-      color: #555;
-      overflow: hidden;
-      max-height: 38px;
-      transition: max-height 0.4s ease;
-    }
+ .request-card p.desc {
+ font-size: 13px;
+ margin: 5px 0;
+ color: #555;
+ overflow: hidden;
+ max-height: 38px;
+ transition: max-height 0.4s ease;
+ }
 
-    .request-card p.desc.expanded {
-      max-height: 300px;
-    }
+ .request-card p.desc.expanded {
+ max-height: 300px;
+ }
 
-    .request-card .extra-info {
-      font-size: 11px;
-      color: #555;
-      margin: 5px 0;
-    }
+ .request-card .extra-info {
+ font-size: 11px;
+ color: #555;
+ margin: 5px 0;
+ }
 
-    .request-card .moreBtn {
-      background: none;
-      border: none;
-      color: grey;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 0;
-      margin: 3px 0;
-      text-align: left;
-      font-size: 12px;
-    }
+ .request-card .moreBtn {
+ background: none;
+ border: none;
+ color: grey;
+ font-weight: bold;
+ cursor: pointer;
+ padding: 0;
+ margin: 3px 0;
+ text-align: left;
+ font-size: 12px;
+ }
 
-    .request-card span.price {
-      font-weight: bold;
-      color: #333;
-      margin-top: 5px;
-      display: block;
-      font-size: 14px;
-    }
+ .request-card span.price {
+ font-weight: bold;
+ color: #333;
+ margin-top: 5px;
+ display: block;
+ font-size: 14px;
+ }
 
-    .request-card button.offerBtn {
-      margin-top: auto;
-      padding: 9px 12px;
-      border: none;
-      border-radius: 6px;
-      background: #001f3f;
-      color: white;
-      cursor: pointer;
-      width: 100%;
-      font-weight: bold;
-      font-size: 14px;
-      transition: .3s;
-    }
+ .request-card button.offerBtn {
+ margin-top: auto;
+ padding: 9px 12px;
+ border: none;
+ border-radius: 6px;
+ background: #001f3f;
+ color: white;
+ cursor: pointer;
+ width: 100%;
+ font-weight: bold;
+ font-size: 14px;
+ transition: .3s;
+ }
 
-    .request-card button.offerBtn:hover {
-      background: #004f80;
-    }
+ .request-card button.offerBtn:hover {
+ background: #004f80;
+ }
 
-    /* Modal */
-    #requestModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 200;
-    }
+ /* Modal */
+ #requestModal {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background: rgba(0, 0, 0, 0.5);
+ z-index: 200;
+ }
 
-    #requestModal .modal-content {
-      background: white;
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 25px;
-      border-radius: 12px;
-      position: relative;
-      text-align: center;
-    }
+ #requestModal .modal-content {
+ background: white;
+ max-width: 500px;
+ margin: 50px auto;
+ padding: 25px;
+ border-radius: 12px;
+ position: relative;
+ text-align: center;
+ }
 
-    #requestModal .close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 28px;
-      cursor: pointer;
-    }
+ #requestModal .close {
+ position: absolute;
+ top: 10px;
+ right: 15px;
+ font-size: 28px;
+ cursor: pointer;
+ }
 
-    #requestModal .contact-btn {
-      padding: 12px 20px;
-      margin: 10px 5px;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: .3s;
-    }
+ #requestModal .contact-btn {
+ padding: 12px 20px;
+ margin: 10px 5px;
+ border: none;
+ border-radius: 8px;
+ color: white;
+ font-size: 16px;
+ cursor: pointer;
+ font-weight: bold;
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ transition: .3s;
+ }
 
-    #emailBtn {
-      background: #ff6b6b;
-    }
+ #emailBtn {
+ background: #ff6b6b;
+ }
 
-    #emailBtn:hover {
-      background: #ff4c4c;
-    }
+ #emailBtn:hover {
+ background: #ff4c4c;
+ }
 
-    #whatsappBtn {
-      background: #25d366;
-    }
+ #whatsappBtn {
+ background: #25d366;
+ }
 
-    #whatsappBtn:hover {
-      background: #1ebe57;
-    }
+ #whatsappBtn:hover {
+ background: #1ebe57;
+ }
 
-    #telegramBtn {
-      background: #0088cc;
-    }
+ #telegramBtn {
+ background: #0088cc;
+ }
 
-    #telegramBtn:hover {
-      background: #0077b3;
-    }
+ #telegramBtn:hover {
+ background: #0077b3;
+ }
 
-    /* Filter Popup */
-    #filterPopup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      z-index: 300;
-      text-align: center;
-    }
+ /* Filter Popup */
+ #filterPopup {
+ display: none;
+ position: fixed;
+ top: 50%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ background: white;
+ padding: 25px;
+ border-radius: 12px;
+ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+ z-index: 300;
+ text-align: center;
+ }
 
-    #filterPopup select {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
+ #filterPopup select {
+ padding: 10px;
+ margin: 10px;
+ font-size: 16px;
+ border-radius: 8px;
+ border: 1px solid #ccc;
+ }
 
-    #filterPopup button {
-      padding: 10px 20px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      background: #001f3f;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
+ #filterPopup button {
+ padding: 10px 20px;
+ margin-top: 15px;
+ border: none;
+ border-radius: 8px;
+ background: #001f3f;
+ color: white;
+ cursor: pointer;
+ font-weight: bold;
+ }
 
-    #filterPopup button:hover {
-      background: #004f80;
-    }
+ #filterPopup button:hover {
+ background: #004f80;
+ }
 
-    /* FAB button for adding sample data */
-    .fab-btn {
-      position: fixed;
-      bottom: 25px;
-      right: 25px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: #6b21a8;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(107,33,168,0.4);
-      transition: 0.3s;
-      z-index: 500;
-      border: none;
-    }
-    .fab-btn:hover {
-      transform: scale(1.1);
-      background: #7c3aed;
-    }
-    .fab-panel {
-      display: none;
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 350px;
-      max-width: 90%;
-      height: 100vh;
-      background: white;
-      z-index: 501;
-      box-shadow: -5px 0 25px rgba(0,0,0,0.3);
-      overflow-y: auto;
-    }
-    .fab-panel.active { display: block; animation: slideIn 0.3s ease; }
-    @keyframes slideIn {
-      from { transform: translateX(100%); }
-      to { transform: translateX(0); }
-    }
-    .fab-panel-content { padding: 25px; }
-    .close-fab {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      cursor: pointer;
-      color: #666;
-    }
-    .close-fab:hover { color: #333; }
-    .fab-panel h2 { color: #6b21a8; margin-bottom: 20px; }
-    .fab-panel p { color: #555; margin-bottom: 15px; }
-    .fab-btn-action {
-      width: 100%;
-      padding: 12px;
-      background: #6b21a8;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: 0.2s;
-    }
-    .fab-btn-action:hover { background: #5b1a8a; }
+ /* FAB button for adding sample data */
+ .fab-btn {
+ position: fixed;
+ bottom: 25px;
+ right: 25px;
+ width: 56px;
+ height: 56px;
+ border-radius: 50%;
+ background: #6b21a8;
+ color: white;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 28px;
+ font-weight: bold;
+ cursor: pointer;
+ box-shadow: 0 4px 15px rgba(107,33,168,0.4);
+ transition: 0.3s;
+ z-index: 500;
+ border: none;
+ }
+ .fab-btn:hover {
+ transform: scale(1.1);
+ background: #7c3aed;
+ }
+ .fab-panel {
+ display: none;
+ position: fixed;
+ top: 0;
+ right: 0;
+ width: 350px;
+ max-width: 90%;
+ height: 100vh;
+ background: white;
+ z-index: 501;
+ box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+ overflow-y: auto;
+ }
+ .fab-panel.active { display: block; animation: slideIn 0.3s ease; }
+ @keyframes slideIn {
+ from { transform: translateX(100%); }
+ to { transform: translateX(0); }
+ }
+ .fab-panel-content { padding: 25px; }
+ .close-fab {
+ position: absolute;
+ top: 15px;
+ right: 20px;
+ font-size: 28px;
+ cursor: pointer;
+ color: #666;
+ }
+ .close-fab:hover { color: #333; }
+ .fab-panel h2 { color: #6b21a8; margin-bottom: 20px; }
+ .fab-panel p { color: #555; margin-bottom: 15px; }
+ .fab-btn-action {
+ width: 100%;
+ padding: 12px;
+ background: #6b21a8;
+ color: white;
+ border: none;
+ border-radius: 8px;
+ font-size: 14px;
+ font-weight: bold;
+ cursor: pointer;
+ margin-bottom: 10px;
+ transition: 0.2s;
+ }
+ .fab-btn-action:hover { background: #5b1a8a; }
 
-    footer {
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      text-align: center;
-      padding: 15px;
-      margin-top: 20px;
-    }
+ footer {
+ background: rgba(0, 0, 0, 0.2);
+ color: white;
+ text-align: center;
+ padding: 15px;
+ margin-top: 20px;
+ }
 
-    @media(max-width:600px) {
-      .search-bar input {
-        width: 80%;
-      }
+ @media(max-width:600px) {
+ .search-bar input {
+ width: 80%;
+ }
 
-      .request-list {
-        gap: 15px;
-        justify-content: center;
-      }
+ .request-list {
+ gap: 15px;
+ justify-content: center;
+ }
 
-      .request-card {
-        max-width: 90%;
-      }
-    }
-  </style>
+ .request-card {
+ max-width: 90%;
+ }
+ }
+ </style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
-    <div class="profile-container" id="profileContainer">
-      <img src="assets/images/ipey.jpeg" class="profile-pic" id="profilePic">
-      <div class="dropdown">
-        <a href="profile.html">👤 My Profile</a>
-        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">🏪 Vendor Dashboard</a>
-        <hr class="divider">
-        <a href="#" class="logout-link" onclick="doLogout()">🚪 Logout</a>
-      </div>
-    </div>
-  </header>
+ <header>
+ <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+ <div class="profile-container" id="profileContainer">
+ <img src="assets/images/ipey.jpeg" class="profile-pic" id="profilePic">
+ <div class="dropdown">
+ <a href="profile.html">My Profile</a>
+ <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
+ <a href="admin.html" class="admin-link hidden" id="adminDropdownLink">Admin Dashboard</a>
+ <hr class="divider">
+ <a href="#" class="logout-link" onclick="doLogout()">Logout</a>
+ </div>
+ </div>
+ </header>
 
-  <div class="back-button" onclick="window.location.href='home.html'">
-    <i class="fa-solid fa-arrow-left"></i> Back
-  </div>
+ <div class="back-button" onclick="window.location.href='home.html'">
+ <i class="fa-solid fa-arrow-left"></i> Back
+ </div>
 
-  <div class="page-title">Service Needed</div>
+ <div class="page-title">Service Needed</div>
 
-  <button class="filter-button" onclick="toggleFilterPopup()">Filter <i class="fa-solid fa-filter"></i></button>
+ <button class="filter-button" onclick="toggleFilterPopup()">Filter <i class="fa-solid fa-filter"></i></button>
 
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search requests...">
-    <button onclick="searchRequests()">Search</button>
-  </div>
+ <div class="search-bar">
+ <input type="text" id="searchInput" placeholder="Search requests...">
+ <button onclick="searchRequests()">Search</button>
+ </div>
 
-  <div class="request-list" id="requestList">
-    <div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">Loading requests...</div>
-  </div>
+ <div class="request-list" id="requestList">
+ <div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">Loading requests...</div>
+ </div>
 
-  <!-- FAB button for admin/sample data -->
-  <button class="fab-btn" onclick="toggleFabPanel()">+</button>
-  <div id="fabPanel" class="fab-panel">
-    <div class="fab-panel-content">
-      <span class="close-fab" onclick="toggleFabPanel()">&times;</span>
-      <h2>Developer Tools</h2>
-      <p>Add sample service needed requests for testing:</p>
-      <button class="fab-btn-action" onclick="addSampleNeededServices()">📦 Add Sample Requests</button>
-      <p style="font-size:12px;color:#888;margin-top:15px;">Note: Only admins can add sample data.</p>
-    </div>
-  </div>
+ <!-- FAB button for admin/sample data -->
+ <button class="fab-btn" onclick="toggleFabPanel()">+</button>
+ <div id="fabPanel" class="fab-panel">
+ <div class="fab-panel-content">
+ <span class="close-fab" onclick="toggleFabPanel()">&times;</span>
+ <h2>Developer Tools</h2>
+ <p>Add sample service needed requests for testing:</p>
+ <button class="fab-btn-action" onclick="addSampleNeededServices()"> Add Sample Requests</button>
+ <p style="font-size:12px;color:#888;margin-top:15px;">Note: Only admins can add sample data.</p>
+ </div>
+ </div>
 
-  <!-- Filter Popup -->
-  <div id="filterPopup">
-    <h3>Filter Requests</h3>
-    <select id="categoryFilter">
-      <option value="all">All Categories</option>
-      <option value="food">Food & Drinks</option>
-      <option value="runner">Runner</option>
-      <option value="printing">Printing</option>
-      <option value="cleaning">Cleaning</option>
-      <option value="laundry">Laundry</option>
-      <option value="delivery">Delivery</option>
-      <option value="tutoring">Tutoring</option>
-      <option value="design">Design</option>
-      <option value="coding">Coding</option>
-      <option value="photography">Photography</option>
-      <option value="repair">Repair</option>
-      <option value="writing">Writing</option>
-      <option value="other">Other</option>
-    </select>
-    <select id="priceFilter">
-      <option value="all">All Budgets</option>
-      <option value="under20">Under RM20</option>
-      <option value="20to50">RM20 - RM50</option>
-      <option value="above50">Above RM50</option>
-    </select>
-    <br>
-    <button onclick="applyFilter()">Apply</button>
-  </div>
+ <!-- Filter Popup -->
+ <div id="filterPopup">
+ <h3>Filter Requests</h3>
+ <select id="categoryFilter">
+ <option value="all">All Categories</option>
+ <option value="food">Food & Drinks</option>
+ <option value="runner">Runner</option>
+ <option value="printing">Printing</option>
+ <option value="cleaning">Cleaning</option>
+ <option value="laundry">Laundry</option>
+ <option value="delivery">Delivery</option>
+ <option value="tutoring">Tutoring</option>
+ <option value="design">Design</option>
+ <option value="coding">Coding</option>
+ <option value="photography">Photography</option>
+ <option value="repair">Repair</option>
+ <option value="writing">Writing</option>
+ <option value="other">Other</option>
+ </select>
+ <select id="priceFilter">
+ <option value="all">All Budgets</option>
+ <option value="under20">Under RM20</option>
+ <option value="20to50">RM20 - RM50</option>
+ <option value="above50">Above RM50</option>
+ </select>
+ <br>
+ <button onclick="applyFilter()">Apply</button>
+ </div>
 
-  <!-- Modal -->
-  <div id="requestModal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2 id="modalTitle"></h2>
-      <p id="modalDescription"></p>
-      <p><strong>Budget:</strong> <span id="modalPrice"></span></p>
-      <div>
-        <button id="emailBtn" class="contact-btn"><i class="fa-solid fa-envelope"></i>Email</button>
-        <button id="telegramBtn" class="contact-btn"><i class="fa-brands fa-telegram"></i>Telegram</button>
-        <button id="whatsappBtn" class="contact-btn"><i class="fa-brands fa-whatsapp"></i>WhatsApp</button>
-      </div>
-    </div>
-  </div>
+ <!-- Modal -->
+ <div id="requestModal">
+ <div class="modal-content">
+ <span class="close" onclick="closeModal()">&times;</span>
+ <h2 id="modalTitle"></h2>
+ <p id="modalDescription"></p>
+ <p><strong>Budget:</strong><span id="modalPrice"></span></p>
+ <div>
+ <button id="emailBtn" class="contact-btn"><i class="fa-solid fa-envelope"></i>Email</button>
+ <button id="telegramBtn" class="contact-btn"><i class="fa-brands fa-telegram"></i>Telegram</button>
+ <button id="whatsappBtn" class="contact-btn"><i class="fa-brands fa-whatsapp"></i>WhatsApp</button>
+ </div>
+ </div>
+ </div>
 
-  <footer>
-    <p>&copy; 2025 iTa'awun - All Rights Reserved</p>
-  </footer>
+ <footer>
+ <p>&copy; 2025 iTa'awun - All Rights Reserved</p>
+ </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <script>
+ const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    let currentUser = null
-    let allRequests = []
+ let currentUser = null
+ let allRequests = []
 
-    // Auth check
-    db.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { window.location.href = 'index.html'; return }
-      currentUser = session.user
-      loadRequests()
-    })
+ // Auth check
+ db.auth.getSession().then(({ data: { session } }) => {
+ if (!session) { window.location.href = 'index.html'; return }
+ currentUser = session.user
+ loadRequests()
+ })
 
-    // Load profile picture
-    db.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
-      db.from('profiles').select('avatar_url').eq('id', user.id).single()
-        .then(({ data }) => {
-          if (data?.avatar_url) {
-            document.getElementById('profilePic').src = data.avatar_url
-          }
-        })
-    })
+ // Load profile picture
+ db.auth.getUser().then(({ data: { user } }) => {
+ if (!user) return
+ db.from('profiles').select('avatar_url').eq('id', user.id).single()
+ .then(({ data }) => {
+ if (data?.avatar_url) {
+ document.getElementById('profilePic').src = data.avatar_url
+ }
+ })
+ })
 
-    // ── Load requests from Supabase ──────────────────────
-    async function loadRequests() {
-      const { data, error } = await db
-        .from('services')
-        .select('*')
-        .eq('status', 'active')
-        .eq('type', 'needed')
-        .order('created_at', { ascending: false })
+ // Load requests from Supabase 
+ async function loadRequests() {
+ const { data, error } = await db
+ .from('services')
+ .select('*')
+ .eq('status', 'active')
+ .eq('type', 'needed')
+ .order('created_at', { ascending: false })
 
-      const container = document.getElementById('requestList')
-      if (error || !data || data.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">No service requests yet. Be the first to request!</div>'
-        return
-      }
+ const container = document.getElementById('requestList')
+ if (error || !data || data.length === 0) {
+ container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">No service requests yet. Be the first to request!</div>'
+ return
+ }
 
-      allRequests = data
+ allRequests = data
 
-      // Fetch requester names and avatars
-      const requesterIds = [...new Set(data.map(r => r.vendor_id))]
-      const { data: profiles } = await db.from('profiles').select('id, full_name, avatar_url').in('id', requesterIds)
-      const profileMap = {}
-      if (profiles) profiles.forEach(p => { profileMap[p.id] = p })
+ // Fetch requester names and avatars
+ const requesterIds = [...new Set(data.map(r => r.vendor_id))]
+ const { data: profiles } = await db.from('profiles').select('id, full_name, avatar_url').in('id', requesterIds)
+ const profileMap = {}
+ if (profiles) profiles.forEach(p => { profileMap[p.id] = p })
 
-      renderRequests(data, profileMap)
-    }
+ renderRequests(data, profileMap)
+ }
 
-    function renderRequests(requests, profileMap) {
-      const container = document.getElementById('requestList')
-      if (requests.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">No requests found.</div>'
-        return
-      }
+ function renderRequests(requests, profileMap) {
+ const container = document.getElementById('requestList')
+ if (requests.length === 0) {
+ container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">No requests found.</div>'
+ return
+ }
 
-      container.innerHTML = requests.map(r => {
-        const requester = profileMap[r.vendor_id] || {}
-        const requesterName = requester.full_name || 'Student'
-        const avatar = requester.avatar_url || 'assets/images/OIP.jpg'
-        const category = r.category || 'writing'
-        const priceVal = parseFloat(r.price) || 0
+ container.innerHTML = requests.map(r => {
+ const requester = profileMap[r.vendor_id] || {}
+ const requesterName = requester.full_name || 'Student'
+ const avatar = requester.avatar_url || 'assets/images/OIP.jpg'
+ const category = r.category || 'writing'
+ const priceVal = parseFloat(r.price) || 0
 
-        return `
-        <div class="request-card" data-category="${category}" data-price="${priceVal}">
-          <img src="${r.image || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
-          <div class="requester"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(requesterName)}</span></div>
-          <div class="content">
-            <h3>${escapeHtml(r.title)}</h3>
-            <p class="desc">${escapeHtml(r.description || '')}</p>
-            <button class="moreBtn" onclick="toggleDesc(this)">More</button>
-            <div class="extra-info">
-              <p><strong>Location:</strong> ${escapeHtml(r.location || '—')}</p>
-              <p><strong>Time Needed:</strong> ${escapeHtml(r.time || '—')}</p>
-            </div>
-            <span class="price">RM${priceVal.toFixed(2)}</span>
-            <button class="offerBtn" onclick="openModal('${escapeJs(r.title)}','${escapeJs(r.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(r.contact || '')}','${escapeJs(r.telegram || '')}','${escapeJs(r.whatsapp || '')}')">Offer Service</button>
-          </div>
-        </div>`
-      }).join('')
-    }
+ return `
+ <div class="request-card" data-category="${category}" data-price="${priceVal}">
+ <img src="${r.image || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
+ <div class="requester"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(requesterName)}</span></div>
+ <div class="content">
+ <h3>${escapeHtml(r.title)}</h3>
+ <p class="desc">${escapeHtml(r.description || '')}</p>
+ <button class="moreBtn" onclick="toggleDesc(this)">More</button>
+ <div class="extra-info">
+ <p><strong>Location:</strong> ${escapeHtml(r.location || '—')}</p>
+ <p><strong>Time Needed:</strong> ${escapeHtml(r.time || '—')}</p>
+ </div>
+ <span class="price">RM${priceVal.toFixed(2)}</span>
+ <button class="offerBtn" onclick="openModal('${escapeJs(r.title)}','${escapeJs(r.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(r.contact || '')}','${escapeJs(r.telegram || '')}','${escapeJs(r.whatsapp || '')}')">Offer Service</button>
+ </div>
+ </div>`
+ }).join('')
+ }
 
-    function escapeHtml(text) {
-      if (!text) return ''
-      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-    }
-    function escapeJs(text) {
-      if (!text) return ''
-      return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"')
-    }
+ function escapeHtml(text) {
+ if (!text) return ''
+ return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+ }
+ function escapeJs(text) {
+ if (!text) return ''
+ return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"')
+ }
 
-    // Auth check with vendor link
-    (async function initNeeded() {
-      const { data: { session } } = await db.auth.getSession()
-      if (!session) { window.location.href = 'index.html'; return }
-      currentUser = session.user
+ // Auth check with vendor link
+ (async function initNeeded() {
+ const { data: { session } } = await db.auth.getSession()
+ if (!session) { window.location.href = 'index.html'; return }
+ currentUser = session.user
 
-      const { data: profile } = await db.from('profiles').select('role').eq('id', session.user.id).single()
-      if (profile?.role === 'vendor' || profile?.role === 'admin') {
-        const vendorLink = document.getElementById('vendorDropdownLink')
-        if (vendorLink) vendorLink.classList.remove('hidden')
-      }
+ const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
+ if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
+ if (profile?.role === 'vendor') document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
+ if (profile?.role === 'admin') document.getElementById('adminDropdownLink')?.classList.remove('hidden')
 
-      loadRequests()
-    })()
+ loadRequests()
+ })()
 
-    // Description toggle
-    function toggleDesc(btn) { const desc = btn.previousElementSibling; desc.classList.toggle('expanded'); btn.textContent = desc.classList.contains('expanded') ? 'Less' : 'More'; }
+ // Description toggle
+ function toggleDesc(btn) { const desc = btn.previousElementSibling; desc.classList.toggle('expanded'); btn.textContent = desc.classList.contains('expanded') ? 'Less' : 'More'; }
 
-    // Modal
-    function openModal(title, desc, price, email, telegram, whatsapp) {
-      document.getElementById("requestModal").style.display = "block";
-      document.getElementById("modalTitle").textContent = title;
-      document.getElementById("modalDescription").textContent = desc;
-      document.getElementById("modalPrice").textContent = price;
-      document.getElementById("emailBtn").onclick = () => { window.location.href = `mailto:${email}?subject=Offer for ${title}`; };
-      document.getElementById("telegramBtn").onclick = () => { window.open(`https://t.me/${telegram}`, "_blank"); };
-      document.getElementById("whatsappBtn").onclick = () => { window.open(`https://wa.me/${whatsapp}`, "_blank"); };
-    }
-    function closeModal() { document.getElementById("requestModal").style.display = "none"; }
+ // Modal
+ function openModal(title, desc, price, email, telegram, whatsapp) {
+ document.getElementById("requestModal").style.display = "block";
+ document.getElementById("modalTitle").textContent = title;
+ document.getElementById("modalDescription").textContent = desc;
+ document.getElementById("modalPrice").textContent = price;
+ document.getElementById("emailBtn").onclick = () => { window.location.href = `mailto:${email}?subject=Offer for ${title}`; };
+ document.getElementById("telegramBtn").onclick = () => { window.open(`https://t.me/${telegram}`, "_blank"); };
+ document.getElementById("whatsappBtn").onclick = () => { window.open(`https://wa.me/${whatsapp}`, "_blank"); };
+ }
+ function closeModal() { document.getElementById("requestModal").style.display = "none"; }
 
-    // Search
-    function searchRequests() {
-      const term = document.getElementById("searchInput").value.toLowerCase().trim()
-      if (!term) { loadRequests(); return }
+ // Search
+ function searchRequests() {
+ const term = document.getElementById("searchInput").value.toLowerCase().trim()
+ if (!term) { loadRequests(); return }
 
-      let filtered = allRequests.filter(r =>
-        (r.title && r.title.toLowerCase().includes(term)) ||
-        (r.description && r.description.toLowerCase().includes(term))
-      )
+ let filtered = allRequests.filter(r =>
+ (r.title && r.title.toLowerCase().includes(term)) ||
+ (r.description && r.description.toLowerCase().includes(term))
+ )
 
-      db.from('profiles').select('id, full_name, avatar_url')
-        .in('id', [...new Set(filtered.map(r => r.vendor_id))])
-        .then(({ data }) => {
-          const profileMap = {}
-          if (data) data.forEach(p => { profileMap[p.id] = p })
-          renderRequests(filtered, profileMap)
-        })
-    }
+ db.from('profiles').select('id, full_name, avatar_url')
+ .in('id', [...new Set(filtered.map(r => r.vendor_id))])
+ .then(({ data }) => {
+ const profileMap = {}
+ if (data) data.forEach(p => { profileMap[p.id] = p })
+ renderRequests(filtered, profileMap)
+ })
+ }
 
-    // Filter popup
-    function toggleFilterPopup() { const f = document.getElementById("filterPopup"); f.style.display = f.style.display === "block" ? "none" : "block"; }
-    function applyFilter() {
-      toggleFilterPopup();
-      filterRequests();
-    }
+ // Filter popup
+ function toggleFilterPopup() { const f = document.getElementById("filterPopup"); f.style.display = f.style.display === "block" ? "none" : "block"; }
+ function applyFilter() {
+ toggleFilterPopup();
+ filterRequests();
+ }
 
-    // Filtering with Supabase data
-    function filterRequests() {
-      const cat = document.getElementById("categoryFilter").value;
-      const price = document.getElementById("priceFilter").value;
+ // Filtering with Supabase data
+ function filterRequests() {
+ const cat = document.getElementById("categoryFilter").value;
+ const price = document.getElementById("priceFilter").value;
 
-      let filtered = allRequests.filter(r => {
-        const category = r.category || 'writing'
-        const p = parseFloat(r.price) || 0
+ let filtered = allRequests.filter(r => {
+ const category = r.category || 'writing'
+ const p = parseFloat(r.price) || 0
 
-        if (cat !== "all" && category !== cat) return false
-        if (price === "under20" && p >= 20) return false
-        if (price === "20to50" && (p < 20 || p > 50)) return false
-        if (price === "above50" && p <= 50) return false
-        return true
-      })
+ if (cat !== "all" && category !== cat) return false
+ if (price === "under20" && p >= 20) return false
+ if (price === "20to50" && (p < 20 || p > 50)) return false
+ if (price === "above50" && p <= 50) return false
+ return true
+ })
 
-      // Also filter by service_type = 'needed'
-      filtered = filtered.filter(r => r.type === 'needed')
+ // Also filter by service_type = 'needed'
+ filtered = filtered.filter(r => r.type === 'needed')
 
-      db.from('profiles').select('id, full_name, avatar_url')
-        .in('id', [...new Set(filtered.map(r => r.vendor_id))])
-        .then(({ data }) => {
-          const profileMap = {}
-          if (data) data.forEach(p => { profileMap[p.id] = p })
-          renderRequests(filtered, profileMap)
-        })
-    }
+ db.from('profiles').select('id, full_name, avatar_url')
+ .in('id', [...new Set(filtered.map(r => r.vendor_id))])
+ .then(({ data }) => {
+ const profileMap = {}
+ if (data) data.forEach(p => { profileMap[p.id] = p })
+ renderRequests(filtered, profileMap)
+ })
+ }
 
-    // Logout
-    async function doLogout() {
-      const { error } = await db.auth.signOut()
-      if (error) { console.error('Logout error:', error) }
-      window.location.replace('index.html?logged=out')
-    }
+ // Logout
+ async function doLogout() {
+ const { error } = await db.auth.signOut()
+ if (error) { console.error('Logout error:', error) }
+ window.location.replace('index.html?logged=out')
+ }
 
-    // FAB Panel toggle
-    function toggleFabPanel() {
-      const panel = document.getElementById('fabPanel')
-      panel.classList.toggle('active')
-    }
+ // FAB Panel toggle
+ function toggleFabPanel() {
+ const panel = document.getElementById('fabPanel')
+ panel.classList.toggle('active')
+ }
 
-    // Add sample needed services
-    async function addSampleNeededServices() {
-      if (!currentUser) { alert('Please login first'); return }
+ // Add sample needed services
+ async function addSampleNeededServices() {
+ if (!currentUser) { alert('Please login first'); return }
 
-      // Check if user is admin
-      const { data: profile } = await db.from('profiles').select('role').eq('id', currentUser.id).single()
-      if (profile?.role !== 'admin') {
-        alert('Only admins can add sample data.')
-        return
-      }
+ // Check if user is admin
+ const { data: profile } = await db.from('profiles').select('role').eq('id', currentUser.id).single()
+ if (profile?.role !== 'admin') {
+ alert('Only admins can add sample data.')
+ return
+ }
 
-      const btn = event.target
-      btn.disabled = true
-      btn.textContent = 'Adding...'
+ const btn = event.target
+ btn.disabled = true
+ btn.textContent = 'Adding...'
 
-      const sampleNeeded = [
-        { title: 'Need someone to design a logo', category: 'design', price: 30 },
-        { title: 'Looking for Python coding help', category: 'coding', price: 25 },
-        { title: 'Need essay proofreading', category: 'writing', price: 15 },
-        { title: 'Mathematics tutoring needed', category: 'tutoring', price: 40 },
-        { title: 'Event photography needed', category: 'photography', price: 80 },
-        { title: 'Need food delivery from canteen', category: 'food', price: 5 },
-        { title: 'Looking for runner to print documents', category: 'runner', price: 8 },
-        { title: 'Need help with PowerPoint slides', category: 'design', price: 20 },
-        { title: 'Chemistry tutoring needed', category: 'tutoring', price: 35 },
-        { title: 'Need someone to fix my laptop', category: 'repair', price: 50 }
-      ]
+ const sampleNeeded = [
+ { title: 'Need someone to design a logo', category: 'design', price: 30 },
+ { title: 'Looking for Python coding help', category: 'coding', price: 25 },
+ { title: 'Need essay proofreading', category: 'writing', price: 15 },
+ { title: 'Mathematics tutoring needed', category: 'tutoring', price: 40 },
+ { title: 'Event photography needed', category: 'photography', price: 80 },
+ { title: 'Need food delivery from canteen', category: 'food', price: 5 },
+ { title: 'Looking for runner to print documents', category: 'runner', price: 8 },
+ { title: 'Need help with PowerPoint slides', category: 'design', price: 20 },
+ { title: 'Chemistry tutoring needed', category: 'tutoring', price: 35 },
+ { title: 'Need someone to fix my laptop', category: 'repair', price: 50 }
+ ]
 
-      let count = 0
-      for (const item of sampleNeeded) {
-        const { error } = await db.from('services').insert({
-          vendor_id: currentUser.id,
-          type: 'needed',
-          title: item.title,
-          category: item.category,
-          description: item.title + ' - urgent requirement!',
-          price: item.price,
-          location: 'Mahallah Z, B15',
-          time: 'Weekdays 09:00-17:00, Weekends 10:00-18:00',
-          whatsapp: '60123456789',
-          telegram: 'student_' + (count + 1),
-          contact: 'student' + (count + 1) + '@example.com',
-          image: 'https://via.placeholder.com/300x120',
-          status: 'active'
-        })
-        if (!error) count++
-      }
+ let count = 0
+ for (const item of sampleNeeded) {
+ const { error } = await db.from('services').insert({
+ vendor_id: currentUser.id,
+ type: 'needed',
+ title: item.title,
+ category: item.category,
+ description: item.title + ' - urgent requirement!',
+ price: item.price,
+ location: 'Mahallah Z, B15',
+ time: 'Weekdays 09:00-17:00, Weekends 10:00-18:00',
+ whatsapp: '60123456789',
+ telegram: 'student_' + (count + 1),
+ contact: 'student' + (count + 1) + '@example.com',
+ image: 'https://via.placeholder.com/300x120',
+ status: 'active'
+ })
+ if (!error) count++
+ }
 
-      btn.disabled = false
-      btn.textContent = '📦 Add Sample Requests'
-      alert(`Added ${count} sample service needed requests!`)
-      toggleFabPanel()
-      loadRequests()
-    }
-  </script>
+ btn.disabled = false
+ btn.textContent = ' Add Sample Requests'
+ alert(`Added ${count} sample service needed requests!`)
+ toggleFabPanel()
+ loadRequests()
+ }
+ </script>
 </body>
 
 </html>

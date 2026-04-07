@@ -2,573 +2,509 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile - iTa'awun</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .back-button {
-      padding: 10px 40px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      font-weight: bold;
-      color: #001f3f;
-      font-size: 16px;
-    }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>My Profile - iTa'awun</title>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ <style>
+ .back-button {
+ padding: 10px 40px;
+ display: flex;
+ align-items: center;
+ cursor: pointer;
+ font-weight: bold;
+ color: #001f3f;
+ font-size: 16px;
+ }
 
-    .back-button i {
-      margin-right: 8px;
-    }
+ .back-button i {
+ margin-right: 8px;
+ }
 
-    .back-button:hover {
-      color: #004f80;
-    }
+ .back-button:hover {
+ color: #004f80;
+ }
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-    }
+ body {
+ margin: 0;
+ font-family: 'Segoe UI', sans-serif;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+ background-size: 400% 400%;
+ animation: gradientBG 15s ease infinite;
+ }
 
-    @keyframes gradientBG {
-      0% {
-        background-position: 0% 50%;
-      }
+ @keyframes gradientBG {
+ 0% {
+ background-position: 0% 50%;
+ }
 
-      50% {
-        background-position: 100% 50%;
-      }
+ 50% {
+ background-position: 100% 50%;
+ }
 
-      100% {
-        background-position: 0% 50%;
-      }
-    }
+ 100% {
+ background-position: 0% 50%;
+ }
+ }
 
-    /* Theme variants */
-    body.theme-purple {
-      background: linear-gradient(-45deg, #6b21a8, #ffffff, #3F00FF);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-    }
-    body.theme-blue {
-      background: linear-gradient(-45deg, #0066cc, #ffffff, #00cc99);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-    }
-    body.theme-green {
-      background: linear-gradient(-45deg, #006644, #ffffff, #99cc00);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-    }
-    body.theme-sunset {
-      background: linear-gradient(-45deg, #ff6600, #ffffff, #cc3366);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-    }
 
-    header {
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      padding: 15px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+ header {
+ background: rgba(0, 0, 0, 0.2);
+ color: white;
+ padding: 15px 40px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
 
-    header .logo {
-      font-size: 22px;
-      font-weight: bold;
-      cursor: pointer;
-      color: white;
-    }
+ header .logo {
+ font-size: 22px;
+ font-weight: bold;
+ cursor: pointer;
+ color: white;
+ }
 
-    .profile-card {
-      background: rgba(255, 255, 255, 0.95);
-      max-width: 600px;
-      margin: 30px auto;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
+ .profile-card {
+ background: rgba(255, 255, 255, 0.95);
+ max-width: 600px;
+ margin: 30px auto;
+ padding: 30px;
+ border-radius: 15px;
+ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+ }
 
-    .profile-header {
-      text-align: center;
-      margin-bottom: 25px;
-    }
+ .profile-header {
+ text-align: center;
+ margin-bottom: 25px;
+ }
 
-    .profile-card img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 3px solid #001f3f;
-      margin-bottom: 15px;
-      object-fit: cover;
-    }
+ .profile-card img {
+ width: 120px;
+ height: 120px;
+ border-radius: 50%;
+ border: 3px solid #001f3f;
+ margin-bottom: 15px;
+ object-fit: cover;
+ }
 
-    .profile-card h2 {
-      margin: 10px 0;
-      color: #001f3f;
-    }
+ .profile-card h2 {
+ margin: 10px 0;
+ color: #001f3f;
+ }
 
-    .role-badge {
-      display: inline-block;
-      padding: 3px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-      background: #f3e8ff;
-      color: #6b21a8;
-      margin-bottom: 10px;
-    }
+ .role-badge {
+ display: inline-block;
+ padding: 3px 12px;
+ border-radius: 20px;
+ font-size: 12px;
+ font-weight: bold;
+ background: #f3e8ff;
+ color: #6b21a8;
+ margin-bottom: 10px;
+ }
 
-    .section-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #001f3f;
-      margin: 20px 0 10px;
-      padding-bottom: 5px;
-      border-bottom: 2px solid #6b21a8;
-    }
+ .section-title {
+ font-size: 16px;
+ font-weight: bold;
+ color: #001f3f;
+ margin: 20px 0 10px;
+ padding-bottom: 5px;
+ border-bottom: 2px solid #6b21a8;
+ }
 
-    .info {
-      margin-top: 15px;
-    }
+ .info {
+ margin-top: 15px;
+ }
 
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-    }
+ .info-row {
+ display: flex;
+ justify-content: space-between;
+ padding: 8px 0;
+ border-bottom: 1px solid #eee;
+ }
 
-    .info-row:last-child {
-      border-bottom: none;
-    }
+ .info-row:last-child {
+ border-bottom: none;
+ }
 
-    .info-label {
-      color: #666;
-      font-size: 14px;
-    }
+ .info-label {
+ color: #666;
+ font-size: 14px;
+ }
 
-    .info-value {
-      color: #333;
-      font-weight: 500;
-      font-size: 14px;
-    }
+ .info-value {
+ color: #333;
+ font-weight: 500;
+ font-size: 14px;
+ }
 
-    .edit-btn {
-      background: #6b21a8;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      margin-top: 15px;
-      transition: 0.2s;
-    }
+ .edit-btn {
+ background: #6b21a8;
+ color: white;
+ border: none;
+ padding: 8px 16px;
+ border-radius: 6px;
+ cursor: pointer;
+ font-size: 13px;
+ margin-top: 15px;
+ transition: 0.2s;
+ }
 
-    .edit-btn:hover {
-      background: #5b1a8a;
-    }
+ .edit-btn:hover {
+ background: #5b1a8a;
+ }
 
-    .theme-selector {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
+ .edit-form {
+ overflow: hidden;
+ max-height: 0;
+ opacity: 0;
+ margin-top: 0;
+ transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+ }
 
-    .theme-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+ .edit-form.active {
+ max-height: 800px;
+ opacity: 1;
+ margin-top: 15px;
+ }
 
-    .theme-btn:hover {
-      transform: scale(1.1);
-    }
+ .edit-form label {
+ display: block;
+ margin: 10px 0 5px;
+ font-size: 13px;
+ color: #555;
+ }
 
-    .theme-btn.active {
-      border-color: #001f3f;
-    }
+ .edit-form input {
+ width: 100%;
+ padding: 10px;
+ border: 1px solid #ddd;
+ border-radius: 6px;
+ font-size: 14px;
+ box-sizing: border-box;
+ }
 
-    .theme-purple-btn { background: linear-gradient(135deg, #6b21a8, #3F00FF); }
-    .theme-blue-btn { background: linear-gradient(135deg, #0066cc, #00cc99); }
-    .theme-green-btn { background: linear-gradient(135deg, #006644, #99cc00); }
-    .theme-sunset-btn { background: linear-gradient(135deg, #ff6600, #cc3366); }
+ .edit-form .form-actions {
+ display: flex;
+ gap: 10px;
+ margin-top: 15px;
+ }
 
-    .edit-form {
-      display: none;
-      margin-top: 15px;
-    }
+ .save-btn {
+ flex: 1;
+ background: #16a34a;
+ color: white;
+ border: none;
+ padding: 10px;
+ border-radius: 6px;
+ cursor: pointer;
+ font-size: 14px;
+ }
 
-    .edit-form.active {
-      display: block;
-    }
+ .cancel-btn {
+ flex: 1;
+ background: #666;
+ color: white;
+ border: none;
+ padding: 10px;
+ border-radius: 6px;
+ cursor: pointer;
+ font-size: 14px;
+ }
 
-    .edit-form label {
-      display: block;
-      margin: 10px 0 5px;
-      font-size: 13px;
-      color: #555;
-    }
+ .logout-btn {
+ margin-top: 25px;
+ padding: 10px 20px;
+ background: #dc2626;
+ color: white;
+ border: none;
+ border-radius: 8px;
+ font-size: 16px;
+ cursor: pointer;
+ transition: 0.3s;
+ width: 100%;
+ }
 
-    .edit-form input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
+ .logout-btn:hover {
+ background: #b91c1c;
+ }
 
-    .edit-form .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
+ footer {
+ margin-top: auto;
+ background: rgba(0, 0, 0, 0.2);
+ color: white;
+ text-align: center;
+ padding: 15px;
+ }
 
-    .save-btn {
-      flex: 1;
-      background: #16a34a;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
+ @media (max-width: 600px) {
+ .profile-card {
+ margin: 20px;
+ padding: 20px;
+ }
 
-    .cancel-btn {
-      flex: 1;
-      background: #666;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .logout-btn {
-      margin-top: 25px;
-      padding: 10px 20px;
-      background: #dc2626;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-      width: 100%;
-    }
-
-    .logout-btn:hover {
-      background: #b91c1c;
-    }
-
-    footer {
-      margin-top: auto;
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      text-align: center;
-      padding: 15px;
-    }
-
-    @media (max-width: 600px) {
-      .profile-card {
-        margin: 20px;
-        padding: 20px;
-      }
-
-      .profile-card img {
-        width: 100px;
-        height: 100px;
-      }
-    }
-  </style>
+ .profile-card img {
+ width: 100px;
+ height: 100px;
+ }
+ }
+ </style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
-  </header>
+ <header>
+ <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+ </header>
 
-  <div class="back-button" onclick="window.location.href='home.html'">
-    <i class="fa-solid fa-arrow-left"></i> Back
-  </div>
+ <div class="back-button" onclick="window.location.href='home.html'">
+ <i class="fa-solid fa-arrow-left"></i> Back
+ </div>
 
-  <div class="profile-card">
-    <div class="profile-header">
-      <img id="pfp" src="assets/images/ipey.jpeg" alt="Profile Picture">
-      <br>
-      <button id="uploadBtn" onclick="triggerFileUpload()" class="edit-btn">📷 Change Photo</button>
-      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
-      <div id="uploadStatus" style="margin-top:10px;font-size:13px;"></div>
-      <h2 id="displayName">Loading...</h2>
-      <span class="role-badge" id="roleBadge">student</span>
-    </div>
+ <div class="profile-card">
+ <div class="profile-header">
+ <img id="pfp" src="assets/images/ipey.jpeg" alt="Profile Picture">
+ <br>
+ <button id="uploadBtn" onclick="triggerFileUpload()" class="edit-btn">Change Photo</button>
+ <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+ <div id="uploadStatus" style="margin-top:10px;font-size:13px;"></div>
+ <h2 id="displayName">Loading...</h2>
+ <span class="role-badge" id="roleBadge">student</span>
+ </div>
 
-    <div class="section-title">📋 Profile Information</div>
-    <div class="info">
-      <div class="info-row">
-        <span class="info-label">Email</span>
-        <span class="info-value" id="userEmail">—</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Full Name</span>
-        <span class="info-value" id="fullNameDisplay">—</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Student ID</span>
-        <span class="info-value" id="studentId">—</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Phone</span>
-        <span class="info-value" id="userPhone">—</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Room Address</span>
-        <span class="info-value" id="roomAddress">—</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Gender</span>
-        <span class="info-value" id="gender">—</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Member Since</span>
-        <span class="info-value" id="memberSince">—</span>
-      </div>
-    </div>
+ <div class="section-title">Profile Information</div>
+ <div class="info">
+ <div class="info-row">
+ <span class="info-label">Email</span>
+ <span class="info-value" id="userEmail">—</span>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Full Name</span>
+ <span class="info-value" id="fullNameDisplay">—</span>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Student ID</span>
+ <span class="info-value" id="studentId">—</span>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Phone</span>
+ <span class="info-value" id="userPhone">—</span>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Room Address</span>
+ <span class="info-value" id="roomAddress">—</span>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Gender</span>
+ <span class="info-value" id="gender">—</span>
+ </div>
+ <div class="info-row">
+ <span class="info-label">Member Since</span>
+ <span class="info-value" id="memberSince">—</span>
+ </div>
+ </div>
 
-    <button class="edit-btn" onclick="toggleEditForm()">✏️ Edit Profile</button>
+ <button class="edit-btn" onclick="toggleEditForm()">Edit Profile</button>
 
-    <div class="edit-form" id="editForm">
-      <label>Full Name</label>
-      <input type="text" id="editFullName">
-      <label>Student ID</label>
-      <input type="text" id="editStudentId">
-      <label>Phone</label>
-      <input type="text" id="editPhone">
-      <label>Room Address</label>
-      <input type="text" id="editRoomAddress" placeholder="Mahallah X, Block A, Level 1, Room 101">
-      <label>New Password (leave blank to keep current)</label>
-      <input type="password" id="editPassword" placeholder="Min 6 characters">
-      <div class="form-actions">
-        <button class="save-btn" onclick="saveProfile()">Save Changes</button>
-        <button class="cancel-btn" onclick="toggleEditForm()">Cancel</button>
-      </div>
-    </div>
+ <div class="edit-form" id="editForm">
+ <label>Full Name</label>
+ <input type="text" id="editFullName">
+ <label>Student ID</label>
+ <input type="text" id="editStudentId">
+ <label>Phone</label>
+ <input type="text" id="editPhone">
+ <label>Room Address</label>
+ <input type="text" id="editRoomAddress" placeholder="Mahallah X, Block A, Level 1, Room 101">
+ <label>New Password (leave blank to keep current)</label>
+ <input type="password" id="editPassword" placeholder="Min 6 characters">
+ <div class="form-actions">
+ <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+ <button class="cancel-btn" onclick="toggleEditForm()">Cancel</button>
+ </div>
+ </div>
 
-    <div class="section-title">🎨 Theme</div>
-    <div class="theme-selector">
-      <button class="theme-btn theme-purple-btn active" onclick="setTheme('purple')" title="Purple"></button>
-      <button class="theme-btn theme-blue-btn" onclick="setTheme('blue')" title="Blue"></button>
-      <button class="theme-btn theme-green-btn" onclick="setTheme('green')" title="Green"></button>
-      <button class="theme-btn theme-sunset-btn" onclick="setTheme('sunset')" title="Sunset"></button>
-    </div>
+ <button class="logout-btn" onclick="doLogout()">Logout</button>
+ </div>
 
-    <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
-  </div>
+ <footer>
+ <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
+ </footer>
 
-  <footer>
-    <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
-  </footer>
+ <script>
+ const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-  <script>
-    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+ let currentUser = null
 
-    let currentUser = null
+ // Protect page
+ (async function initProfile() {
+ const { data: { session } } = await db.auth.getSession()
+ if (!session) { window.location.href = 'index.html'; return }
 
-    // Protect page
-    (async function initProfile() {
-      const { data: { session } } = await db.auth.getSession()
-      if (!session) { window.location.href = 'index.html'; return }
+ currentUser = session.user
 
-      currentUser = session.user
+ // Load auth email
+ document.getElementById('userEmail').textContent = session.user.email
 
-      // Load auth email
-      document.getElementById('userEmail').textContent = session.user.email
+ // Load profile data from profiles table
+ const { data: profile } = await db
+ .from('profiles')
+ .select('*')
+ .eq('id', session.user.id)
+ .single()
 
-      // Load profile data from profiles table
-      const { data: profile } = await db
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single()
+ if (profile) {
+ document.getElementById('displayName').textContent = profile.full_name || 'No name set'
+ document.getElementById('fullNameDisplay').textContent = profile.full_name || '—'
+ document.getElementById('studentId').textContent = profile.student_id || '—'
+ document.getElementById('userPhone').textContent = profile.phone || '—'
+ document.getElementById('roomAddress').textContent = profile.room_address || '—'
+ document.getElementById('gender').textContent = profile.gender || '—'
+ document.getElementById('roleBadge').textContent = profile.role || 'student'
 
-      if (profile) {
-        document.getElementById('displayName').textContent = profile.full_name || 'No name set'
-        document.getElementById('fullNameDisplay').textContent = profile.full_name || '—'
-        document.getElementById('studentId').textContent = profile.student_id || '—'
-        document.getElementById('userPhone').textContent = profile.phone || '—'
-        document.getElementById('roomAddress').textContent = profile.room_address || '—'
-        document.getElementById('gender').textContent = profile.gender || '—'
-        document.getElementById('roleBadge').textContent = profile.role || 'student'
+ // Member since
+ if (profile.created_at) {
+ const date = new Date(profile.created_at)
+ document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+ }
 
-        // Member since
-        if (profile.created_at) {
-          const date = new Date(profile.created_at)
-          document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-        }
+ if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url
 
-        if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url
+ // Pre-fill edit form
+ document.getElementById('editFullName').value = profile.full_name || ''
+ document.getElementById('editStudentId').value = profile.student_id || ''
+ document.getElementById('editPhone').value = profile.phone || ''
+ document.getElementById('editRoomAddress').value = profile.room_address || ''
+ } else {
+ document.getElementById('displayName').textContent = session.user.email
+ }
 
-        // Pre-fill edit form
-        document.getElementById('editFullName').value = profile.full_name || ''
-        document.getElementById('editStudentId').value = profile.student_id || ''
-        document.getElementById('editPhone').value = profile.phone || ''
-        document.getElementById('editRoomAddress').value = profile.room_address || ''
-      } else {
-        document.getElementById('displayName').textContent = session.user.email
-      }
+ })()
 
-      // Load saved theme
-      const savedTheme = localStorage.getItem('itaawun_theme') || 'purple'
-      setTheme(savedTheme)
-    })()
+ async function doLogout() {
+ const { error } = await db.auth.signOut()
+ if (error) { console.error('Logout error:', error) }
+ window.location.replace('index.html?logged=out')
+ }
 
-    async function doLogout() {
-      const { error } = await db.auth.signOut()
-      if (error) { console.error('Logout error:', error) }
-      window.location.replace('index.html?logged=out')
-    }
+ function toggleEditForm() {
+ const form = document.getElementById('editForm')
+ form.classList.toggle('active')
+ }
 
-    function toggleEditForm() {
-      const form = document.getElementById('editForm')
-      form.classList.toggle('active')
-    }
+ async function saveProfile() {
+ const fullName = document.getElementById('editFullName').value.trim()
+ const studentId = document.getElementById('editStudentId').value.trim()
+ const phone = document.getElementById('editPhone').value.trim()
+ const roomAddress = document.getElementById('editRoomAddress').value.trim()
+ const newPassword = document.getElementById('editPassword').value
 
-    async function saveProfile() {
-      const fullName = document.getElementById('editFullName').value.trim()
-      const studentId = document.getElementById('editStudentId').value.trim()
-      const phone = document.getElementById('editPhone').value.trim()
-      const roomAddress = document.getElementById('editRoomAddress').value.trim()
-      const newPassword = document.getElementById('editPassword').value
+ if (!fullName || !studentId) {
+ alert('Full Name and Student ID are required.')
+ return
+ }
 
-      if (!fullName || !studentId) {
-        alert('Full Name and Student ID are required.')
-        return
-      }
+ const updates = {
+ full_name: fullName,
+ student_id: studentId,
+ phone: phone,
+ room_address: roomAddress
+ }
 
-      const updates = {
-        full_name: fullName,
-        student_id: studentId,
-        phone: phone,
-        room_address: roomAddress
-      }
+ // Update password if provided
+ if (newPassword && newPassword.length >= 6) {
+ const { error: pwError } = await db.auth.updateUser({ password: newPassword })
+ if (pwError) {
+ alert('Error updating password: ' + pwError.message)
+ return
+ }
+ } else if (newPassword && newPassword.length < 6) {
+ alert('Password must be at least 6 characters.')
+ return
+ }
 
-      // Update password if provided
-      if (newPassword && newPassword.length >= 6) {
-        const { error: pwError } = await db.auth.updateUser({ password: newPassword })
-        if (pwError) {
-          alert('Error updating password: ' + pwError.message)
-          return
-        }
-      } else if (newPassword && newPassword.length < 6) {
-        alert('Password must be at least 6 characters.')
-        return
-      }
+ const { error } = await db
+ .from('profiles')
+ .update(updates)
+ .eq('id', currentUser.id)
 
-      const { error } = await db
-        .from('profiles')
-        .update(updates)
-        .eq('id', currentUser.id)
+ if (error) {
+ alert('Error saving profile: ' + error.message)
+ return
+ }
 
-      if (error) {
-        alert('Error saving profile: ' + error.message)
-        return
-      }
+ alert('Profile updated successfully!')
+ toggleEditForm()
+ window.location.reload()
+ }
 
-      alert('Profile updated successfully!')
-      toggleEditForm()
-      window.location.reload()
-    }
+ // Profile picture upload functions
+ function triggerFileUpload() {
+ document.getElementById('fileInput').click()
+ }
 
-    function setTheme(themeName) {
-      document.body.className = ''
-      if (themeName !== 'purple') {
-        document.body.classList.add('theme-' + themeName)
-      }
-      localStorage.setItem('itaawun_theme', themeName)
-      document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'))
-      document.querySelector('.theme-' + themeName + '-btn').classList.add('active')
-    }
+ async function handleFileSelect(event) {
+ const file = event.target.files[0]
+ if (!file) return
+ if (!currentUser) { alert('Session not ready. Please refresh.'); return }
 
-    // Profile picture upload functions
-    function triggerFileUpload() {
-      document.getElementById('fileInput').click()
-    }
+ const statusEl = document.getElementById('uploadStatus')
+ statusEl.textContent = 'Uploading...'
+ statusEl.style.color = '#666'
 
-    async function handleFileSelect(event) {
-      const file = event.target.files[0]
-      if (!file) return
+ // Check file size (max 2MB)
+ if (file.size > 2 * 1024 * 1024) {
+ statusEl.textContent = 'File too large. Max 2MB.'
+ statusEl.style.color = '#dc2626'
+ return
+ }
 
-      const statusEl = document.getElementById('uploadStatus')
-      statusEl.textContent = 'Uploading...'
-      statusEl.style.color = '#666'
+ // Check file type
+ if (!file.type.startsWith('image/')) {
+ statusEl.textContent = 'Please select an image file.'
+ statusEl.style.color = '#dc2626'
+ return
+ }
 
-      // Check file size (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        statusEl.textContent = 'File too large. Max 2MB.'
-        statusEl.style.color = '#dc2626'
-        return
-      }
+ try {
+ // Upload to Supabase Storage
+ const fileExt = file.name.split('.').pop()
+ const fileName = `${currentUser.id}.${fileExt}`
+ const { error: uploadError } = await db.storage
+ .from('avatars')
+ .upload(fileName, file, { upsert: true })
 
-      // Check file type
-      if (!file.type.startsWith('image/')) {
-        statusEl.textContent = 'Please select an image file.'
-        statusEl.style.color = '#dc2626'
-        return
-      }
+ if (uploadError) throw uploadError
 
-      try {
-        // Upload to Supabase Storage
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${currentUser.id}.${fileExt}`
-        const { error: uploadError } = await db.storage
-          .from('avatars')
-          .upload(fileName, file, { upsert: true })
+ // Get public URL
+ const { data: { publicUrl } } = db.storage
+ .from('avatars')
+ .getPublicUrl(fileName)
 
-        if (uploadError) throw uploadError
+ // Update profile with new avatar URL
+ const { error: updateError } = await db
+ .from('profiles')
+ .update({ avatar_url: publicUrl })
+ .eq('id', currentUser.id)
 
-        // Get public URL
-        const { data: { publicUrl } } = db.storage
-          .from('avatars')
-          .getPublicUrl(fileName)
+ if (updateError) throw updateError
 
-        // Update profile with new avatar URL
-        const { error: updateError } = await db
-          .from('profiles')
-          .update({ avatar_url: publicUrl })
-          .eq('id', currentUser.id)
-
-        if (updateError) throw updateError
-
-        // Update UI
-        document.getElementById('pfp').src = publicUrl
-        statusEl.textContent = 'Photo updated!'
-        statusEl.style.color = '#16a34a'
-      } catch (err) {
-        console.error('Upload error:', err)
-        statusEl.textContent = 'Upload failed: ' + err.message
-        statusEl.style.color = '#dc2626'
-      }
-    }
-  </script>
+ // Update UI
+ document.getElementById('pfp').src = publicUrl
+ statusEl.textContent = 'Photo updated!'
+ statusEl.style.color = '#16a34a'
+ } catch (err) {
+ console.error('Upload error:', err)
+ statusEl.textContent = 'Upload failed: ' + err.message
+ statusEl.style.color = '#dc2626'
+ }
+ }
+ </script>
 </body>
 
 </html>
