@@ -172,6 +172,9 @@
 
   <div class="profile-card">
     <img id="pfp" src="assets/images/ipey.jpeg" alt="Profile Picture">
+    <button id="uploadBtn" onclick="triggerFileUpload()" style="margin-top:10px;padding:8px 16px;background:#6b21a8;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;">📷 Change Photo</button>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+    <div id="uploadStatus" style="margin-top:10px;font-size:13px;"></div>
     <h2 id="displayName">Loading...</h2>
     <span class="role-badge" id="roleBadge">student</span>
     <div class="info">
@@ -220,6 +223,67 @@
       const { error } = await db.auth.signOut()
       if (error) { console.error('Logout error:', error) }
       window.location.replace('index.html?logged=out')
+    }
+
+    // Profile picture upload functions
+    function triggerFileUpload() {
+      document.getElementById('fileInput').click()
+    }
+
+    async function handleFileSelect(event) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      const statusEl = document.getElementById('uploadStatus')
+      statusEl.textContent = 'Uploading...'
+      statusEl.style.color = '#666'
+
+      // Check file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        statusEl.textContent = 'File too large. Max 2MB.'
+        statusEl.style.color = '#dc2626'
+        return
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        statusEl.textContent = 'Please select an image file.'
+        statusEl.style.color = '#dc2626'
+        return
+      }
+
+      try {
+        // Upload to Supabase Storage
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${currentUser.id}.${fileExt}`
+        const { error: uploadError } = await db.storage
+          .from('avatars')
+          .upload(fileName, file, { upsert: true })
+
+        if (uploadError) throw uploadError
+
+        // Get public URL
+        const { data: { publicUrl } } = db.storage
+          .from('avatars')
+          .getPublicUrl(fileName)
+
+        // Update profile with new avatar URL
+        const { error: updateError } = await db
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', currentUser.id)
+
+        if (updateError) throw updateError
+
+        // Update UI
+        document.getElementById('pfp').src = publicUrl
+        statusEl.textContent = 'Photo updated!'
+        statusEl.style.color = '#16a34a'
+      } catch (err) {
+        console.error('Upload error:', err)
+        statusEl.textContent = 'Upload failed: ' + err.message
+        statusEl.style.color = '#dc2626'
+      }
     }
   </script>
 </body>
