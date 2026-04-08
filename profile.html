@@ -196,14 +196,42 @@
 
  .save-btn {
  flex: 1;
- background: #16a34a;
+ background: #6b21a8;
  color: white;
  border: none;
  padding: 10px;
  border-radius: 6px;
  cursor: pointer;
  font-size: 14px;
+ transition: 0.2s;
  }
+ .save-btn:hover { background: #5b1a8a; }
+ .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+ /* Toast notification */
+ .toast {
+ position: fixed;
+ bottom: 30px;
+ left: 50%;
+ transform: translateX(-50%) translateY(20px);
+ background: #1e1b4b;
+ color: white;
+ padding: 12px 24px;
+ border-radius: 8px;
+ font-size: 14px;
+ font-weight: 500;
+ opacity: 0;
+ transition: opacity 0.3s ease, transform 0.3s ease;
+ z-index: 9999;
+ pointer-events: none;
+ box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+ }
+ .toast.show {
+ opacity: 1;
+ transform: translateX(-50%) translateY(0);
+ }
+ .toast.success { background: #166534; }
+ .toast.error { background: #991b1b; }
 
  .cancel-btn {
  flex: 1;
@@ -333,6 +361,7 @@
  <footer>
  <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
  </footer>
+ <div class="toast" id="toast"></div>
 
  <script>
  const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
@@ -341,41 +370,45 @@
 
  let currentUser = null
 
+ function showToast(msg, type = 'success') {
+ const t = document.getElementById('toast')
+ t.textContent = msg
+ t.className = 'toast ' + type + ' show'
+ setTimeout(() => { t.className = 'toast ' + type }, 3000)
+ }
+
  // Protect page
  (async function initProfile() {
+ try {
  const { data: { session } } = await db.auth.getSession()
  if (!session) { window.location.href = 'index.html'; return }
 
  currentUser = session.user
-
- // Load auth email
  document.getElementById('userEmail').textContent = session.user.email
 
- // Load profile data from profiles table
- const { data: profile } = await db
+ const { data: profile, error } = await db
  .from('profiles')
  .select('*')
  .eq('id', session.user.id)
  .single()
 
+ if (error) throw error
+
  if (profile) {
- document.getElementById('displayName').textContent = profile.full_name || 'No name set'
+ document.getElementById('displayName').textContent = profile.full_name || session.user.email
  document.getElementById('fullNameDisplay').textContent = profile.full_name || '—'
  document.getElementById('studentId').textContent = profile.student_id || '—'
  document.getElementById('userPhone').textContent = profile.phone || '—'
  document.getElementById('roomAddress').textContent = profile.room_address || '—'
- document.getElementById('gender').textContent = profile.gender || '—'
+ document.getElementById('gender').textContent = profile.gender
+ ? profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)
+ : '—'
  document.getElementById('roleBadge').textContent = profile.role || 'student'
-
- // Member since
  if (profile.created_at) {
  const date = new Date(profile.created_at)
  document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
  }
-
  if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url
-
- // Pre-fill edit form
  document.getElementById('editFullName').value = profile.full_name || ''
  document.getElementById('editStudentId').value = profile.student_id || ''
  document.getElementById('editPhone').value = profile.phone || ''
@@ -383,18 +416,19 @@
  } else {
  document.getElementById('displayName').textContent = session.user.email
  }
-
+ } catch (err) {
+ console.error('initProfile error:', err)
+ document.getElementById('displayName').textContent = 'Error loading profile'
+ }
  })()
 
  async function doLogout() {
- const { error } = await db.auth.signOut()
- if (error) { console.error('Logout error:', error) }
+ await db.auth.signOut()
  window.location.replace('index.html?logged=out')
  }
 
  function toggleEditForm() {
- const form = document.getElementById('editForm')
- form.classList.toggle('active')
+ document.getElementById('editForm').classList.toggle('active')
  }
 
  async function saveProfile() {
@@ -405,103 +439,92 @@
  const newPassword = document.getElementById('editPassword').value
 
  if (!fullName || !studentId) {
- alert('Full Name and Student ID are required.')
- return
+ showToast('Full Name and Student ID are required.', 'error'); return
+ }
+ if (newPassword && newPassword.length < 6) {
+ showToast('Password must be at least 6 characters.', 'error'); return
  }
 
- const updates = {
- full_name: fullName,
- student_id: studentId,
- phone: phone,
- room_address: roomAddress
- }
+ const btn = document.querySelector('.save-btn')
+ btn.disabled = true
+ btn.textContent = 'Saving...'
 
- // Update password if provided
- if (newPassword && newPassword.length >= 6) {
+ if (newPassword) {
  const { error: pwError } = await db.auth.updateUser({ password: newPassword })
  if (pwError) {
- alert('Error updating password: ' + pwError.message)
- return
+ showToast('Password error: ' + pwError.message, 'error')
+ btn.disabled = false; btn.textContent = 'Save Changes'; return
  }
- } else if (newPassword && newPassword.length < 6) {
- alert('Password must be at least 6 characters.')
- return
  }
 
- const { error } = await db
- .from('profiles')
- .update(updates)
- .eq('id', currentUser.id)
+ const { error } = await db.from('profiles').update({
+ full_name: fullName, student_id: studentId, phone, room_address: roomAddress
+ }).eq('id', currentUser.id)
 
- if (error) {
- alert('Error saving profile: ' + error.message)
- return
- }
+ btn.disabled = false
+ btn.textContent = 'Save Changes'
 
- alert('Profile updated successfully!')
+ if (error) { showToast('Error: ' + error.message, 'error'); return }
+
+ showToast('Profile updated!', 'success')
+ document.getElementById('displayName').textContent = fullName
+ document.getElementById('fullNameDisplay').textContent = fullName
+ document.getElementById('studentId').textContent = studentId
+ document.getElementById('userPhone').textContent = phone || '—'
+ document.getElementById('roomAddress').textContent = roomAddress || '—'
+ document.getElementById('editPassword').value = ''
  toggleEditForm()
- window.location.reload()
  }
 
- // Profile picture upload functions
  function triggerFileUpload() {
+ if (!currentUser) { showToast('Session not ready. Please refresh.', 'error'); return }
  document.getElementById('fileInput').click()
  }
 
  async function handleFileSelect(event) {
  const file = event.target.files[0]
  if (!file) return
- if (!currentUser) { alert('Session not ready. Please refresh.'); return }
+ if (!currentUser) { showToast('Session not ready. Please refresh.', 'error'); return }
 
  const statusEl = document.getElementById('uploadStatus')
+ const btn = document.getElementById('uploadBtn')
  statusEl.textContent = 'Uploading...'
- statusEl.style.color = '#666'
+ statusEl.style.color = '#6b21a8'
+ btn.disabled = true
 
- // Check file size (max 2MB)
  if (file.size > 2 * 1024 * 1024) {
  statusEl.textContent = 'File too large. Max 2MB.'
  statusEl.style.color = '#dc2626'
- return
+ btn.disabled = false; return
  }
-
- // Check file type
  if (!file.type.startsWith('image/')) {
  statusEl.textContent = 'Please select an image file.'
  statusEl.style.color = '#dc2626'
- return
+ btn.disabled = false; return
  }
 
  try {
- // Upload to Supabase Storage
  const fileExt = file.name.split('.').pop()
  const fileName = `${currentUser.id}.${fileExt}`
  const { error: uploadError } = await db.storage
- .from('avatars')
- .upload(fileName, file, { upsert: true })
-
+ .from('avatars').upload(fileName, file, { upsert: true })
  if (uploadError) throw uploadError
 
- // Get public URL
- const { data: { publicUrl } } = db.storage
- .from('avatars')
- .getPublicUrl(fileName)
+ const { data: { publicUrl } } = db.storage.from('avatars').getPublicUrl(fileName)
 
- // Update profile with new avatar URL
- const { error: updateError } = await db
- .from('profiles')
- .update({ avatar_url: publicUrl })
- .eq('id', currentUser.id)
-
+ const { error: updateError } = await db.from('profiles')
+ .update({ avatar_url: publicUrl }).eq('id', currentUser.id)
  if (updateError) throw updateError
 
- // Update UI
- document.getElementById('pfp').src = publicUrl
- statusEl.textContent = 'Photo updated!'
- statusEl.style.color = '#16a34a'
+ document.getElementById('pfp').src = publicUrl + '?t=' + Date.now()
+ statusEl.textContent = ''
+ btn.disabled = false
+ showToast('Profile photo updated!', 'success')
  } catch (err) {
  console.error('Upload error:', err)
  statusEl.textContent = 'Upload failed: ' + err.message
  statusEl.style.color = '#dc2626'
+ btn.disabled = false
  }
  }
  </script>
