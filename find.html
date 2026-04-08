@@ -558,7 +558,7 @@
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
  <div class="profile-container" id="profileContainer">
- <img src="assets/images/ipey.jpeg" class="profile-pic" id="profilePic">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic">
  <div class="dropdown">
  <a href="profile.html">My Profile</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
@@ -698,14 +698,31 @@
  if (profiles) profiles.forEach(p => { profileMap[p.id] = p })
  }
 
- renderServices(data, profileMap)
+ // Fetch avg rating per vendor
+ const ratingMap = {}
+ if (vendorIds.length > 0) {
+ const { data: ratings } = await db.from('ratings').select('target_id, score').in('target_id', vendorIds)
+ if (ratings) {
+ const ratingGroups = {}
+ ratings.forEach(r => {
+ if (!ratingGroups[r.target_id]) ratingGroups[r.target_id] = []
+ ratingGroups[r.target_id].push(r.score)
+ })
+ Object.keys(ratingGroups).forEach(id => {
+ const scores = ratingGroups[id]
+ ratingMap[id] = { avg: (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1), count: scores.length }
+ })
+ }
+ }
+ window._ratingCache = ratingMap
+ renderServices(data, profileMap, ratingMap)
  } catch (err) {
  console.error('loadServices error:', err)
  container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#dc2626;">Error loading services: ' + (err.message || err) + '</div>'
  }
  }
 
- function renderServices(services, profileMap) {
+ function renderServices(services, profileMap, ratingMap = {}) {
  const container = document.getElementById('serviceList')
  if (services.length === 0) {
  container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;color:#001f3f;">No services found.</div>'
@@ -715,14 +732,19 @@
  container.innerHTML = services.map(s => {
  const vendor = profileMap[s.vendor_id] || {}
  const vendorName = vendor.full_name || 'Vendor'
- const avatar = vendor.avatar_url || 'assets/images/OIP.jpg'
+ const avatar = vendor.avatar_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E"
+ const rating = ratingMap[s.vendor_id]
+ const starsHtml = rating
+ ? `<span style="color:#f59e0b;font-size:12px">${'★'.repeat(Math.round(parseFloat(rating.avg)))}${'☆'.repeat(5 - Math.round(parseFloat(rating.avg)))}</span> <span style="font-size:11px;color:#666">${rating.avg} (${rating.count})</span>`
+ : `<span style="color:#ccc;font-size:12px">☆☆☆☆☆</span> <span style="font-size:11px;color:#aaa">No ratings</span>`
  const category = s.category || 'service'
  const priceVal = parseFloat(s.price) || 0
 
  return `
  <div class="service-card" data-category="${category}" data-price="${priceVal}">
  <img src="${s.image || 'https://via.placeholder.com/300x120'}" onerror="this.src='https://via.placeholder.com/300x120'">
- <div class="offerer"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(vendorName)}</span></div>
+ <div class="offerer" style="cursor:pointer" onclick="window.location.href='shop.html?id=${s.vendor_id}'"><img src="${avatar}" alt="profile" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'"><span>${escapeHtml(vendorName)}</span></div>
+ <div style="padding:0 12px 6px;font-size:12px">${starsHtml}</div>
  <div class="content">
  <h3>${escapeHtml(s.title)}</h3>
  <p class="desc">${escapeHtml(s.description || '')}</p>
@@ -775,6 +797,11 @@
  }
  })
 
+ function buildRatingMapFromLoaded(services) {
+ // We'll re-use the global ratingCache if available
+ return window._ratingCache || {}
+ }
+
  function filterServices() {
  const cat = document.getElementById('categoryFilter').value
  const price = document.getElementById('priceFilter').value
@@ -799,7 +826,7 @@
  .then(({ data }) => {
  const profileMap = {}
  if (data) data.forEach(p => { profileMap[p.id] = p })
- renderServices(filtered, profileMap)
+ renderServices(filtered, profileMap, window._ratingCache || {})
  })
  }
 
@@ -817,7 +844,7 @@
  .then(({ data }) => {
  const profileMap = {}
  if (data) data.forEach(p => { profileMap[p.id] = p })
- renderServices(filtered, profileMap)
+ renderServices(filtered, profileMap, window._ratingCache || {})
  })
  }
 

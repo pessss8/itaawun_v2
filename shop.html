@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop - iTa'awun</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      background: rgba(0,0,0,0.2);
+      color: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .logo { font-size: 22px; font-weight: bold; cursor: pointer; color: white; }
+
+    .profile-container { position: relative; display: inline-block; }
+    .profile-pic { width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+      border: 2px solid white; object-fit: cover; display: block;
+      transition: transform 0.2s, box-shadow 0.2s; }
+    .profile-container:hover .profile-pic { transform: scale(1.1); box-shadow: 0 0 0 3px rgba(255,255,255,0.5); }
+    .dropdown { display: none; position: absolute; right: 0; top: 48px; background: white;
+      color: #333; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      min-width: 170px; z-index: 100; overflow: hidden; animation: fadeIn 0.15s ease; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+    .profile-container:hover .dropdown, .dropdown:hover { display: block; }
+    .dropdown a { display: block; padding: 11px 16px; text-decoration: none; color: #333;
+      font-size: 14px; transition: background 0.15s; }
+    .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+    .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+    .dropdown .logout-link { color: #dc2626 !important; }
+    .dropdown .logout-link:hover { background: #fef2f2 !important; }
+    .hidden { display: none; }
+
+    .back-button { padding: 12px 40px; display: flex; align-items: center; cursor: pointer;
+      font-weight: bold; color: #001f3f; font-size: 16px; }
+    .back-button i { margin-right: 8px; }
+    .back-button:hover { color: #004f80; }
+
+    /* Vendor Hero */
+    .vendor-hero {
+      background: rgba(255,255,255,0.95);
+      max-width: 900px;
+      margin: 0 auto 24px;
+      width: calc(100% - 40px);
+      border-radius: 16px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .vendor-hero img {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 3px solid #6b21a8; object-fit: cover; flex-shrink: 0;
+    }
+    .vendor-hero-info { flex: 1; }
+    .vendor-hero-name { font-size: 22px; font-weight: bold; color: #001f3f; margin: 0 0 4px; }
+    .vendor-hero-role { font-size: 12px; background: #f3e8ff; color: #6b21a8;
+      padding: 2px 10px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 8px; }
+    .vendor-hero-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+    .vendor-hero-stat { font-size: 13px; color: #555; }
+    .vendor-hero-stat strong { color: #001f3f; }
+    .stars-display { color: #f59e0b; font-size: 18px; }
+
+    /* Services grid */
+    .shop-container { max-width: 900px; margin: 0 auto; width: calc(100% - 40px); padding-bottom: 40px; }
+    .shop-section-title {
+      font-size: 18px; font-weight: bold; color: #001f3f;
+      margin: 0 0 16px; padding-bottom: 8px;
+      border-bottom: 2px solid #6b21a8;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+    }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+
+    .product-card {
+      background: white; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .product-card img { width: 100%; height: 140px; object-fit: cover; }
+    .product-body { padding: 14px; }
+    .product-title { font-size: 15px; font-weight: bold; color: #001f3f; margin: 0 0 6px; }
+    .product-desc { font-size: 12px; color: #666; margin: 0 0 10px; line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-meta { font-size: 12px; color: #888; margin: 3px 0; }
+    .product-price { font-size: 18px; font-weight: bold; color: #6b21a8; margin: 8px 0; }
+    .product-variants { margin: 8px 0; }
+    .product-variants select {
+      width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 7px;
+      font-size: 13px; color: #333; background: #fafafa; cursor: pointer;
+    }
+    .product-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-contact {
+      flex: 1; padding: 8px; border: 2px solid #6b21a8; border-radius: 7px;
+      background: white; color: #6b21a8; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-contact:hover { background: #f3e8ff; }
+    .btn-book {
+      flex: 1; padding: 8px; border: none; border-radius: 7px;
+      background: #6b21a8; color: white; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-book:hover { background: #5b1a8a; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 60px 20px; color: #888; background: rgba(255,255,255,0.9);
+      border-radius: 12px; }
+    .empty-state i { font-size: 48px; color: #ccc; margin-bottom: 12px; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 60px; color: #001f3f; font-size: 16px;
+      background: rgba(255,255,255,0.9); border-radius: 12px; }
+
+    /* Contact Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: white; border-radius: 14px; padding: 24px; max-width: 380px;
+      width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+    .modal-box h3 { color: #001f3f; margin: 0 0 6px; }
+    .modal-box .modal-desc { font-size: 13px; color: #666; margin: 0 0 16px; }
+    .modal-box .modal-price { font-size: 20px; font-weight: bold; color: #6b21a8; margin: 0 0 16px; }
+    .contact-btns { display: flex; flex-direction: column; gap: 10px; }
+    .contact-btns button { padding: 11px; border: none; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-wa { background: #25d366; color: white; }
+    .btn-wa:hover { background: #1da851; }
+    .btn-tg { background: #0088cc; color: white; }
+    .btn-tg:hover { background: #0077b5; }
+    .btn-email { background: #f3f4f6; color: #333; }
+    .btn-email:hover { background: #e5e7eb; }
+    .btn-close-modal { margin-top: 8px; background: #e5e5e5; color: #333; padding: 9px;
+      border: none; border-radius: 8px; font-size: 13px; cursor: pointer; width: 100%; }
+    .btn-close-modal:hover { background: #d4d4d4; }
+
+    /* Book Modal */
+    .book-modal-box { background: white; border-radius: 14px; padding: 24px; max-width: 420px;
+      width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+    .book-modal-box h3 { color: #001f3f; margin: 0 0 12px; }
+    .book-modal-box label { font-size: 13px; color: #555; display: block; margin: 10px 0 4px; }
+    .book-modal-box select, .book-modal-box textarea {
+      width: 100%; padding: 9px 10px; border: 1px solid #ddd; border-radius: 7px;
+      font-size: 14px; box-sizing: border-box; font-family: inherit;
+    }
+    .book-modal-box textarea { min-height: 70px; resize: vertical; }
+    .book-modal-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .book-modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-confirm-book { background: #6b21a8; color: white; }
+    .btn-confirm-book:hover { background: #5b1a8a; }
+    .btn-cancel-book { background: #e5e5e5; color: #333; }
+    .btn-cancel-book:hover { background: #d4d4d4; }
+
+    footer { margin-top: auto; background: rgba(0,0,0,0.2); color: white; text-align: center; padding: 15px; }
+
+    @media (max-width: 600px) {
+      .vendor-hero { flex-direction: column; text-align: center; }
+      .vendor-hero-stats { justify-content: center; }
+      header { padding: 15px 20px; }
+      .back-button { padding: 10px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+    <div class="profile-container">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic">
+      <div class="dropdown">
+        <a href="profile.html">My Profile</a>
+        <a href="bookings.html">My Bookings</a>
+        <a href="vendor.html" class="hidden" id="vendorDropdownLink">Vendor Dashboard</a>
+        <a href="admin.html" class="hidden" id="adminDropdownLink">Admin Dashboard</a>
+        <hr class="divider">
+        <a href="#" class="logout-link" onclick="doLogout()">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="back-button" onclick="history.back()">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </div>
+
+  <!-- Vendor Hero -->
+  <div class="vendor-hero" id="vendorHero">
+    <div class="loading" style="width:100%">Loading shop...</div>
+  </div>
+
+  <!-- Products -->
+  <div class="shop-container">
+    <div class="shop-section-title" id="shopSectionTitle" style="display:none">Services Offered</div>
+    <div id="productGrid" class="services-grid">
+      <div class="loading">Loading services...</div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div class="modal-overlay" id="contactModal">
+    <div class="modal-box">
+      <h3 id="cModalTitle">—</h3>
+      <p class="modal-desc" id="cModalDesc">—</p>
+      <p class="modal-price" id="cModalPrice">—</p>
+      <div class="contact-btns">
+        <button class="btn-wa" id="cBtnWa" onclick="openWa()"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+        <button class="btn-tg" id="cBtnTg" onclick="openTg()"><i class="fa-brands fa-telegram"></i> Telegram</button>
+        <button class="btn-email" id="cBtnEmail" onclick="openEmail()"><i class="fa-solid fa-envelope"></i> Email</button>
+      </div>
+      <button class="btn-close-modal" onclick="closeContactModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Book Modal -->
+  <div class="modal-overlay" id="bookModal">
+    <div class="book-modal-box">
+      <h3 id="bModalTitle">Book Service</h3>
+      <label id="bVariantLabel" style="display:none">Select Option</label>
+      <select id="bVariantSelect" style="display:none"></select>
+      <label>Note to vendor (optional)</label>
+      <textarea id="bNote" placeholder="Any special requests or details..."></textarea>
+      <div class="book-modal-actions">
+        <button class="btn-cancel-book" onclick="closeBookModal()">Cancel</button>
+        <button class="btn-confirm-book" id="btnConfirmBook" onclick="confirmBook()">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 iTa'awun | Student Freelance Collaboration</p>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    let currentUser = null
+    let pendingBook = { serviceId: null, vendorId: null, title: '', variants: [] }
+    let contactData = { whatsapp: '', telegram: '', contact: '' }
+
+    // Auth + init
+    ;(async function init() {
+      const { data: { session } } = await db.auth.getSession()
+      if (!session) { window.location.href = 'index.html'; return }
+      currentUser = session.user
+
+      const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).maybeSingle()
+      if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
+      if (profile?.role === 'vendor') document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
+      if (profile?.role === 'admin') {
+        document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
+        document.getElementById('adminDropdownLink')?.classList.remove('hidden')
+      }
+
+      const vendorId = new URLSearchParams(window.location.search).get('id')
+      if (!vendorId) {
+        document.getElementById('vendorHero').innerHTML = '<div class="empty-state"><i class="fa-solid fa-store-slash"></i><p>No shop found. Invalid URL.</p></div>'
+        document.getElementById('productGrid').innerHTML = ''
+        return
+      }
+
+      await loadShop(vendorId)
+    })()
+
+    async function loadShop(vendorId) {
+      // Load vendor profile + ratings in parallel
+      const [profileRes, ratingsRes, servicesRes] = await Promise.all([
+        db.from('profiles').select('*').eq('id', vendorId).maybeSingle(),
+        db.from('ratings').select('score').eq('target_id', vendorId),
+        db.from('services').select('*').eq('vendor_id', vendorId).eq('status', 'active').eq('type', 'offered').order('created_at', { ascending: false })
+      ])
+
+      const vendor = profileRes.data
+      const ratings = ratingsRes.data || []
+      const services = servicesRes.data || []
+
+      // Render vendor hero
+      const heroEl = document.getElementById('vendorHero')
+      if (!vendor) {
+        heroEl.innerHTML = '<div class="empty-state"><i class="fa-solid fa-user-slash"></i><p>Vendor not found.</p></div>'
+        document.getElementById('productGrid').innerHTML = ''
+        return
+      }
+
+      const avgRating = ratings.length > 0
+        ? (ratings.reduce((s, r) => s + r.score, 0) / ratings.length).toFixed(1)
+        : null
+      const filledStars = avgRating ? Math.round(parseFloat(avgRating)) : 0
+      const starsHtml = '★'.repeat(filledStars) + '☆'.repeat(5 - filledStars)
+
+      const avatarSrc = vendor.avatar_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E"
+
+      heroEl.innerHTML = `
+        <img src="${avatarSrc}" alt="${escapeHtml(vendor.full_name || 'Vendor')}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2222%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
+        <div class="vendor-hero-info">
+          <h1 class="vendor-hero-name">${escapeHtml(vendor.full_name || 'Anonymous Vendor')}</h1>
+          <span class="vendor-hero-role">${vendor.role || 'vendor'}</span>
+          <div class="vendor-hero-stats">
+            <div class="vendor-hero-stat">
+              <span class="stars-display">${starsHtml}</span>
+              ${avgRating ? `<strong> ${avgRating}</strong> <span style="color:#aaa">(${ratings.length} review${ratings.length !== 1 ? 's' : ''})</span>` : '<span style="color:#aaa"> No reviews yet</span>'}
+            </div>
+            <div class="vendor-hero-stat"><strong>${services.length}</strong> service${services.length !== 1 ? 's' : ''} available</div>
+            ${vendor.room_address ? `<div class="vendor-hero-stat"><i class="fa-solid fa-location-dot" style="color:#6b21a8"></i> ${escapeHtml(vendor.room_address)}</div>` : ''}
+          </div>
+        </div>
+      `
+
+      // Render products
+      const grid = document.getElementById('productGrid')
+      const sectionTitle = document.getElementById('shopSectionTitle')
+
+      if (services.length === 0) {
+        sectionTitle.style.display = 'none'
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <i class="fa-solid fa-store"></i>
+            <p>This vendor has no active services right now.</p>
+          </div>`
+        return
+      }
+
+      sectionTitle.style.display = 'block'
+      grid.innerHTML = services.map(s => {
+        const variants = Array.isArray(s.variants) ? s.variants : []
+        const basePrice = parseFloat(s.price) || 0
+        const priceDisplay = variants.length > 0
+          ? `From RM${Math.min(...variants.map(v => parseFloat(v.price) || basePrice)).toFixed(2)}`
+          : `RM${basePrice.toFixed(2)}`
+
+        const variantsHtml = variants.length > 0 ? `
+          <div class="product-variants">
+            <select id="variant-${s.id}" onchange="updatePrice(this, ${basePrice})">
+              ${variants.map(v => `<option value="${parseFloat(v.price) || basePrice}">${escapeHtml(v.name)} — RM${(parseFloat(v.price) || basePrice).toFixed(2)}</option>`).join('')}
+            </select>
+          </div>` : ''
+
+        return `
+        <div class="product-card">
+          <img src="${s.image || 'https://via.placeholder.com/300x140'}" alt="${escapeHtml(s.title)}" onerror="this.src='https://via.placeholder.com/300x140'">
+          <div class="product-body">
+            <h3 class="product-title">${escapeHtml(s.title)}</h3>
+            <p class="product-desc">${escapeHtml(s.description || '')}</p>
+            <p class="product-meta"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(s.location || '—')}</p>
+            <p class="product-meta"><i class="fa-regular fa-clock"></i> ${escapeHtml(s.time || '—')}</p>
+            ${variantsHtml}
+            <div class="product-price" id="price-${s.id}">${priceDisplay}</div>
+            <div class="product-actions">
+              <button class="btn-contact" onclick='openContactModal(${JSON.stringify({ title: s.title, description: s.description, price: s.price, whatsapp: s.whatsapp, telegram: s.telegram, contact: s.contact })})'>Contact</button>
+              <button class="btn-book" onclick='openBookModal("${s.id}", "${vendorId}", ${JSON.stringify(s.title)}, ${JSON.stringify(variants)})'>Book</button>
+            </div>
+          </div>
+        </div>`
+      }).join('')
+    }
+
+    function updatePrice(selectEl, basePrice) {
+      const card = selectEl.closest('.product-card')
+      const priceEl = card?.querySelector('.product-price')
+      if (priceEl) priceEl.textContent = `RM${parseFloat(selectEl.value).toFixed(2)}`
+    }
+
+    // Contact modal
+    function openContactModal(svc) {
+      contactData = { whatsapp: svc.whatsapp || '', telegram: svc.telegram || '', contact: svc.contact || '' }
+      document.getElementById('cModalTitle').textContent = svc.title || 'Service'
+      document.getElementById('cModalDesc').textContent = svc.description || ''
+      document.getElementById('cModalPrice').textContent = `RM${parseFloat(svc.price || 0).toFixed(2)}`
+      document.getElementById('cBtnEmail').style.display = svc.contact ? 'flex' : 'none'
+      document.getElementById('contactModal').classList.add('open')
+    }
+    function closeContactModal() { document.getElementById('contactModal').classList.remove('open') }
+    function openWa() { if (contactData.whatsapp) window.open('https://wa.me/' + contactData.whatsapp.replace(/\D/g, ''), '_blank') }
+    function openTg() { if (contactData.telegram) window.open('https://t.me/' + contactData.telegram.replace('@', ''), '_blank') }
+    function openEmail() { if (contactData.contact) window.location.href = 'mailto:' + contactData.contact }
+
+    // Book modal
+    function openBookModal(serviceId, vendorId, title, variants) {
+      if (!currentUser) { window.location.href = 'index.html'; return }
+      pendingBook = { serviceId, vendorId, title, variants }
+
+      const variantLabel = document.getElementById('bVariantLabel')
+      const variantSelect = document.getElementById('bVariantSelect')
+      document.getElementById('bModalTitle').textContent = 'Book: ' + title
+      document.getElementById('bNote').value = ''
+
+      if (variants && variants.length > 0) {
+        variantLabel.style.display = 'block'
+        variantSelect.style.display = 'block'
+        variantSelect.innerHTML = variants.map(v =>
+          `<option value="${escapeHtml(v.name)} (RM${(parseFloat(v.price)).toFixed(2)})">${escapeHtml(v.name)} — RM${(parseFloat(v.price)).toFixed(2)}</option>`
+        ).join('')
+      } else {
+        variantLabel.style.display = 'none'
+        variantSelect.style.display = 'none'
+      }
+
+      document.getElementById('bookModal').classList.add('open')
+    }
+    function closeBookModal() { document.getElementById('bookModal').classList.remove('open') }
+
+    async function confirmBook() {
+      const btn = document.getElementById('btnConfirmBook')
+      btn.disabled = true; btn.textContent = 'Sending...'
+
+      const note = document.getElementById('bNote').value.trim()
+      const variantSelect = document.getElementById('bVariantSelect')
+      const variantNote = variantSelect.style.display !== 'none' && variantSelect.value
+        ? `[Option: ${variantSelect.value}] ` : ''
+      const fullNote = variantNote + note
+
+      const { error } = await db.from('bookings').insert({
+        service_id: pendingBook.serviceId,
+        student_id: currentUser.id,
+        vendor_id: pendingBook.vendorId,
+        note: fullNote || null,
+        status: 'pending'
+      })
+
+      btn.disabled = false; btn.textContent = 'Confirm Booking'
+      if (error) { alert('Booking failed: ' + error.message); return }
+      closeBookModal()
+      alert('Booking sent! The vendor will respond soon. Check "My Bookings" to track it.')
+    }
+
+    async function doLogout() {
+      await db.auth.signOut()
+      window.location.replace('index.html?logged=out')
+    }
+
+    function escapeHtml(text) {
+      if (!text) return ''
+      const d = document.createElement('div')
+      d.textContent = String(text)
+      return d.innerHTML
+    }
+  </script>
+</body>
+</html>

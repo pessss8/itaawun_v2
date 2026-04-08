@@ -244,6 +244,9 @@
  background: #fee2e2;
  color: #991b1b;
  }
+ .s-rejected { background: #fee2e2; color: #991b1b; }
+ .btn-reject-svc { background: #dc2626; color: white; }
+ .btn-reject-svc:hover { background: #b91c1c; }
 
  .s-b40 {
  background: #fef9c3;
@@ -514,7 +517,24 @@
 
  <!-- Panel: Services -->
  <div id="panel-services" class="panel">
- <div class="section-title"> All Services</div>
+ <div class="section-title"> Pending Approval <span id="pending-services-count" style="font-size:13px;color:#666;font-weight:normal;margin-left:8px"></span></div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Title</th>
+ <th>Vendor</th>
+ <th>Category</th>
+ <th>Price</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="tbody-services-pending">
+ <tr class="empty-row">
+ <td colspan="5">Loading...</td>
+ </tr>
+ </tbody>
+ </table>
+ <div class="section-title" style="margin-top:28px"> All Active / Inactive Services</div>
  <table class="data-table">
  <thead>
  <tr>
@@ -791,20 +811,50 @@
  btn.classList.add('active')
  }
 
- // Services 
+ // Services
  async function loadServices() {
- const { data, error } = await db
- .from('services')
- .select('*')
+ // -- Pending services section --
+ const { data: pending, error: pendErr } = await db
+ .from('services').select('*').eq('status', 'pending')
  .order('created_at', { ascending: false })
- .limit(50)
+
+ const tbPending = document.getElementById('tbody-services-pending')
+ const countEl = document.getElementById('pending-services-count')
+
+ if (!pending || pending.length === 0) {
+ tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending services. All clear!</td></tr>'
+ if (countEl) countEl.textContent = ''
+ } else {
+ const pVendorIds = [...new Set(pending.map(s => s.vendor_id))]
+ const { data: pProfiles } = await db.from('profiles').select('id, full_name').in('id', pVendorIds)
+ const pNameMap = {}
+ if (pProfiles) pProfiles.forEach(p => { pNameMap[p.id] = p.full_name })
+ if (countEl) countEl.textContent = `(${pending.length} waiting)`
+ tbPending.innerHTML = pending.map(s => `
+ <tr>
+ <td><strong>${s.title || '—'}</strong><br><span style="font-size:11px;color:#666">${(s.description || '').slice(0, 60)}${s.description?.length > 60 ? '…' : ''}</span></td>
+ <td>${pNameMap[s.vendor_id] || s.vendor_id?.slice(0, 8) + '…'}</td>
+ <td>${s.category || '—'}</td>
+ <td>RM${parseFloat(s.price || 0).toFixed(2)}</td>
+ <td>
+ <button class="btn-sm btn-approve" onclick="approveService('${s.id}')"> Approve</button>
+ <button class="btn-sm btn-reject-svc" onclick="rejectService('${s.id}', '${(s.title || '').replace(/'/g, "\\'")}')"> Reject</button>
+ </td>
+ </tr>`).join('')
+ }
+
+ // -- All non-pending services section --
+ const { data, error } = await db
+ .from('services').select('*')
+ .neq('status', 'pending')
+ .order('created_at', { ascending: false })
+ .limit(100)
 
  const tb = document.getElementById('tbody-services')
  if (error || !data || data.length === 0) {
- tb.innerHTML = '<tr class="empty-row"><td colspan="6">No services yet.</td></tr>'; return
+ tb.innerHTML = '<tr class="empty-row"><td colspan="6">No active/inactive services.</td></tr>'; return
  }
 
- // Fetch vendor names
  const vendorIds = [...new Set(data.map(s => s.vendor_id))]
  const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', vendorIds)
  const nameMap = {}
@@ -824,6 +874,18 @@
  <button class="btn-sm btn-suspend" onclick="deleteService('${s.id}')">Delete</button>
  </td>
  </tr>`).join('')
+ }
+
+ async function approveService(id) {
+ await db.from('services').update({ status: 'active' }).eq('id', id)
+ loadServices()
+ loadStats()
+ }
+ async function rejectService(id, title) {
+ if (!confirm(`Reject "${title}"? This will permanently delete the listing.`)) return
+ await db.from('services').delete().eq('id', id)
+ loadServices()
+ loadStats()
  }
 
  async function activateService(id) {

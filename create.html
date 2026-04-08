@@ -191,7 +191,7 @@
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
  <div class="profile-container" id="profileContainer">
- <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic">
  <div class="dropdown">
  <a href="profile.html"> My Profile</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink"> Vendor Dashboard</a>
@@ -277,6 +277,10 @@
  <label for="contact">Email (optional)</label>
  <input type="email" id="contact" placeholder="your@email.com">
 
+ <label style="margin-top:16px;font-weight:600">Product Variants <span style="font-weight:normal;font-size:12px;color:#888">(optional — e.g. Small/Large with different prices)</span></label>
+ <div id="variantsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+ <button type="button" onclick="addVariant()" style="background:#f3e8ff;color:#6b21a8;border:1.5px dashed #6b21a8;font-size:13px;padding:8px;margin-top:0;width:100%;">+ Add Variant Option</button>
+
  <button type="submit">Submit Service</button>
  </form>
  </div>
@@ -303,6 +307,24 @@
  if (vendorLink) vendorLink.classList.remove('hidden')
  }
  })()
+
+ // Variants management
+ let variantCount = 0
+ function addVariant() {
+ variantCount++
+ const id = 'variant-' + variantCount
+ const row = document.createElement('div')
+ row.id = id
+ row.style.cssText = 'display:flex;gap:8px;align-items:center;'
+ row.innerHTML = `
+ <input type="text" placeholder="Option name (e.g. Large)" style="flex:2;margin:0"
+ class="variant-name" required>
+ <input type="number" placeholder="Price (RM)" step="0.50" min="0" style="flex:1;margin:0"
+ class="variant-price" required>
+ <button type="button" onclick="document.getElementById('${id}').remove()"
+ style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:8px 12px;font-size:13px;cursor:pointer;margin:0;width:auto;">x</button>`
+ document.getElementById('variantsList').appendChild(row)
+ }
 
  async function doLogout() {
  const { error } = await db.auth.signOut()
@@ -351,6 +373,14 @@
  }
  if (!image) image = "https://via.placeholder.com/220x120";
 
+ // Collect variants
+ const variants = []
+ document.querySelectorAll('#variantsList > div').forEach(row => {
+ const name = row.querySelector('.variant-name')?.value.trim()
+ const priceVal = parseFloat(row.querySelector('.variant-price')?.value)
+ if (name && !isNaN(priceVal)) variants.push({ name, price: priceVal })
+ })
+
  // Insert into Supabase services table
  const serviceData = {
  vendor_id: currentUser.id,
@@ -365,7 +395,8 @@
  telegram: telegram,
  image: image,
  type: type,
- status: 'pending' // Requires admin approval
+ status: 'pending', // Requires admin approval
+ variants: variants.length > 0 ? variants : []
  }
 
  const { error } = await db.from('services').insert(serviceData)

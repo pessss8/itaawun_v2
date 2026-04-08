@@ -202,7 +202,7 @@
  // 2. Save profile info to profiles table
  if (data.user) {
  const roomAddress = `Mahallah ${mahallah}, Block ${block}, Level ${level}, Room ${room}`
- await db.from('profiles').insert({
+ const { error: profileError } = await db.from('profiles').insert({
  id: data.user.id,
  full_name: fullname,
  student_id: studentid,
@@ -211,6 +211,12 @@
  gender: gender,
  is_approved: false
  })
+ if (profileError) {
+ document.getElementById('btn-signup').disabled = false
+ setMsg('Account created but profile save failed: ' + profileError.message + '. Please update your profile after logging in.')
+ setTimeout(() => { window.location.href = 'index.html' }, 5000)
+ return
+ }
  }
 
  document.getElementById('btn-signup').disabled = false

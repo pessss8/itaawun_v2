@@ -284,9 +284,10 @@
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
  <div class="profile-container" id="profileContainer">
- <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic">
  <div class="dropdown">
  <a href="profile.html">My Profile</a>
+ <a href="bookings.html"> My Bookings</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
  <a href="admin.html" class="admin-link hidden" id="adminDropdownLink">Admin Dashboard</a>
  <hr class="divider">
@@ -443,6 +444,12 @@
  }
  if (profile?.role === 'admin') {
  document.getElementById('adminDropdownLink')?.classList.remove('hidden')
+ }
+
+ // Hide create FAB for pure students (only vendors and admins can create services)
+ if (profile?.role === 'student' || !profile) {
+ const fab = document.getElementById('createFab') || document.querySelector('.fab-btn') || document.querySelector('[onclick="toggleCreatePopup()"]')
+ if (fab) fab.style.display = 'none'
  }
 
  // Load profile picture

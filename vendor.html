@@ -504,6 +504,39 @@
  width: 100%;
  }
  }
+ .edit-modal-overlay {
+ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+ background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;
+ }
+ .edit-modal-overlay.active { display: flex; }
+ .edit-modal-box {
+ background: white; border-radius: 12px; padding: 25px; max-width: 480px; width: 90%;
+ color: #333; max-height: 85vh; overflow-y: auto;
+ }
+ .edit-modal-box h3 { color: #6b21a8; margin: 0 0 15px; }
+ .edit-modal-box label { display: block; font-size: 13px; color: #555; margin: 10px 0 4px; }
+ .edit-modal-box input, .edit-modal-box textarea, .edit-modal-box select {
+ width: 100%; padding: 9px 10px; border: 1px solid #ddd; border-radius: 7px;
+ font-size: 14px; box-sizing: border-box; font-family: inherit;
+ }
+ .edit-modal-box textarea { min-height: 70px; resize: vertical; }
+ .edit-modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+ .edit-modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 8px;
+ font-size: 14px; font-weight: 600; cursor: pointer; }
+ .btn-save-edit { background: #6b21a8; color: white; }
+ .btn-save-edit:hover { background: #5b1a8a; }
+ .btn-cancel-edit { background: #e5e5e5; color: #333; }
+ .status-badge-svc { display: inline-block; padding: 2px 10px; border-radius: 20px;
+ font-size: 11px; font-weight: bold; }
+ .status-active { background: #dcfce7; color: #166534; }
+ .status-pending { background: #fef3c7; color: #92400e; }
+ .status-inactive { background: #fee2e2; color: #991b1b; }
+ .btn-edit-svc { background: #2563eb; color: white; padding: 6px 14px;
+ border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; margin: 3px; }
+ .btn-edit-svc:hover { background: #1d4ed8; }
+ .btn-del-svc { background: #dc2626; color: white; padding: 6px 14px;
+ border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; margin: 3px; }
+ .btn-del-svc:hover { background: #b91c1c; }
  </style>
 </head>
 
@@ -517,9 +550,10 @@
  <a href="bookings.html">My Bookings</a>
  </nav>
  <div class="profile-container" id="profileContainer">
- <img src="assets/images/ipey.jpeg" alt="Profile" class="profile-pic" id="profilePic">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic">
  <div class="dropdown">
  <a href="profile.html"> My Profile</a>
+ <a href="#" id="previewShopLink"> Preview My Shop</a>
  <a href="profile.html" class="vendor-link hidden" id="manageVendorLink"> Manage Vendors</a>
  <hr class="divider">
  <a href="#" class="logout-link" onclick="doLogout()"> Logout</a>
@@ -686,6 +720,10 @@
  document.getElementById('profilePic').src = profile.avatar_url
  }
 
+ // Set preview shop link
+ const previewShopLink = document.getElementById('previewShopLink')
+ if (previewShopLink) previewShopLink.href = `shop.html?id=${currentUser.id}`
+
  // Show manage vendors link for admin users
  if (profile.role === 'admin') {
  const manageVendorLink = document.getElementById('manageVendorLink')
@@ -818,16 +856,27 @@
  return
  }
 
- listEl.innerHTML = services.map(service => `
+ listEl.innerHTML = services.map(service => {
+ const statusClass = service.status === 'active' ? 'status-active' : service.status === 'pending' ? 'status-pending' : 'status-inactive'
+ const statusLabel = service.status === 'active' ? 'Active' : service.status === 'pending' ? 'Pending Approval' : 'Inactive'
+ return `
  <div class="service-card">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
  <div class="service-title">${escapeHtml(service.title)}</div>
- <div class="service-detail"><strong>Type:</strong> ${service.type === 'offered' ? 'Service Offered' : 'Service Needed'}</div>
- <div class="service-detail"><strong>Category:</strong> ${escapeHtml(service.category)}</div>
- <div class="service-detail"><strong>Price:</strong> RM ${service.price?.toFixed(2) || 'N/A'}</div>
- <div class="service-detail"><strong>Status:</strong> ${service.status}</div>
- <div class="service-detail"><strong>Location:</strong> ${escapeHtml(service.location)}</div>
+ <span class="status-badge-svc ${statusClass}">${statusLabel}</span>
  </div>
- `).join('')
+ <div class="service-detail"><strong>Category:</strong> ${escapeHtml(service.category || '—')}</div>
+ <div class="service-detail"><strong>Price:</strong> RM ${parseFloat(service.price || 0).toFixed(2)}</div>
+ <div class="service-detail"><strong>Location:</strong> ${escapeHtml(service.location || '—')}</div>
+ ${service.variants && service.variants.length > 0
+ ? `<div class="service-detail"><strong>Variants:</strong> ${service.variants.map(v => v.name).join(', ')}</div>`
+ : ''}
+ <div style="margin-top:10px">
+ <button class="btn-edit-svc" onclick='openEditModal(${JSON.stringify(service)})'>Edit</button>
+ <button class="btn-del-svc" onclick="deleteMyService('${service.id}', '${escapeHtml(service.title).replace(/'/g, "\\'")}')">Delete</button>
+ </div>
+ </div>`
+ }).join('')
  }
 
  async function loadHistory() {
@@ -861,6 +910,12 @@
  return
  }
 
+ // Check which bookings already have ratings from this vendor
+ const bookingIds = bookings.map(b => b.id)
+ const { data: existingRatings } = await db.from('ratings')
+ .select('booking_id').eq('reviewer_id', currentUser.id).in('booking_id', bookingIds)
+ const ratedSet = new Set(existingRatings?.map(r => r.booking_id) || [])
+
  countEl.textContent = `${bookings.length} order${bookings.length > 1 ? 's' : ''}`
  listEl.innerHTML = bookings.map(booking => `
  <div class="booking-card" style="border-left-color: #16a34a;">
@@ -875,7 +930,10 @@
  <strong>Completed:</strong> ${new Date(booking.created_at).toLocaleDateString()}
  </div>
  <div class="booking-actions">
- <button class="btn-rate" onclick="openRatingModal('${booking.id}', '${booking.student_id}')"> Rate Student</button>
+ ${ratedSet.has(booking.id)
+ ? `<span style="color:#16a34a;font-size:13px;font-weight:600"> Rated</span>`
+ : `<button class="btn-rate" onclick="openRatingModal('${booking.id}', '${booking.student_id}')"> Rate Student</button>`
+ }
  </div>
  </div>
  `).join('')
@@ -948,6 +1006,73 @@
  await loadHistory()
  }
 
+ function openEditModal(service) {
+ document.getElementById('editSvcId').value = service.id
+ document.getElementById('editSvcTitle').value = service.title || ''
+ document.getElementById('editSvcDesc').value = service.description || ''
+ document.getElementById('editSvcCategory').value = service.category || 'other'
+ document.getElementById('editSvcPrice').value = service.price || ''
+ document.getElementById('editSvcLocation').value = service.location || ''
+ document.getElementById('editSvcWhatsapp').value = service.whatsapp || ''
+ document.getElementById('editSvcTelegram').value = service.telegram || ''
+ // Populate variants
+ const list = document.getElementById('editVariantsList')
+ list.innerHTML = ''
+ const variants = Array.isArray(service.variants) ? service.variants : []
+ variants.forEach(v => addEditVariant(v.name, v.price))
+ document.getElementById('editServiceModal').classList.add('active')
+ }
+
+ let editVariantCount = 0
+ function addEditVariant(name = '', price = '') {
+ editVariantCount++
+ const row = document.createElement('div')
+ row.style.cssText = 'display:flex;gap:6px;align-items:center'
+ row.innerHTML = `
+ <input class="ev-name" type="text" value="${name}" placeholder="Option name (e.g. Large)" style="flex:2;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px">
+ <input class="ev-price" type="number" value="${price}" placeholder="Price (RM)" style="flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px" min="0" step="0.50">
+ <button type="button" onclick="this.parentElement.remove()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px">✕</button>`
+ document.getElementById('editVariantsList').appendChild(row)
+ }
+
+ function closeEditModal() {
+ document.getElementById('editServiceModal').classList.remove('active')
+ }
+
+ async function saveServiceEdit() {
+ const id = document.getElementById('editSvcId').value
+ const btn = document.getElementById('btnSaveEdit')
+ btn.disabled = true; btn.textContent = 'Saving...'
+ // Collect variants
+ const variants = []
+ document.querySelectorAll('#editVariantsList > div').forEach(row => {
+ const name = row.querySelector('.ev-name')?.value.trim()
+ const priceVal = parseFloat(row.querySelector('.ev-price')?.value)
+ if (name && !isNaN(priceVal)) variants.push({ name, price: priceVal })
+ })
+ const { error } = await db.from('services').update({
+ title: document.getElementById('editSvcTitle').value.trim(),
+ description: document.getElementById('editSvcDesc').value.trim(),
+ category: document.getElementById('editSvcCategory').value,
+ price: parseFloat(document.getElementById('editSvcPrice').value) || 0,
+ location: document.getElementById('editSvcLocation').value.trim(),
+ whatsapp: document.getElementById('editSvcWhatsapp').value.trim(),
+ telegram: document.getElementById('editSvcTelegram').value.trim(),
+ variants: variants
+ }).eq('id', id).eq('vendor_id', currentUser.id)
+ btn.disabled = false; btn.textContent = 'Save Changes'
+ if (error) { alert('Error: ' + error.message); return }
+ closeEditModal()
+ await loadMyServices()
+ }
+
+ async function deleteMyService(id, title) {
+ if (!confirm(`Delete "${title}"? This cannot be undone.`)) return
+ const { error } = await db.from('services').delete().eq('id', id).eq('vendor_id', currentUser.id)
+ if (error) { alert('Error: ' + error.message); return }
+ await loadMyServices()
+ }
+
  function switchTab(tabName) {
  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'))
@@ -969,6 +1094,47 @@
  window.location.replace('index.html?logged=out')
  }
  </script>
+ <!-- Edit Service Modal -->
+ <div class="edit-modal-overlay" id="editServiceModal">
+ <div class="edit-modal-box">
+ <h3>Edit Service</h3>
+ <input type="hidden" id="editSvcId">
+ <label>Title</label>
+ <input type="text" id="editSvcTitle">
+ <label>Description</label>
+ <textarea id="editSvcDesc"></textarea>
+ <label>Category</label>
+ <select id="editSvcCategory">
+ <option value="food">Food & Drinks</option>
+ <option value="runner">Runner / Errand</option>
+ <option value="printing">Printing</option>
+ <option value="cleaning">Cleaning</option>
+ <option value="laundry">Laundry</option>
+ <option value="delivery">Delivery</option>
+ <option value="tutoring">Tutoring</option>
+ <option value="design">Design</option>
+ <option value="coding">Coding / IT</option>
+ <option value="photography">Photography</option>
+ <option value="repair">Repair</option>
+ <option value="other">Other</option>
+ </select>
+ <label>Price (RM)</label>
+ <input type="number" id="editSvcPrice" min="0" step="0.50">
+ <label>Location</label>
+ <input type="text" id="editSvcLocation">
+ <label>WhatsApp</label>
+ <input type="text" id="editSvcWhatsapp">
+ <label>Telegram</label>
+ <input type="text" id="editSvcTelegram">
+ <label>Variants <span style="font-weight:400;font-size:12px;color:#888">(optional — e.g. cup sizes with different prices)</span></label>
+ <div id="editVariantsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px"></div>
+ <button type="button" onclick="addEditVariant()" style="font-size:12px;padding:5px 12px;border:1px dashed #6b21a8;background:transparent;color:#6b21a8;border-radius:6px;cursor:pointer">+ Add Option</button>
+ <div class="edit-modal-actions">
+ <button class="btn-cancel-edit" onclick="closeEditModal()">Cancel</button>
+ <button class="btn-save-edit" id="btnSaveEdit" onclick="saveServiceEdit()">Save Changes</button>
+ </div>
+ </div>
+ </div>
 </body>
 
 </html>
