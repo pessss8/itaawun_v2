@@ -483,7 +483,7 @@
  .from('profiles')
  .select('role, avatar_url')
  .eq('id', session.user.id)
- .single()
+ .maybeSingle()
 
  // Show role-based buttons and dropdown links
  if (profile?.role === 'vendor') {
