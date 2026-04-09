@@ -569,6 +569,7 @@
 
  // Load bookings I made (as student)
  async function loadStudentBookings() {
+ try {
  const { data, error } = await db
  .from('bookings')
  .select('*, services(title, price, whatsapp, category)')
@@ -589,12 +590,14 @@
  const acceptedBookingIds = data.filter(b => b.status === 'accepted').map(b => b.id)
  let pendingCancelSet = new Set()
  if (acceptedBookingIds.length > 0) {
-   const { data: cancelReqs } = await db.from('cancellation_requests')
-     .select('booking_id')
-     .in('booking_id', acceptedBookingIds)
-     .eq('student_id', currentUser.id)
-     .eq('status', 'pending')
-   if (cancelReqs) cancelReqs.forEach(r => pendingCancelSet.add(r.booking_id))
+   try {
+     const { data: cancelReqs } = await db.from('cancellation_requests')
+       .select('booking_id')
+       .in('booking_id', acceptedBookingIds)
+       .eq('student_id', currentUser.id)
+       .eq('status', 'pending')
+     if (cancelReqs) cancelReqs.forEach(r => pendingCancelSet.add(r.booking_id))
+   } catch(e) { console.warn('Could not load cancel requests (student):', e) }
  }
 
  function renderCard(b) {
@@ -649,10 +652,16 @@
  }
  if (!html) html = '<div class="empty-state">You have not made any bookings yet.</div>'
  container.innerHTML = html
+ } catch(e) {
+   console.error('loadStudentBookings error:', e)
+   const c = document.getElementById('tab-as-student')
+   if (c) c.innerHTML = '<div class="empty-state">Could not load your orders. Please refresh the page.</div>'
+ }
  }
 
  // Load bookings to my services (as vendor)
  async function loadVendorBookings() {
+ try {
  const { data, error } = await db
  .from('bookings')
  .select('*, services(title, price)')
@@ -675,11 +684,13 @@
  const acceptedIds = data.filter(b => b.status === 'accepted').map(b => b.id)
  let cancelReqMap = {}
  if (acceptedIds.length > 0) {
-   const { data: creqs } = await db.from('cancellation_requests')
-     .select('id, booking_id, reason, status')
-     .in('booking_id', acceptedIds)
-     .eq('status', 'pending')
-   if (creqs) creqs.forEach(r => { cancelReqMap[r.booking_id] = r })
+   try {
+     const { data: creqs } = await db.from('cancellation_requests')
+       .select('id, booking_id, reason, status')
+       .in('booking_id', acceptedIds)
+       .eq('status', 'pending')
+     if (creqs) creqs.forEach(r => { cancelReqMap[r.booking_id] = r })
+   } catch(e) { console.warn('Could not load cancel requests (vendor):', e) }
  }
 
  container.innerHTML = data.map(b => {
@@ -708,9 +719,14 @@
  </div>
  </div>`
  }).join('')
+ } catch(e) {
+   console.error('loadVendorBookings error:', e)
+   const c = document.getElementById('tab-as-vendor')
+   if (c) c.innerHTML = '<div class="empty-state">Could not load incoming requests. Please refresh the page.</div>'
+ }
  }
 
- // Update booking status 
+ // Update booking status
  async function updateStatus(bookingId, newStatus, view) {
  const { error } = await db.from('bookings').update({ status: newStatus }).eq('id', bookingId)
  if (error) { alert('Error: ' + error.message); return }
