@@ -855,23 +855,24 @@
  loadServices()
  }
 
- // Stats 
+ // Stats
  async function loadStats() {
- const [users, bookings, reports, pending] = await Promise.all([
- db.from('profiles').select('id', { count: 'exact', head: true }),
- db.from('bookings').select('id', { count: 'exact', head: true }),
- db.from('reports').select('id', { count: 'exact', head: true }),
- db.from('profiles').select('id', { count: 'exact', head: true })
- .eq('role', 'vendor').eq('is_approved', false)
- ])
- const vendors = await db.from('profiles').select('id', { count: 'exact', head: true })
- .eq('role', 'vendor').eq('is_approved', true)
-
- document.getElementById('stat-users').textContent = users.count ?? '—'
- document.getElementById('stat-bookings').textContent = bookings.count ?? '—'
- document.getElementById('stat-reports').textContent = reports.count ?? '—'
- document.getElementById('stat-pending').textContent = pending.count ?? '—'
- document.getElementById('stat-vendors').textContent = vendors.count ?? '—'
+ try {
+   const [users, vendors, pending, bookings, reports] = await Promise.all([
+     db.from('profiles').select('id').limit(9999),
+     db.from('profiles').select('id').eq('role', 'vendor').eq('is_approved', true).limit(9999),
+     db.from('profiles').select('id').eq('role', 'vendor').eq('is_approved', false).limit(9999),
+     db.from('bookings').select('id').limit(9999),
+     db.from('reports').select('id').limit(9999)
+   ])
+   document.getElementById('stat-users').textContent = users.data?.length ?? 0
+   document.getElementById('stat-vendors').textContent = vendors.data?.length ?? 0
+   document.getElementById('stat-pending').textContent = pending.data?.length ?? 0
+   document.getElementById('stat-bookings').textContent = bookings.data?.length ?? 0
+   document.getElementById('stat-reports').textContent = reports.data?.length ?? 0
+ } catch(e) {
+   console.error('loadStats error:', e)
+ }
  }
 
  // Pending vendor approvals 
