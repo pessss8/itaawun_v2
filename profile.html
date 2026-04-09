@@ -123,8 +123,10 @@
  .info-row {
  display: flex;
  justify-content: space-between;
- padding: 8px 0;
+ align-items: flex-start;
+ padding: 10px 0;
  border-bottom: 1px solid #eee;
+ gap: 12px;
  }
 
  .info-row:last-child {
@@ -134,12 +136,17 @@
  .info-label {
  color: #666;
  font-size: 14px;
+ flex-shrink: 0;
+ min-width: 90px;
  }
 
  .info-value {
  color: #333;
  font-weight: 500;
  font-size: 14px;
+ text-align: right;
+ word-break: break-word;
+ max-width: 65%;
  }
 
  .edit-btn {
@@ -347,6 +354,13 @@
  <input type="text" id="editPhone">
  <label>Room Address</label>
  <input type="text" id="editRoomAddress" placeholder="Mahallah X, Block A, Level 1, Room 101">
+ <label>Gender</label>
+ <select id="editGender">
+ <option value="">-- Select Gender --</option>
+ <option value="male">Male</option>
+ <option value="female">Female</option>
+ <option value="prefer_not_to_say">Prefer not to say</option>
+ </select>
  <label>New Password (leave blank to keep current)</label>
  <input type="password" id="editPassword" placeholder="Min 6 characters">
  <div class="form-actions">
@@ -408,11 +422,12 @@
  const date = new Date(profile.created_at)
  document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
  }
- if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url
+ if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url + '?t=' + Date.now()
  document.getElementById('editFullName').value = profile.full_name || ''
  document.getElementById('editStudentId').value = profile.student_id || ''
  document.getElementById('editPhone').value = profile.phone || ''
  document.getElementById('editRoomAddress').value = profile.room_address || ''
+ document.getElementById('editGender').value = profile.gender || ''
  } else {
  document.getElementById('displayName').textContent = session.user.email
  }
@@ -457,8 +472,9 @@
  }
  }
 
+ const gender = document.getElementById('editGender').value
  const { error } = await db.from('profiles').upsert({
- id: currentUser.id, full_name: fullName, student_id: studentId, phone, room_address: roomAddress
+ id: currentUser.id, full_name: fullName, student_id: studentId, phone, room_address: roomAddress, gender
  })
 
  btn.disabled = false

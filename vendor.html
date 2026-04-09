@@ -554,7 +554,7 @@
  <div class="dropdown">
  <a href="profile.html"> My Profile</a>
  <a href="#" id="previewShopLink"> Preview My Shop</a>
- <a href="profile.html" class="vendor-link hidden" id="manageVendorLink"> Manage Vendors</a>
+ <a href="admin.html" class="hidden" id="adminDropdownLink"> Admin Dashboard</a>
  <hr class="divider">
  <a href="#" class="logout-link" onclick="doLogout()"> Logout</a>
  </div>
@@ -717,17 +717,16 @@
 
  // Load profile picture
  if (profile.avatar_url) {
- document.getElementById('profilePic').src = profile.avatar_url
+ document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
  }
 
  // Set preview shop link
  const previewShopLink = document.getElementById('previewShopLink')
  if (previewShopLink) previewShopLink.href = `shop.html?id=${currentUser.id}`
 
- // Show manage vendors link for admin users
+ // Show admin dashboard link for admin users
  if (profile.role === 'admin') {
- const manageVendorLink = document.getElementById('manageVendorLink')
- if (manageVendorLink) manageVendorLink.classList.remove('hidden')
+ document.getElementById('adminDropdownLink')?.classList.remove('hidden')
  }
 
  // Load all data

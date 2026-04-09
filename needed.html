@@ -617,7 +617,7 @@
  db.from('profiles').select('avatar_url').eq('id', user.id).single()
  .then(({ data }) => {
  if (data?.avatar_url) {
- document.getElementById('profilePic').src = data.avatar_url
+ document.getElementById('profilePic').src = data.avatar_url + '?t=' + Date.now()
  }
  })
  })
@@ -661,6 +661,20 @@
  const avatar = requester.avatar_url || 'assets/images/OIP.jpg'
  const category = r.category || 'writing'
  const priceVal = parseFloat(r.price) || 0
+ const isNeg = r.pricing_mode === 'negotiable' && r.price_min != null
+ const priceDisplay = isNeg
+   ? `RM${parseFloat(r.price_min).toFixed(2)} – RM${parseFloat(r.price_max || r.price_min).toFixed(2)} <span style="font-size:10px;color:#6b21a8">(negotiable)</span>`
+   : `RM${priceVal.toFixed(2)}`
+ const priceModalText = isNeg
+   ? `RM${parseFloat(r.price_min).toFixed(2)} – RM${parseFloat(r.price_max || r.price_min).toFixed(2)} (negotiable)`
+   : `RM${priceVal.toFixed(2)}`
+ const urgencyLabel = r.urgency ? r.urgency.replace(/_/g, ' ') : null
+ const urgencyBadge = urgencyLabel
+   ? `<span style="background:#fef3c7;color:#92400e;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:600;display:inline-block;margin-bottom:6px"> ${urgencyLabel}</span>`
+   : ''
+ const expiryStr = r.expires_at
+   ? `Expires: ${new Date(r.expires_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}`
+   : null
 
  return `
  <div class="request-card" data-category="${category}" data-price="${priceVal}">
@@ -668,14 +682,16 @@
  <div class="requester"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(requesterName)}</span></div>
  <div class="content">
  <h3>${escapeHtml(r.title)}</h3>
+ ${urgencyBadge}
  <p class="desc">${escapeHtml(r.description || '')}</p>
  <button class="moreBtn" onclick="toggleDesc(this)">More</button>
  <div class="extra-info">
  <p><strong>Location:</strong> ${escapeHtml(r.location || '—')}</p>
- <p><strong>Time Needed:</strong> ${escapeHtml(r.time || '—')}</p>
+ ${urgencyLabel ? `<p><strong>Urgency:</strong> ${escapeHtml(urgencyLabel)}</p>` : ''}
+ ${expiryStr ? `<p><strong>${escapeHtml(expiryStr)}</strong></p>` : ''}
  </div>
- <span class="price">RM${priceVal.toFixed(2)}</span>
- <button class="offerBtn" onclick="openModal('${escapeJs(r.title)}','${escapeJs(r.description || '')}','RM${priceVal.toFixed(2)}','${escapeJs(r.contact || '')}','${escapeJs(r.telegram || '')}','${escapeJs(r.whatsapp || '')}')">Offer Service</button>
+ <span class="price">${priceDisplay}</span>
+ <button class="offerBtn" onclick="openModal('${escapeJs(r.title)}','${escapeJs(r.description || '')}','${escapeJs(priceModalText)}','${escapeJs(r.contact || '')}','${escapeJs(r.telegram || '')}','${escapeJs(r.whatsapp || '')}')">Offer Service</button>
  </div>
  </div>`
  }).join('')
@@ -697,7 +713,7 @@
  currentUser = session.user
 
  const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
- if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
+ if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
  if (profile?.role === 'vendor') document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
  if (profile?.role === 'admin') document.getElementById('adminDropdownLink')?.classList.remove('hidden')
 
