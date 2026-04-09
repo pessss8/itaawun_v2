@@ -428,6 +428,7 @@
  <div class="dropdown">
  <a href="profile.html"> My Profile</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink"> Vendor Dashboard</a>
+ <a href="admin.html" class="hidden" id="adminDropdownLink"> Admin Dashboard</a>
  <hr class="divider">
  <a href="#" class="logout-link" onclick="doLogout()"> Logout</a>
  </div>
@@ -443,6 +444,7 @@
  <div class="tabs">
  <button class="tab-btn active" onclick="showTab('as-student')"> My Orders</button>
  <button class="tab-btn" onclick="showTab('as-vendor')"> Incoming Requests</button>
+ <button class="tab-btn" onclick="showTab('as-applications')"> My Applications</button>
  </div>
 
  <!-- Student view: bookings I made -->
@@ -452,6 +454,11 @@
 
  <!-- Vendor view: bookings made to my services -->
  <div id="tab-as-vendor" class="booking-list" style="display:none">
+ <div class="empty-state">Loading...</div>
+ </div>
+
+ <!-- Applications view: role applications I submitted -->
+ <div id="tab-as-applications" class="booking-list" style="display:none">
  <div class="empty-state">Loading...</div>
  </div>
 
@@ -492,10 +499,13 @@
 
  // Load profile for vendor link and avatar
  const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
- if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url
+ if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
  if (profile?.role === 'vendor' || profile?.role === 'admin') {
  const vendorLink = document.getElementById('vendorDropdownLink')
  if (vendorLink) vendorLink.classList.remove('hidden')
+ }
+ if (profile?.role === 'admin') {
+ document.getElementById('adminDropdownLink')?.classList.remove('hidden')
  }
 
  // Hide Incoming Requests tab for non-vendors
@@ -515,16 +525,18 @@
  function showTab(tab) {
  document.getElementById('tab-as-student').style.display = tab === 'as-student' ? 'flex' : 'none'
  document.getElementById('tab-as-vendor').style.display = tab === 'as-vendor' ? 'flex' : 'none'
+ document.getElementById('tab-as-applications').style.display = tab === 'as-applications' ? 'flex' : 'none'
+ if (tab === 'as-applications') loadApplications()
  document.querySelectorAll('.tab-btn').forEach((b, i) => {
- b.classList.toggle('active', (i === 0 && tab === 'as-student') || (i === 1 && tab === 'as-vendor'))
+ b.classList.toggle('active', (i === 0 && tab === 'as-student') || (i === 1 && tab === 'as-vendor') || (i === 2 && tab === 'as-applications'))
  })
  }
 
- // Load bookings I made (as student) 
+ // Load bookings I made (as student)
  async function loadStudentBookings() {
  const { data, error } = await db
  .from('bookings')
- .select('*, services(title, price, whatsapp)')
+ .select('*, services(title, price, whatsapp, category)')
  .eq('student_id', currentUser.id)
  .order('created_at', { ascending: false })
 
@@ -534,23 +546,47 @@
  return
  }
 
- container.innerHTML = data.map(b => {
- const svc = b.services || {}
- const canRate = b.status === 'done'
- const canCancel = b.status === 'pending'
- return `
- <div class="booking-card">
- <p class="svc-title">${svc.title || '(Service deleted)'}</p>
- <p class="meta"> ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
- ${b.note ? `<div class="note-text"> ${b.note}</div>` : ''}
- <div><span class="status-badge status-${b.status}">${b.status}</span></div>
- ${svc.price ? `<p class="meta"> RM ${svc.price}</p>` : ''}
- <div class="btn-row">
- ${canRate ? `<button class="btn-action btn-rate" onclick="openRatingModal('${b.id}','${b.vendor_id}')"> Rate</button>` : ''}
- ${canCancel ? `<button class="btn-action btn-cancel" onclick="updateStatus('${b.id}','cancelled','student')">Cancel</button>` : ''}
- </div>
- </div>`
- }).join('')
+ const SHORT_TERM = ['food', 'runner', 'printing']
+ const active = data.filter(b => ['pending','accepted'].includes(b.status))
+ const history = data.filter(b => ['done','cancelled'].includes(b.status))
+
+ function renderCard(b) {
+   const svc = b.services || {}
+   const canRate = b.status === 'done'
+   const isPending = b.status === 'pending'
+   // 3-min lock: short-term services cannot be cancelled after 3 minutes
+   const isShortTerm = SHORT_TERM.includes(svc.category)
+   const minsOld = (Date.now() - new Date(b.created_at).getTime()) / 60000
+   const cancelLocked = isShortTerm && minsOld > 3
+   const canCancel = isPending && !cancelLocked
+   const lockedMsg = isPending && cancelLocked
+     ? `<p class="meta" style="color:#dc2626;font-size:12px"> Cancellation locked — short-term orders cannot be cancelled after 3 minutes.</p>` : ''
+   return `
+   <div class="booking-card">
+   <p class="svc-title">${svc.title || '(Service deleted)'}</p>
+   <p class="meta"> ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+   ${b.note ? `<div class="note-text"> ${b.note}</div>` : ''}
+   <div><span class="status-badge status-${b.status}">${b.status}</span></div>
+   ${svc.price ? `<p class="meta"> RM ${svc.price}</p>` : ''}
+   ${lockedMsg}
+   <div class="btn-row">
+   ${canRate ? `<button class="btn-action btn-rate" onclick="openRatingModal('${b.id}','${b.vendor_id}')"> Rate</button>` : ''}
+   ${canCancel ? `<button class="btn-action btn-cancel" onclick="updateStatus('${b.id}','cancelled','student')"> Cancel</button>` : ''}
+   </div>
+   </div>`
+ }
+
+ let html = ''
+ if (active.length > 0) {
+   html += `<div style="width:100%;font-weight:600;color:#6b21a8;padding:4px 0 8px;font-size:15px;border-bottom:2px solid #e9d5ff;margin-bottom:8px"> Active Orders</div>`
+   html += active.map(renderCard).join('')
+ }
+ if (history.length > 0) {
+   html += `<div style="width:100%;font-weight:600;color:#888;padding:12px 0 8px;font-size:15px;border-bottom:1px solid #eee;margin-bottom:8px"> Past Orders</div>`
+   html += history.map(renderCard).join('')
+ }
+ if (!html) html = '<div class="empty-state">You have not made any bookings yet.</div>'
+ container.innerHTML = html
  }
 
  // Load bookings to my services (as vendor) 
@@ -636,7 +672,38 @@
  loadStudentBookings()
  }
 
- // Logout 
+ // Load role applications submitted by this user
+ async function loadApplications() {
+ const container = document.getElementById('tab-as-applications')
+ container.innerHTML = '<div class="empty-state">Loading...</div>'
+ const { data, error } = await db
+   .from('admin_applications')
+   .select('*')
+   .eq('user_id', currentUser.id)
+   .order('created_at', { ascending: false })
+ if (error || !data || data.length === 0) {
+   container.innerHTML = '<div class="empty-state">You have not submitted any role applications yet.</div>'
+   return
+ }
+ const roleLabels = {
+   vendor: '🛒 Vendor',
+   barista: '☕ Barista — Campus Cafe',
+   parcel: '📦 Parcel Hub Staff',
+   website_admin: '💻 Website Admin (CFSConnect)',
+   other: '📝 Other Official Work'
+ }
+ const statusColor = { pending: '#f59e0b', approved: '#16a34a', rejected: '#dc2626' }
+ container.innerHTML = data.map(a => `
+   <div class="booking-card">
+   <p class="svc-title">${roleLabels[a.position] || a.position}</p>
+   <p class="meta"> ${new Date(a.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+   ${a.reason ? `<div class="note-text"> "${a.reason}"</div>` : ''}
+   <div><span class="status-badge" style="background:${statusColor[a.status]||'#888'};color:#fff;border-radius:12px;padding:3px 12px;font-size:12px">${a.status}</span></div>
+   ${a.status === 'rejected' ? `<p class="meta" style="color:#dc2626;font-size:12px"> Rejected by admin. You may re-apply with updated qualifications.</p>` : ''}
+   </div>`).join('')
+ }
+
+ // Logout
  async function doLogout() {
  const { error } = await db.auth.signOut()
  if (error) { console.error('Logout error:', error) }

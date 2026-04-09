@@ -43,10 +43,12 @@
  }
  nav a:hover { text-decoration: underline; }
 
- /* Profile dropdown — hover-based, no JS needed */
+ /* Profile dropdown — click-based toggle */
  .profile-container {
  position: relative;
  display: inline-block;
+ padding: 8px;
+ margin: -8px;
  }
  .profile-pic {
  width: 40px; height: 40px;
@@ -63,24 +65,20 @@
  .dropdown {
  display: none;
  position: absolute;
- right: 0; top: 48px;
+ right: 0; top: 56px;
  background: white; color: #333;
  border-radius: 10px;
  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
- min-width: 160px;
+ min-width: 180px;
  z-index: 100;
  overflow: hidden;
- /* Smooth appear */
  animation: fadeIn 0.15s ease;
  }
+ .dropdown.open { display: block; }
  @keyframes fadeIn {
  from { opacity: 0; transform: translateY(-6px); }
  to { opacity: 1; transform: translateY(0); }
  }
- /* Show dropdown on hover */
- .profile-container:hover .dropdown { display: block; }
- /* Keep open when hovering the dropdown itself */
- .dropdown:hover { display: block; }
  .dropdown a {
  display: block; padding: 11px 16px;
  text-decoration: none; color: #333; font-size: 14px;
@@ -124,6 +122,7 @@
  .needed-btn:hover { background: #7326C8; }
  .vendor-btn { background: #059669; color: white; }
  .vendor-btn:hover { background: #047857; }
+ .hidden { display: none !important; }
  .vendor-btn.hidden { display: none; }
  .vendor-link.hidden { display: none; }
  .admin-link.hidden { display: none; }
@@ -208,10 +207,15 @@
  box-shadow: -5px 0 25px rgba(0,0,0,0.3);
  overflow-y: auto;
  }
- .slide-panel.active { display: block; animation: slideIn 0.3s ease; }
+ .slide-panel.active { display: block; animation: slideIn 0.3s ease forwards; }
+ .slide-panel.closing { display: block; animation: slideOut 0.28s ease forwards; }
  @keyframes slideIn {
  from { transform: translateX(100%); }
  to { transform: translateX(0); }
+ }
+ @keyframes slideOut {
+ from { transform: translateX(0); }
+ to { transform: translateX(100%); }
  }
  .slide-panel-content { padding: 25px; }
  .close-panel {
@@ -283,11 +287,11 @@
 
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
- <div class="profile-container" id="profileContainer">
+ <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic">
- <div class="dropdown">
+ <div class="dropdown" id="profileDropdown">
  <a href="profile.html">My Profile</a>
- <a href="bookings.html"> My Bookings</a>
+ <a href="bookings.html" id="myBookingsLink"> My Bookings</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
  <a href="admin.html" class="admin-link hidden" id="adminDropdownLink">Admin Dashboard</a>
  <hr class="divider">
@@ -329,7 +333,7 @@
  <label>Title</label>
  <input type="text" id="quickTitle" required>
  <label>Type</label>
- <select id="quickType" required>
+ <select id="quickType" required onchange="toggleServiceType(this.value)">
  <option value="offered">Service Offered (I provide this)</option>
  <option value="needed">Service Needed (I need this)</option>
  </select>
@@ -351,10 +355,25 @@
  </select>
  <label>Description</label>
  <textarea id="quickDesc" rows="3" required></textarea>
- <label>Price (RM)</label>
- <input type="number" id="quickPrice" step="0.5" required>
+ <label>Pricing</label>
+ <div style="display:flex;gap:8px;margin-bottom:8px;">
+ <button type="button" id="btnFixed" onclick="setPricingMode('fixed')" style="flex:1;padding:8px;border-radius:6px;border:2px solid #6b21a8;background:#6b21a8;color:#fff;cursor:pointer;font-size:13px;font-weight:600">Fixed</button>
+ <button type="button" id="btnNeg" onclick="setPricingMode('negotiable')" style="flex:1;padding:8px;border-radius:6px;border:2px solid #6b21a8;background:#fff;color:#6b21a8;cursor:pointer;font-size:13px;font-weight:600">Negotiable</button>
+ </div>
+ <div id="fixedPriceSection">
+ <input type="number" id="quickPrice" step="0.5" placeholder="Price (RM)">
+ </div>
+ <div id="negPriceSection" style="display:none">
+ <div style="display:flex;gap:8px;align-items:center;">
+ <input type="number" id="priceMin" step="0.5" placeholder="Min (RM)" style="margin-bottom:0">
+ <span style="color:#666;flex-shrink:0">–</span>
+ <input type="number" id="priceMax" step="0.5" placeholder="Max (RM)" style="margin-bottom:0">
+ </div>
+ </div>
  <label>Location</label>
  <input type="text" id="quickLocation" placeholder="e.g. Mahallah Z, B15" required>
+ <!-- Available Time (Service Offered only) -->
+ <div id="timeSlotSection">
  <label>Available Time</label>
  <div class="time-slots">
  <div class="time-slot">
@@ -369,6 +388,21 @@
  <span>-</span>
  <input type="time" id="weekendEnd" value="18:00">
  </div>
+ </div>
+ </div>
+ <!-- Urgency & Expiry (Service Needed only) -->
+ <div id="urgencySection" style="display:none">
+ <label>Urgency</label>
+ <select id="quickUrgency">
+ <option value="asap">ASAP — Need it urgently</option>
+ <option value="1_day">Within 1 day</option>
+ <option value="3_days">Within 3 days</option>
+ <option value="1_week">Within 1 week</option>
+ <option value="2_weeks">Within 2 weeks</option>
+ <option value="flexible">Flexible</option>
+ </select>
+ <label>Request Expires On <span style="font-size:11px;color:#999">(auto-removes after this date)</span></label>
+ <input type="date" id="quickExpiry">
  </div>
  <label>WhatsApp *</label>
  <input type="text" id="quickWhatsapp" placeholder="60123456789" required>
@@ -392,14 +426,16 @@
  <div class="slide-panel-content">
  <span class="close-panel" onclick="toggleApplyPanel()">&times;</span>
  <h2>Apply for a Role</h2>
- <p style="font-size:13px;color:#666;margin-bottom:16px">Want to sell services or work at a campus outlet? Apply here and an admin will review your request.</p>
+ <p style="font-size:13px;color:#666;margin-bottom:8px">Want to sell services or work at a campus outlet? Apply here and an admin will review your request.</p>
+ <p id="roleNote" style="font-size:12px;background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:8px;margin-bottom:16px;display:none"></p>
  <form id="applyRoleForm">
  <label>Role Applying For</label>
- <select id="applyPosition" required>
+ <select id="applyPosition" required onchange="toggleWorkRoles(this.value)">
  <option value="">Select Role</option>
  <option value="vendor"> Vendor (sell your services)</option>
- <option value="barista"> Barista (campus cafe)</option>
+ <option value="barista"> Barista — Campus Cafe</option>
  <option value="parcel"> Parcel Hub Staff</option>
+ <option value="website_admin"> Website Admin (CFSConnect)</option>
  <option value="other"> Other Official Work</option>
  </select>
  <label>Why do you want this role?</label>
@@ -408,6 +444,8 @@
  <textarea id="applyQualifications" rows="3" placeholder="Any related skills or experience..." required></textarea>
  <label>WhatsApp Contact *</label>
  <input type="text" id="applyWhatsapp" placeholder="60123456789" required>
+ <label>CV / Resume <span style="font-size:11px;color:#999">(optional — PDF or image)</span></label>
+ <input type="file" id="applyResume" accept=".pdf,.doc,.docx,image/*" style="padding:6px;">
  <button type="submit" class="submit-btn">Submit Application</button>
  </form>
  </div>
@@ -446,15 +484,16 @@
  document.getElementById('adminDropdownLink')?.classList.remove('hidden')
  }
 
- // Hide create FAB for pure students (only vendors and admins can create services)
+ // Hide create FAB and My Bookings for pure students
  if (profile?.role === 'student' || !profile) {
  const fab = document.getElementById('createFab') || document.querySelector('.fab-btn') || document.querySelector('[onclick="toggleCreatePopup()"]')
  if (fab) fab.style.display = 'none'
+ document.getElementById('myBookingsLink')?.classList.add('hidden')
  }
 
- // Load profile picture
+ // Load profile picture (cache-busted so new uploads reflect immediately)
  if (profile?.avatar_url) {
- document.getElementById('profilePic').src = profile.avatar_url
+ document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
  }
  })()
 
@@ -465,15 +504,40 @@
  }
 
  // Create service popup
+ function toggleDropdown(e) {
+ e.stopPropagation()
+ document.getElementById('profileDropdown').classList.toggle('open')
+ }
+ document.addEventListener('click', function() {
+ document.getElementById('profileDropdown')?.classList.remove('open')
+ })
+
+ function closePanel(id) {
+ const panel = document.getElementById(id)
+ if (!panel || !panel.classList.contains('active')) return
+ panel.classList.add('closing')
+ setTimeout(() => panel.classList.remove('active', 'closing'), 290)
+ }
+
  function toggleCreatePopup() {
  const panel = document.getElementById('createPanel')
- panel.classList.toggle('active')
+ closePanel('applyPanel')
+ if (panel.classList.contains('active')) {
+   closePanel('createPanel')
+ } else {
+   setTimeout(() => panel.classList.add('active'), panel.classList.contains('closing') ? 290 : 0)
+ }
  }
 
  // Apply for a Role popup
  function toggleApplyPanel() {
  const panel = document.getElementById('applyPanel')
- panel.classList.toggle('active')
+ closePanel('createPanel')
+ if (panel.classList.contains('active')) {
+   closePanel('applyPanel')
+ } else {
+   setTimeout(() => panel.classList.add('active'), panel.classList.contains('closing') ? 290 : 0)
+ }
  }
 
  // Quick create form submission
@@ -502,18 +566,42 @@
  }
  }
 
+ const svcType = document.getElementById('quickType').value
+ const isNeeded = svcType === 'needed'
+
+ // Time string (only for offered)
+ let timeStr = null
+ if (!isNeeded) {
  const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`
  const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`
+ timeStr = `${weekdayTime}, ${weekendTime}`
+ }
+
+ // Pricing
+ let finalPrice = null, priceMin = null, priceMax = null
+ if (_pricingMode === 'fixed') {
+ finalPrice = parseFloat(document.getElementById('quickPrice').value) || null
+ } else {
+ priceMin = parseFloat(document.getElementById('priceMin').value) || null
+ priceMax = parseFloat(document.getElementById('priceMax').value) || null
+ finalPrice = priceMin // store min as base price for display
+ }
 
  const serviceData = {
  vendor_id: currentUser.id,
- type: document.getElementById('quickType').value,
+ type: svcType,
  title: document.getElementById('quickTitle').value,
  category: document.getElementById('quickCategory').value,
  description: document.getElementById('quickDesc').value,
- price: parseFloat(document.getElementById('quickPrice').value),
+ price: finalPrice,
+ price_min: priceMin,
+ price_max: priceMax,
+ pricing_mode: _pricingMode,
  location: document.getElementById('quickLocation').value,
- time: `${weekdayTime}, ${weekendTime}`,
+ time: timeStr,
+ urgency: isNeeded ? document.getElementById('quickUrgency').value : null,
+ expires_at: isNeeded && document.getElementById('quickExpiry').value
+   ? new Date(document.getElementById('quickExpiry').value).toISOString() : null,
  whatsapp: document.getElementById('quickWhatsapp').value,
  telegram: document.getElementById('quickTelegram').value,
  contact: document.getElementById('quickEmail').value || null,
@@ -531,7 +619,7 @@
  return
  }
 
- alert('Service submitted! Waiting for admin approval.')
+ showToast(' Service submitted! Waiting for admin approval.')
  toggleCreatePopup()
  this.reset()
  })
@@ -545,12 +633,28 @@
  btn.disabled = true
  btn.textContent = 'Submitting...'
 
+ // Upload CV/Resume if provided
+ let resumeUrl = null
+ const resumeFile = document.getElementById('applyResume').files[0]
+ if (resumeFile) {
+ try {
+   const ext = resumeFile.name.split('.').pop()
+   const fileName = `resume_${currentUser.id}_${Date.now()}.${ext}`
+   const { error: upErr } = await db.storage.from('application-docs').upload(fileName, resumeFile)
+   if (!upErr) {
+   const { data: { publicUrl } } = db.storage.from('application-docs').getPublicUrl(fileName)
+   resumeUrl = publicUrl
+   }
+ } catch (err) { console.warn('Resume upload skipped:', err) }
+ }
+
  const { error } = await db.from('admin_applications').insert({
  user_id: currentUser.id,
  position: document.getElementById('applyPosition').value,
  reason: document.getElementById('applyReason').value,
  qualifications: document.getElementById('applyQualifications').value,
  whatsapp: document.getElementById('applyWhatsapp').value,
+ resume_url: resumeUrl,
  status: 'pending'
  })
 
@@ -562,10 +666,65 @@
  return
  }
 
- alert('Application submitted! Admin will review your request.')
+ showToast(' Application submitted! Admin will review your request.')
  toggleApplyPanel()
  this.reset()
  })
+
+ function toggleServiceType(val) {
+   const isNeeded = val === 'needed'
+   document.getElementById('timeSlotSection').style.display = isNeeded ? 'none' : 'block'
+   document.getElementById('urgencySection').style.display = isNeeded ? 'block' : 'none'
+   // Set a sensible default expiry (2 weeks from now) when switching to needed
+   if (isNeeded) {
+     const d = new Date(); d.setDate(d.getDate() + 14)
+     document.getElementById('quickExpiry').value = d.toISOString().split('T')[0]
+   }
+ }
+
+ let _pricingMode = 'fixed'
+ function setPricingMode(mode) {
+   _pricingMode = mode
+   const isNeg = mode === 'negotiable'
+   document.getElementById('fixedPriceSection').style.display = isNeg ? 'none' : 'block'
+   document.getElementById('negPriceSection').style.display = isNeg ? 'block' : 'none'
+   document.getElementById('btnFixed').style.background = isNeg ? '#fff' : '#6b21a8'
+   document.getElementById('btnFixed').style.color = isNeg ? '#6b21a8' : '#fff'
+   document.getElementById('btnNeg').style.background = isNeg ? '#6b21a8' : '#fff'
+   document.getElementById('btnNeg').style.color = isNeg ? '#fff' : '#6b21a8'
+ }
+
+ function toggleWorkRoles(val) {
+   const note = document.getElementById('roleNote')
+   if (!note) return
+   const msgs = {
+     vendor: '📋 <strong>Vendor Note:</strong> You must have a minimum CGPA of 3.5 to be approved as a vendor.',
+     barista: '☕ <strong>Barista:</strong> Familiarity with coffee-making and customer service is a plus.',
+     parcel: '📦 <strong>Parcel Hub Staff:</strong> Availability and attention to detail required.',
+     website_admin: '💻 <strong>Website Admin (CFSConnect):</strong> Web/tech skills preferred.',
+     other: '📝 Please describe your relevant qualifications in the fields below.'
+   }
+   if (val && msgs[val]) {
+     note.innerHTML = msgs[val]
+     note.style.display = 'block'
+   } else {
+     note.style.display = 'none'
+   }
+ }
+
+ function showToast(msg, duration = 3500) {
+   let toast = document.getElementById('homeToast')
+   if (!toast) {
+     toast = document.createElement('div')
+     toast.id = 'homeToast'
+     toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.3);transition:opacity 0.3s;pointer-events:none;'
+     document.body.appendChild(toast)
+   }
+   toast.textContent = msg
+   toast.style.opacity = '1'
+   clearTimeout(toast._t)
+   toast._t = setTimeout(() => { toast.style.opacity = '0' }, duration)
+ }
  </script>
 </body>
 </html>
