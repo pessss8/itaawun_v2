@@ -206,13 +206,14 @@
  </div>
 
  <div class="container">
- <h2>Create Your Service</h2>
+ <h2>Create Your Listing</h2>
  <form id="serviceForm">
- <label for="serviceType">Service Type</label>
- <select id="serviceType" required>
+
+ <label for="serviceType">What kind of listing is this?</label>
+ <select id="serviceType" required onchange="toggleServiceType(this.value)">
  <option value="">Select Type</option>
- <option value="offered">Service Offered</option>
- <option value="needed">Service Needed</option>
+ <option value="offered">Service Offered — I provide this</option>
+ <option value="needed">Service Needed — I need someone for this</option>
  </select>
 
  <label for="title">Title</label>
@@ -221,8 +222,21 @@
  <label for="desc">Description</label>
  <textarea id="desc" rows="4" required></textarea>
 
- <label for="price">Price (RM)</label>
- <input type="number" id="price" required>
+ <label>Pricing</label>
+ <div style="display:flex;gap:8px;margin-bottom:8px;">
+ <button type="button" id="btnFixed" onclick="setPricingMode('fixed')" style="flex:1;padding:9px;border-radius:6px;border:2px solid #6b21a8;background:#6b21a8;color:#fff;cursor:pointer;font-size:13px;font-weight:600">Fixed</button>
+ <button type="button" id="btnNeg" onclick="setPricingMode('negotiable')" style="flex:1;padding:9px;border-radius:6px;border:2px solid #6b21a8;background:#fff;color:#6b21a8;cursor:pointer;font-size:13px;font-weight:600">Negotiable / Range</button>
+ </div>
+ <div id="fixedPriceSection">
+ <input type="number" id="price" step="0.5" min="0" placeholder="Price (RM)">
+ </div>
+ <div id="negPriceSection" style="display:none">
+ <div style="display:flex;gap:8px;align-items:center;">
+ <input type="number" id="priceMin" step="0.5" min="0" placeholder="Min (RM)" style="margin-bottom:0">
+ <span style="color:#666;flex-shrink:0;font-size:16px">–</span>
+ <input type="number" id="priceMax" step="0.5" min="0" placeholder="Max (RM)" style="margin-bottom:0">
+ </div>
+ </div>
 
  <label for="category">Category</label>
  <select id="category" required>
@@ -242,24 +256,42 @@
  </select>
 
  <label for="location">Location</label>
- <input type="text" id="location" placeholder="City, Area, etc." required>
+ <input type="text" id="location" placeholder="e.g. Library, Kuliyyah, Online" required>
 
- <label for="time">Time Available</label>
+ <!-- Time Available — shown for Service Offered only -->
+ <div id="timeSlotSection">
+ <label>Time Available</label>
  <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:10px;">
  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
  <span style="font-size:13px;color:#555;min-width:80px;">Weekday:</span>
  <input type="time" id="weekdayStart" value="09:00" style="flex:1;margin:0;">
- <span>-</span>
+ <span>–</span>
  <input type="time" id="weekdayEnd" value="17:00" style="flex:1;margin:0;">
  </div>
  <div style="display:flex;align-items:center;gap:8px;">
  <span style="font-size:13px;color:#555;min-width:80px;">Weekend:</span>
  <input type="time" id="weekendStart" value="10:00" style="flex:1;margin:0;">
- <span>-</span>
+ <span>–</span>
  <input type="time" id="weekendEnd" value="18:00" style="flex:1;margin:0;">
  </div>
  </div>
- <input type="hidden" id="time" value="">
+ </div>
+
+ <!-- Urgency & Expiry — shown for Service Needed only -->
+ <div id="urgencySection" style="display:none">
+ <label>Urgency</label>
+ <select id="urgency">
+ <option value="asap">ASAP — Need it urgently</option>
+ <option value="1_day">Within 1 day</option>
+ <option value="3_days">Within 3 days</option>
+ <option value="1_week">Within 1 week</option>
+ <option value="2_weeks" selected>Within 2 weeks</option>
+ <option value="flexible">Flexible</option>
+ </select>
+ <label>Request Expiry Date</label>
+ <input type="date" id="expiry">
+ <p style="font-size:12px;color:#888;margin-top:4px;">After this date, the request will be automatically removed.</p>
+ </div>
 
  <label for="whatsapp">WhatsApp Number *</label>
  <input type="text" id="whatsapp" placeholder="60123456789" required>
@@ -267,21 +299,23 @@
  <label for="telegram">Telegram Username *</label>
  <input type="text" id="telegram" placeholder="username" required>
 
- <label for="image">Image</label>
+ <label for="image">Image (optional)</label>
  <div style="display:flex;flex-direction:column;gap:8px;">
  <input type="text" id="imageUrl" placeholder="Image URL">
- <span style="font-size:12px;color:#888;text-align:center;">- OR -</span>
+ <span style="font-size:12px;color:#888;text-align:center;">— OR —</span>
  <input type="file" id="imageFile" accept="image/*" style="padding:8px;">
  </div>
 
  <label for="contact">Email (optional)</label>
  <input type="email" id="contact" placeholder="your@email.com">
 
- <label style="margin-top:16px;font-weight:600">Product Variants <span style="font-weight:normal;font-size:12px;color:#888">(optional — e.g. Small/Large with different prices)</span></label>
+ <div id="variantsSection">
+ <label style="margin-top:8px;font-weight:600">Product Variants <span style="font-weight:normal;font-size:12px;color:#888">(optional)</span></label>
  <div id="variantsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
  <button type="button" onclick="addVariant()" style="background:#f3e8ff;color:#6b21a8;border:1.5px dashed #6b21a8;font-size:13px;padding:8px;margin-top:0;width:100%;">+ Add Variant Option</button>
+ </div>
 
- <button type="submit">Submit Service</button>
+ <button type="submit">Submit for Approval</button>
  </form>
  </div>
 
@@ -310,6 +344,29 @@
  document.getElementById('adminDropdownLink')?.classList.remove('hidden')
  }
  })()
+
+ // Service type toggle
+ function toggleServiceType(val) {
+   const isNeeded = val === 'needed'
+   document.getElementById('timeSlotSection').style.display = isNeeded ? 'none' : 'block'
+   document.getElementById('urgencySection').style.display = isNeeded ? 'block' : 'none'
+   document.getElementById('variantsSection').style.display = isNeeded ? 'none' : 'block'
+   if (isNeeded) {
+     const d = new Date(); d.setDate(d.getDate() + 14)
+     document.getElementById('expiry').value = d.toISOString().split('T')[0]
+   }
+ }
+
+ // Pricing mode toggle
+ let _pricingMode = 'fixed'
+ function setPricingMode(mode) {
+   _pricingMode = mode
+   const isNeg = mode === 'negotiable'
+   document.getElementById('fixedPriceSection').style.display = isNeg ? 'none' : 'block'
+   document.getElementById('negPriceSection').style.display = isNeg ? 'block' : 'none'
+   document.getElementById('btnFixed').style.cssText = `flex:1;padding:9px;border-radius:6px;border:2px solid #6b21a8;background:${isNeg ? '#fff' : '#6b21a8'};color:${isNeg ? '#6b21a8' : '#fff'};cursor:pointer;font-size:13px;font-weight:600`
+   document.getElementById('btnNeg').style.cssText = `flex:1;padding:9px;border-radius:6px;border:2px solid #6b21a8;background:${isNeg ? '#6b21a8' : '#fff'};color:${isNeg ? '#fff' : '#6b21a8'};cursor:pointer;font-size:13px;font-weight:600`
+ }
 
  // Variants management
  let variantCount = 0
@@ -342,93 +399,100 @@
  }
 
  document.getElementById("serviceForm").addEventListener("submit", async function (e) {
- e.preventDefault();
+ e.preventDefault()
+ if (!currentUser) { alert('Please login first.'); return }
 
- if (!currentUser) { alert('Please login first.'); return; }
+ const type = document.getElementById("serviceType").value
+ if (!type) { alert('Please select a service type.'); return }
 
- const type = document.getElementById("serviceType").value;
- const title = document.getElementById("title").value;
- const desc = document.getElementById("desc").value;
- const price = parseFloat(document.getElementById("price").value);
- const category = document.getElementById("category").value;
- const location = document.getElementById("location").value;
- const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`;
- const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`;
- const time = `${weekdayTime}, ${weekendTime}`;
- const contact = document.getElementById("contact").value || null;
- const whatsapp = document.getElementById("whatsapp").value;
- const telegram = document.getElementById("telegram").value;
+ const isNeeded = type === 'needed'
+ const title = document.getElementById("title").value
+ const desc = document.getElementById("desc").value
+ const category = document.getElementById("category").value
+ const location = document.getElementById("location").value
+ const contact = document.getElementById("contact").value || null
+ const whatsapp = document.getElementById("whatsapp").value
+ const telegram = document.getElementById("telegram").value
 
- const btn = this.querySelector('button[type="submit"]');
- const originalText = btn.textContent;
- btn.disabled = true;
- btn.textContent = 'Submitting...';
+ // Pricing
+ let finalPrice = null, priceMin = null, priceMax = null
+ if (_pricingMode === 'fixed') {
+   finalPrice = parseFloat(document.getElementById('price').value) || null
+ } else {
+   priceMin = parseFloat(document.getElementById('priceMin').value) || null
+   priceMax = parseFloat(document.getElementById('priceMax').value) || null
+   finalPrice = priceMin
+ }
+
+ // Time (offered only)
+ let time = null
+ if (!isNeeded) {
+   const wdTime = `Weekdays ${document.getElementById('weekdayStart').value}–${document.getElementById('weekdayEnd').value}`
+   const weTime = `Weekends ${document.getElementById('weekendStart').value}–${document.getElementById('weekendEnd').value}`
+   time = `${wdTime}, ${weTime}`
+ }
+
+ // Urgency + expiry (needed only)
+ const urgency = isNeeded ? document.getElementById('urgency').value : null
+ const expiryVal = isNeeded ? document.getElementById('expiry').value : null
+ const expires_at = expiryVal ? new Date(expiryVal).toISOString() : null
+
+ const btn = this.querySelector('button[type="submit"]')
+ const originalText = btn.textContent
+ btn.disabled = true
+ btn.textContent = 'Submitting...'
 
  // Handle image upload
- let image = document.getElementById("imageUrl").value;
- const imageFile = document.getElementById("imageFile").files[0];
+ let image = document.getElementById("imageUrl").value
+ const imageFile = document.getElementById("imageFile").files[0]
  if (imageFile) {
- try {
- const fileExt = imageFile.name.split('.').pop();
- const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
- const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile);
- if (!uploadError) {
- const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName);
- image = publicUrl;
+   try {
+     const fileExt = imageFile.name.split('.').pop()
+     const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`
+     const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile)
+     if (!uploadError) {
+       const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName)
+       image = publicUrl
+     }
+   } catch (err) { console.error('Image upload error:', err) }
  }
- } catch (err) {
- console.error('Image upload error:', err);
- }
- }
- if (!image) image = "https://via.placeholder.com/220x120";
+ if (!image) image = "https://via.placeholder.com/220x120"
 
- // Collect variants
+ // Collect variants (offered only)
  const variants = []
- document.querySelectorAll('#variantsList > div').forEach(row => {
- const name = row.querySelector('.variant-name')?.value.trim()
- const priceVal = parseFloat(row.querySelector('.variant-price')?.value)
- if (name && !isNaN(priceVal)) variants.push({ name, price: priceVal })
- })
+ if (!isNeeded) {
+   document.querySelectorAll('#variantsList > div').forEach(row => {
+     const name = row.querySelector('.variant-name')?.value.trim()
+     const priceVal = parseFloat(row.querySelector('.variant-price')?.value)
+     if (name && !isNaN(priceVal)) variants.push({ name, price: priceVal })
+   })
+ }
 
- // Insert into Supabase services table
  const serviceData = {
- vendor_id: currentUser.id,
- title: title,
- description: desc,
- price: price,
- category: category,
- location: location,
- time: time,
- contact: contact,
- whatsapp: whatsapp,
- telegram: telegram,
- image: image,
- type: type,
- status: 'pending', // Requires admin approval
- variants: variants.length > 0 ? variants : []
+   vendor_id: currentUser.id,
+   title, description: desc, price: finalPrice,
+   price_min: priceMin, price_max: priceMax, pricing_mode: _pricingMode,
+   category, location, time, contact, whatsapp, telegram, image,
+   type, status: 'pending',
+   variants: variants.length > 0 ? variants : [],
+   urgency, expires_at
  }
 
  const { error } = await db.from('services').insert(serviceData)
-
- btn.disabled = false;
- btn.textContent = originalText;
+ btn.disabled = false
+ btn.textContent = originalText
 
  if (error) {
- console.error('Supabase error details:', error)
- alert('Error submitting service: ' + error.message);
- return;
+   console.error('Submit error:', error)
+   alert('Error submitting: ' + error.message)
+   return
  }
 
- alert('Service submitted! Waiting for admin approval.');
- document.getElementById("serviceForm").reset();
-
- // Redirect based on service type
- if (type === 'needed') {
- window.location.href = 'needed.html';
- } else {
- window.location.href = 'find.html';
- }
- });
+ alert('Submitted! Waiting for admin approval.')
+ this.reset()
+ if (isNeeded) window.location.href = 'needed.html'
+ else window.location.href = 'find.html'
+ })
  </script>
 
 </body>
