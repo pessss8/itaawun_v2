@@ -96,8 +96,7 @@
  from { opacity: 0; transform: translateY(-6px); }
  to { opacity: 1; transform: translateY(0); }
  }
- .profile-container:hover .dropdown { display: block; }
- .dropdown:hover { display: block; }
+ .dropdown.open { display: block; }
  .dropdown a {
  display: block; padding: 11px 16px;
  text-decoration: none; color: #333; font-size: 14px;
@@ -293,6 +292,42 @@
  background: #4b5563;
  }
 
+ .btn-req-cancel {
+ background: #ea580c;
+ color: white;
+ }
+ .btn-req-cancel:hover {
+ background: #c2410c;
+ }
+
+ .cancel-form {
+ margin-top: 8px;
+ padding: 10px 12px;
+ background: #fff7ed;
+ border-radius: 8px;
+ border-left: 3px solid #f97316;
+ }
+ .cancel-form p {
+ margin: 0 0 6px;
+ font-size: 13px;
+ color: #9a3412;
+ font-weight: 600;
+ }
+ .cancel-form textarea {
+ width: calc(100% - 20px);
+ padding: 8px;
+ border: 1px solid #fed7aa;
+ border-radius: 6px;
+ font-size: 13px;
+ font-family: 'Segoe UI', sans-serif;
+ resize: none;
+ }
+ .cancel-form .form-btns {
+ display: flex;
+ gap: 8px;
+ margin-top: 8px;
+ }
+
  .btn-rate {
  background: #6b21a8;
  color: white;
@@ -423,9 +458,9 @@
 
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
- <div class="profile-container" id="profileContainer">
- <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic">
- <div class="dropdown">
+ <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
+ <div class="dropdown" id="profileDropdown">
  <a href="profile.html"> My Profile</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink"> Vendor Dashboard</a>
  <a href="admin.html" class="hidden" id="adminDropdownLink"> Admin Dashboard</a>
@@ -550,29 +585,56 @@
  const active = data.filter(b => ['pending','accepted'].includes(b.status))
  const history = data.filter(b => ['done','cancelled'].includes(b.status))
 
+ // Fetch pending cancellation requests for accepted bookings
+ const acceptedBookingIds = data.filter(b => b.status === 'accepted').map(b => b.id)
+ let pendingCancelSet = new Set()
+ if (acceptedBookingIds.length > 0) {
+   const { data: cancelReqs } = await db.from('cancellation_requests')
+     .select('booking_id')
+     .in('booking_id', acceptedBookingIds)
+     .eq('student_id', currentUser.id)
+     .eq('status', 'pending')
+   if (cancelReqs) cancelReqs.forEach(r => pendingCancelSet.add(r.booking_id))
+ }
+
  function renderCard(b) {
    const svc = b.services || {}
    const canRate = b.status === 'done'
    const isPending = b.status === 'pending'
+   const isAccepted = b.status === 'accepted'
+   const hasPendingCancel = pendingCancelSet.has(b.id)
    // 3-min lock: short-term services cannot be cancelled after 3 minutes
    const isShortTerm = SHORT_TERM.includes(svc.category)
    const minsOld = (Date.now() - new Date(b.created_at).getTime()) / 60000
    const cancelLocked = isShortTerm && minsOld > 3
    const canCancel = isPending && !cancelLocked
    const lockedMsg = isPending && cancelLocked
-     ? `<p class="meta" style="color:#dc2626;font-size:12px"> Cancellation locked — short-term orders cannot be cancelled after 3 minutes.</p>` : ''
+     ? `<p class="meta" style="color:#dc2626;font-size:12px">🔒 Cancellation locked — short-term orders cannot be cancelled after 3 minutes.</p>` : ''
    return `
-   <div class="booking-card">
+   <div class="booking-card" id="bcard-${b.id}">
    <p class="svc-title">${svc.title || '(Service deleted)'}</p>
-   <p class="meta"> ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-   ${b.note ? `<div class="note-text"> ${b.note}</div>` : ''}
-   <div><span class="status-badge status-${b.status}">${b.status}</span></div>
-   ${svc.price ? `<p class="meta"> RM ${svc.price}</p>` : ''}
+   <p class="meta">📅 ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+   ${b.note ? `<div class="note-text">📌 ${b.note}</div>` : ''}
+   <div>
+     <span class="status-badge status-${b.status}">${b.status}</span>
+     ${hasPendingCancel ? `<span class="status-badge status-pending" style="margin-left:6px">⏳ Cancel Requested</span>` : ''}
+   </div>
+   ${svc.price ? `<p class="meta">💰 RM ${svc.price}</p>` : ''}
    ${lockedMsg}
    <div class="btn-row">
-   ${canRate ? `<button class="btn-action btn-rate" onclick="openRatingModal('${b.id}','${b.vendor_id}')"> Rate</button>` : ''}
-   ${canCancel ? `<button class="btn-action btn-cancel" onclick="updateStatus('${b.id}','cancelled','student')"> Cancel</button>` : ''}
+   ${canRate ? `<button class="btn-action btn-rate" onclick="openRatingModal('${b.id}','${b.vendor_id}')">⭐ Rate</button>` : ''}
+   ${canCancel ? `<button class="btn-action btn-cancel" onclick="updateStatus('${b.id}','cancelled','student')">✕ Cancel</button>` : ''}
+   ${isAccepted && !hasPendingCancel ? `<button class="btn-action btn-req-cancel" onclick="toggleCancelForm('${b.id}')">✕ Request Cancel</button>` : ''}
    </div>
+   ${isAccepted && !hasPendingCancel ? `
+   <div id="cancelform-${b.id}" class="cancel-form" style="display:none">
+     <p>Reason for cancellation (required):</p>
+     <textarea id="cancelreason-${b.id}" rows="2" placeholder="e.g. Change of plans, no longer needed..."></textarea>
+     <div class="form-btns">
+       <button class="btn-action btn-reject" style="flex:1" onclick="submitCancelRequest('${b.id}','${b.vendor_id}')">Submit Request</button>
+       <button class="btn-action btn-cancel" style="flex:0.6;background:#9ca3af" onclick="toggleCancelForm('${b.id}')">Never mind</button>
+     </div>
+   </div>` : ''}
    </div>`
  }
 
@@ -589,7 +651,7 @@
  container.innerHTML = html
  }
 
- // Load bookings to my services (as vendor) 
+ // Load bookings to my services (as vendor)
  async function loadVendorBookings() {
  const { data, error } = await db
  .from('bookings')
@@ -609,22 +671,40 @@
  const nameMap = {}
  if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
 
+ // Fetch pending cancellation requests for accepted bookings
+ const acceptedIds = data.filter(b => b.status === 'accepted').map(b => b.id)
+ let cancelReqMap = {}
+ if (acceptedIds.length > 0) {
+   const { data: creqs } = await db.from('cancellation_requests')
+     .select('id, booking_id, reason, status')
+     .in('booking_id', acceptedIds)
+     .eq('status', 'pending')
+   if (creqs) creqs.forEach(r => { cancelReqMap[r.booking_id] = r })
+ }
+
  container.innerHTML = data.map(b => {
  const svc = b.services || {}
  const studentName = nameMap[b.student_id] || 'Student'
  const isPending = b.status === 'pending'
  const isAccepted = b.status === 'accepted'
+ const cancelReq = cancelReqMap[b.id]
  return `
  <div class="booking-card">
  <p class="svc-title">${svc.title || '(Service deleted)'}</p>
- <p class="meta"> ${studentName} &nbsp;|&nbsp; ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
- ${b.note ? `<div class="note-text"> "${b.note}"</div>` : ''}
- <div><span class="status-badge status-${b.status}">${b.status}</span></div>
- ${svc.price ? `<p class="meta"> RM ${svc.price}</p>` : ''}
+ <p class="meta">👤 ${studentName} &nbsp;|&nbsp; 📅 ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+ ${b.note ? `<div class="note-text">📌 "${b.note}"</div>` : ''}
+ <div>
+   <span class="status-badge status-${b.status}">${b.status}</span>
+   ${cancelReq ? `<span class="status-badge status-cancelled" style="margin-left:6px">⚠️ Cancel Requested</span>` : ''}
+ </div>
+ ${svc.price ? `<p class="meta">💰 RM ${svc.price}</p>` : ''}
+ ${cancelReq ? `<div class="note-text" style="border-left-color:#f97316;background:#fff7ed">📋 Student's reason: "${cancelReq.reason || '—'}"</div>` : ''}
  <div class="btn-row">
- ${isPending ? `<button class="btn-action btn-accept" onclick="updateStatus('${b.id}','accepted','vendor')"> Accept</button>` : ''}
- ${isPending ? `<button class="btn-action btn-reject" onclick="updateStatus('${b.id}','cancelled','vendor')"> Reject</button>` : ''}
- ${isAccepted ? `<button class="btn-action btn-done" onclick="updateStatus('${b.id}','done','vendor')"> Mark Done</button>` : ''}
+ ${isPending ? `<button class="btn-action btn-accept" onclick="updateStatus('${b.id}','accepted','vendor')">✓ Accept</button>` : ''}
+ ${isPending ? `<button class="btn-action btn-reject" onclick="updateStatus('${b.id}','cancelled','vendor')">✕ Reject</button>` : ''}
+ ${isAccepted && !cancelReq ? `<button class="btn-action btn-done" onclick="updateStatus('${b.id}','done','vendor')">✓ Mark Done</button>` : ''}
+ ${cancelReq ? `<button class="btn-action btn-accept" onclick="approveCancelRequest('${b.id}','${cancelReq.id}')">✓ Approve Cancel</button>` : ''}
+ ${cancelReq ? `<button class="btn-action btn-cancel" style="background:#6b7280" onclick="denyCancelRequest('${cancelReq.id}','${b.id}')">✕ Deny</button>` : ''}
  </div>
  </div>`
  }).join('')
@@ -702,6 +782,62 @@
    ${a.status === 'rejected' ? `<p class="meta" style="color:#dc2626;font-size:12px"> Rejected by admin. You may re-apply with updated qualifications.</p>` : ''}
    </div>`).join('')
  }
+
+ // Cancel request flow
+ function toggleCancelForm(bookingId) {
+   const form = document.getElementById('cancelform-' + bookingId)
+   if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none'
+ }
+
+ async function submitCancelRequest(bookingId, vendorId) {
+   const reasonEl = document.getElementById('cancelreason-' + bookingId)
+   const reason = reasonEl?.value.trim()
+   if (!reason) { showToast('Please provide a reason for cancellation.'); return }
+   const { error } = await db.from('cancellation_requests').insert({
+     booking_id: bookingId,
+     student_id: currentUser.id,
+     vendor_id: vendorId,
+     reason: reason,
+     status: 'pending'
+   })
+   if (error) { showToast('Error submitting request: ' + error.message); return }
+   showToast('✅ Cancellation request sent to vendor.')
+   loadStudentBookings()
+ }
+
+ async function approveCancelRequest(bookingId, requestId) {
+   await db.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId)
+   await db.from('cancellation_requests').update({ status: 'approved' }).eq('id', requestId)
+   showToast('✅ Cancellation approved. Booking cancelled.')
+   loadVendorBookings()
+ }
+
+ async function denyCancelRequest(requestId, bookingId) {
+   await db.from('cancellation_requests').update({ status: 'denied' }).eq('id', requestId)
+   showToast('❌ Cancellation request denied. Order continues.')
+   loadVendorBookings()
+ }
+
+ // Toast notification
+ function showToast(msg) {
+   let t = document.getElementById('bookingsToast')
+   if (!t) {
+     t = document.createElement('div')
+     t.id = 'bookingsToast'
+     t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e1b4b;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);opacity:0;transition:opacity 0.3s'
+     document.body.appendChild(t)
+   }
+   t.textContent = msg
+   t.style.opacity = '1'
+   clearTimeout(t._timer)
+   t._timer = setTimeout(() => { t.style.opacity = '0' }, 3000)
+ }
+
+ function toggleDropdown(e) {
+   e.stopPropagation()
+   document.getElementById('profileDropdown').classList.toggle('open')
+ }
+ document.addEventListener('click', () => document.getElementById('profileDropdown')?.classList.remove('open'))
 
  // Logout
  async function doLogout() {

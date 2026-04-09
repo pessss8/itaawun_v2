@@ -464,6 +464,7 @@
  <tr>
  <th>Title</th>
  <th>Vendor</th>
+ <th>Type</th>
  <th>Category</th>
  <th>Price</th>
  <th>Action</th>
@@ -471,7 +472,7 @@
  </thead>
  <tbody id="tbody-services-pending">
  <tr class="empty-row">
- <td colspan="5">Loading...</td>
+ <td colspan="6">Loading...</td>
  </tr>
  </tbody>
  </table>
@@ -773,7 +774,7 @@
  const countEl = document.getElementById('pending-services-count')
 
  if (!pending || pending.length === 0) {
- tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">No pending services. All clear!</td></tr>'
+ tbPending.innerHTML = '<tr class="empty-row"><td colspan="6">No pending services. All clear!</td></tr>'
  if (countEl) countEl.textContent = ''
  } else {
  const pVendorIds = [...new Set(pending.map(s => s.vendor_id))]
@@ -785,6 +786,7 @@
  <tr>
  <td><strong>${s.title || '—'}</strong><br><span style="font-size:11px;color:#666">${(s.description || '').slice(0, 60)}${s.description?.length > 60 ? '…' : ''}</span></td>
  <td>${pNameMap[s.vendor_id] || s.vendor_id?.slice(0, 8) + '…'}</td>
+ <td><span class="status-badge s-${s.type === 'offered' ? 'vendor' : 'student'}">${s.type || '—'}</span></td>
  <td>${s.category || '—'}</td>
  <td>RM${parseFloat(s.price || 0).toFixed(2)}</td>
  <td>

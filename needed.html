@@ -94,8 +94,7 @@
  from { opacity: 0; transform: translateY(-6px); }
  to { opacity: 1; transform: translateY(0); }
  }
- .profile-container:hover .dropdown { display: block; }
- .dropdown:hover { display: block; }
+ .dropdown.open { display: block; }
  .dropdown a {
  display: block; padding: 11px 16px;
  text-decoration: none; color: #333; font-size: 14px;
@@ -506,9 +505,9 @@
 
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
- <div class="profile-container" id="profileContainer">
- <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic">
- <div class="dropdown">
+ <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
+ <div class="dropdown" id="profileDropdown">
  <a href="profile.html">My Profile</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
  <a href="admin.html" class="admin-link hidden" id="adminDropdownLink">Admin Dashboard</a>
@@ -604,31 +603,18 @@
  let currentUser = null
  let allRequests = []
 
- // Auth check
- db.auth.getSession().then(({ data: { session } }) => {
- if (!session) { window.location.href = 'index.html'; return }
- currentUser = session.user
+ // Load requests immediately — public data, no auth required
  loadRequests()
- })
 
- // Load profile picture
- db.auth.getUser().then(({ data: { user } }) => {
- if (!user) return
- db.from('profiles').select('avatar_url').eq('id', user.id).single()
- .then(({ data }) => {
- if (data?.avatar_url) {
- document.getElementById('profilePic').src = data.avatar_url + '?t=' + Date.now()
- }
- })
- })
-
- // Load requests from Supabase 
+ // Load requests from Supabase
  async function loadRequests() {
+ const now = new Date().toISOString()
  const { data, error } = await db
  .from('services')
  .select('*')
  .eq('status', 'active')
  .eq('type', 'needed')
+ .or(`expires_at.is.null,expires_at.gt.${now}`)
  .order('created_at', { ascending: false })
 
  const container = document.getElementById('requestList')
@@ -682,6 +668,7 @@
  <div class="requester"><img src="${avatar}" alt="profile" onerror="this.src='assets/images/OIP.jpg'"><span>${escapeHtml(requesterName)}</span></div>
  <div class="content">
  <h3>${escapeHtml(r.title)}</h3>
+ <span style="display:inline-block;background:#f97316;color:#fff;border-radius:10px;padding:2px 10px;font-size:10px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">SERVICE NEEDED</span>
  ${urgencyBadge}
  <p class="desc">${escapeHtml(r.description || '')}</p>
  <button class="moreBtn" onclick="toggleDesc(this)">More</button>
@@ -706,18 +693,16 @@
  return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"')
  }
 
- // Auth check with vendor link
- (async function initNeeded() {
+ // Auth check (for dropdown links and avatar only)
+ ;(async function initNeeded() {
  const { data: { session } } = await db.auth.getSession()
- if (!session) { window.location.href = 'index.html'; return }
+ if (!session) return // Not logged in — can still browse requests
  currentUser = session.user
 
- const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
+ const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).maybeSingle()
  if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
  if (profile?.role === 'vendor') document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
  if (profile?.role === 'admin') document.getElementById('adminDropdownLink')?.classList.remove('hidden')
-
- loadRequests()
  })()
 
  // Description toggle
@@ -788,6 +773,12 @@
  renderRequests(filtered, profileMap)
  })
  }
+
+ function toggleDropdown(e) {
+   e.stopPropagation()
+   document.getElementById('profileDropdown').classList.toggle('open')
+ }
+ document.addEventListener('click', () => document.getElementById('profileDropdown')?.classList.remove('open'))
 
  // Logout
  async function doLogout() {

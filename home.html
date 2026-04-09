@@ -288,7 +288,7 @@
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
  <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
- <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
  <div class="dropdown" id="profileDropdown">
  <a href="profile.html">My Profile</a>
  <a href="bookings.html" id="myBookingsLink"> My Bookings</a>
@@ -429,15 +429,25 @@
  <p style="font-size:13px;color:#666;margin-bottom:8px">Want to sell services or work at a campus outlet? Apply here and an admin will review your request.</p>
  <p id="roleNote" style="font-size:12px;background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:8px;margin-bottom:16px;display:none"></p>
  <form id="applyRoleForm">
- <label>Role Applying For</label>
- <select id="applyPosition" required onchange="toggleWorkRoles(this.value)">
- <option value="">Select Role</option>
- <option value="vendor"> Vendor (sell your services)</option>
- <option value="barista"> Barista — Campus Cafe</option>
- <option value="parcel"> Parcel Hub Staff</option>
- <option value="website_admin"> Website Admin (CFSConnect)</option>
- <option value="other"> Other Official Work</option>
+ <label>Role Type</label>
+ <select id="applyCategory" required onchange="toggleRoleCategory(this.value)">
+ <option value="">Select Role Type</option>
+ <option value="vendor">🛒 Vendor (sell your services)</option>
+ <option value="parttime">💼 Part-time Job</option>
  </select>
+ <!-- Part-time sub-dropdown (hidden until Part-time is selected) -->
+ <div id="parttimeSubSection" style="display:none;margin-top:4px">
+ <label>Which Position?</label>
+ <select id="applyPartTimeRole">
+ <option value="">Select Position</option>
+ <option value="barista">☕ Barista — Campus Cafe</option>
+ <option value="parcel">📦 Parcel Hub Staff</option>
+ <option value="website_admin">💻 Website Admin (CFSConnect)</option>
+ <option value="library_assistant">📚 Library Assistant</option>
+ <option value="sports_facility">🏟 Sports Facility Staff</option>
+ <option value="other_work">📝 Others (specify below)</option>
+ </select>
+ </div>
  <label>Why do you want this role?</label>
  <textarea id="applyReason" rows="4" placeholder="Tell us why you're interested..." required></textarea>
  <label>Your Relevant Experience / Qualifications</label>
@@ -648,9 +658,15 @@
  } catch (err) { console.warn('Resume upload skipped:', err) }
  }
 
+ // Derive final position from two-tier dropdown
+ const category = document.getElementById('applyCategory').value
+ const position = category === 'parttime'
+ ? (document.getElementById('applyPartTimeRole').value || 'parttime')
+ : category
+
  const { error } = await db.from('admin_applications').insert({
  user_id: currentUser.id,
- position: document.getElementById('applyPosition').value,
+ position: position,
  reason: document.getElementById('applyReason').value,
  qualifications: document.getElementById('applyQualifications').value,
  whatsapp: document.getElementById('applyWhatsapp').value,
@@ -694,21 +710,20 @@
    document.getElementById('btnNeg').style.color = isNeg ? '#fff' : '#6b21a8'
  }
 
- function toggleWorkRoles(val) {
+ function toggleRoleCategory(val) {
    const note = document.getElementById('roleNote')
-   if (!note) return
-   const msgs = {
-     vendor: '📋 <strong>Vendor Note:</strong> You must have a minimum CGPA of 3.5 to be approved as a vendor.',
-     barista: '☕ <strong>Barista:</strong> Familiarity with coffee-making and customer service is a plus.',
-     parcel: '📦 <strong>Parcel Hub Staff:</strong> Availability and attention to detail required.',
-     website_admin: '💻 <strong>Website Admin (CFSConnect):</strong> Web/tech skills preferred.',
-     other: '📝 Please describe your relevant qualifications in the fields below.'
-   }
-   if (val && msgs[val]) {
-     note.innerHTML = msgs[val]
+   const parttimeSec = document.getElementById('parttimeSubSection')
+   if (val === 'vendor') {
+     note.innerHTML = '📋 <strong>Vendor Note:</strong> You must have a minimum CGPA of 3.5 to be approved as a vendor.'
      note.style.display = 'block'
+     parttimeSec.style.display = 'none'
+   } else if (val === 'parttime') {
+     note.innerHTML = '💼 <strong>Part-time Job:</strong> Select the specific position below. Relevant experience is a plus.'
+     note.style.display = 'block'
+     parttimeSec.style.display = 'block'
    } else {
      note.style.display = 'none'
+     parttimeSec.style.display = 'none'
    }
  }
 

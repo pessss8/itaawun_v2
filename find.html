@@ -96,8 +96,7 @@
  from { opacity: 0; transform: translateY(-6px); }
  to { opacity: 1; transform: translateY(0); }
  }
- .profile-container:hover .dropdown { display: block; }
- .dropdown:hover { display: block; }
+ .dropdown.open { display: block; }
  .dropdown a {
  display: block; padding: 11px 16px;
  text-decoration: none; color: #333; font-size: 14px;
@@ -557,9 +556,9 @@
 
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
- <div class="profile-container" id="profileContainer">
- <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic">
- <div class="dropdown">
+ <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
+ <div class="dropdown" id="profileDropdown">
  <a href="profile.html">My Profile</a>
  <a href="bookings.html">My Bookings</a>
  <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
@@ -653,16 +652,16 @@
  let pendingBook = { serviceId: null, vendorId: null, title: '' }
  var allServices = []
 
- // Auth check
- (async function initFind() {
- const { data: { session } } = await db.auth.getSession()
- if (!session) { window.location.href = 'index.html'; return }
- currentUser = session.user
-
- // Load services immediately (don't wait for profile fetch)
+ // Load services immediately — public data, no auth required
  loadServices()
 
- // Load profile for dropdown links and avatar (in parallel)
+ // Auth check (for booking and dropdown links only)
+ ;(async function initFind() {
+ const { data: { session } } = await db.auth.getSession()
+ if (!session) return // Not logged in — can browse, just can't book
+ currentUser = session.user
+
+ // Load profile for dropdown links and avatar
  const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).maybeSingle()
  if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
  if (profile?.role === 'vendor') {
@@ -884,9 +883,12 @@
  function contactWhatsApp() { window.open('https://wa.me/' + modalData.whatsapp, '_blank') }
  function contactTelegram() { window.open('https://t.me/' + modalData.telegram, '_blank') }
 
- // Book Modal 
+ // Book Modal
  function openBookModal(title, serviceId, vendorId) {
- if (!currentUser) { window.location.href = 'index.html'; return }
+ if (!currentUser) {
+ showToast('Please log in to book this service.')
+ return
+ }
  pendingBook = { serviceId, vendorId, title }
  document.getElementById('bookModalTitle').textContent = 'Book: ' + title
  document.getElementById('bookNote').value = ''
@@ -911,10 +913,30 @@
  btn.disabled = false
  btn.textContent = ' Confirm Booking'
 
- if (error) { alert('Booking failed: ' + error.message); return }
+ if (error) { showToast('Booking failed: ' + error.message); return }
  closeBookModal()
- alert(' Booking sent! The vendor will respond soon. Check "My Bookings" to track it.')
+ showToast(' Booking sent! Check My Bookings to track it.')
  }
+
+ function showToast(msg, duration = 3500) {
+ let t = document.getElementById('findToast')
+ if (!t) {
+ t = document.createElement('div')
+ t.id = 'findToast'
+ t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.3);transition:opacity 0.3s;pointer-events:none;'
+ document.body.appendChild(t)
+ }
+ t.textContent = msg
+ t.style.opacity = '1'
+ clearTimeout(t._to)
+ t._to = setTimeout(() => { t.style.opacity = '0' }, duration)
+ }
+
+ function toggleDropdown(e) {
+   e.stopPropagation()
+   document.getElementById('profileDropdown').classList.toggle('open')
+ }
+ document.addEventListener('click', () => document.getElementById('profileDropdown')?.classList.remove('open'))
 
  async function doLogout() {
  const { error } = await db.auth.signOut()
