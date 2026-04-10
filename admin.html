@@ -715,23 +715,30 @@
 
  // Auth + Admin Gate 
  (async function initAdmin() {
- const { data: { session } } = await db.auth.getSession()
- if (!session) { window.location.href = 'index.html'; return }
+ try {
+   const { data, error: sessErr } = await db.auth.getSession()
+   if (sessErr) { console.error('Session error:', sessErr); window.location.href = 'index.html'; return }
+   const session = data?.session
+   if (!session) { window.location.href = 'index.html'; return }
 
- currentUser = session.user
+   currentUser = session.user
 
- const { data: profile, error } = await db
- .from('profiles').select('role, avatar_url').eq('id', session.user.id).single()
+   const { data: profile, error } = await db
+     .from('profiles').select('role, avatar_url').eq('id', session.user.id).maybeSingle()
 
- if (error || !profile || profile.role !== 'admin') {
- alert('Access denied. Admins only.')
- window.location.href = 'home.html'
- return
+   if (error || !profile || profile.role !== 'admin') {
+     console.error('Admin check failed:', error || 'role=' + profile?.role)
+     alert('Access denied. Admins only.')
+     window.location.href = 'home.html'
+     return
+   }
+
+   if (profile.avatar_url) document.getElementById('adminProfilePic').src = profile.avatar_url + '?t=' + Date.now()
+
+   loadAll()
+ } catch(e) {
+   console.error('initAdmin fatal error:', e)
  }
-
- if (profile.avatar_url) document.getElementById('adminProfilePic').src = profile.avatar_url + '?t=' + Date.now()
-
- loadAll()
  })()
 
  function toggleAdminDropdown(e) {
@@ -765,6 +772,7 @@
 
  // Services
  async function loadServices() {
+ try {
  // -- Pending services section --
  const { data: pending, error: pendErr } = await db
  .from('services').select('*').eq('status', 'pending')
@@ -827,6 +835,13 @@
  <button class="btn-sm btn-suspend" onclick="deleteService('${s.id}')">Delete</button>
  </td>
  </tr>`).join('')
+ } catch(e) {
+ console.error('loadServices error:', e)
+ const tbPending = document.getElementById('tbody-services-pending')
+ const tb = document.getElementById('tbody-services')
+ if (tbPending) tbPending.innerHTML = '<tr class="empty-row"><td colspan="6">Error loading services.</td></tr>'
+ if (tb) tb.innerHTML = '<tr class="empty-row"><td colspan="6">Error loading services.</td></tr>'
+ }
  }
 
  async function approveService(id) {
@@ -875,8 +890,9 @@
  }
  }
 
- // Pending vendor approvals 
+ // Pending vendor approvals
  async function loadPendingVendors() {
+ try {
  const { data } = await db.from('profiles').select('*')
  .eq('role', 'vendor').eq('is_approved', false)
  const tb = document.getElementById('tbody-pending')
@@ -900,10 +916,16 @@
  <button class="btn-sm btn-suspend" onclick="rejectVendor('${u.id}')"> Reject</button>
  </td>
  </tr>`).join('')
+ } catch(e) {
+ console.error('loadPendingVendors error:', e)
+ const tb = document.getElementById('tbody-pending')
+ if (tb) tb.innerHTML = '<tr class="empty-row"><td colspan="5">Error loading vendor applications.</td></tr>'
+ }
  }
 
- // Approved vendors 
+ // Approved vendors
  async function loadApprovedVendors() {
+ try {
  const { data } = await db.from('profiles').select('*')
  .eq('role', 'vendor').eq('is_approved', true)
  const tb = document.getElementById('tbody-vendors')
@@ -930,10 +952,16 @@
  <button class="btn-sm btn-suspend" onclick="suspendVendor('${u.id}')">Suspend</button>
  </td>
  </tr>`).join('')
+ } catch(e) {
+ console.error('loadApprovedVendors error:', e)
+ const tb = document.getElementById('tbody-vendors')
+ if (tb) tb.innerHTML = '<tr class="empty-row"><td colspan="6">Error loading approved vendors.</td></tr>'
+ }
  }
 
- // All users 
+ // All users
  async function loadAllUsers() {
+ try {
  const { data } = await db.from('profiles').select('*').order('created_at', { ascending: false })
  const tb = document.getElementById('tbody-users')
  if (!data || data.length === 0) {
@@ -951,10 +979,16 @@
  <button class="btn-sm btn-save" onclick="saveCgpaUser('${u.id}')">Save</button>
  </td>
  </tr>`).join('')
+ } catch(e) {
+ console.error('loadAllUsers error:', e)
+ const tb = document.getElementById('tbody-users')
+ if (tb) tb.innerHTML = '<tr class="empty-row"><td colspan="5">Error loading users.</td></tr>'
+ }
  }
 
- // Bookings 
+ // Bookings
  async function loadBookings() {
+ try {
  const { data } = await db.from('bookings')
  .select('*, services(title)')
  .order('created_at', { ascending: false })
@@ -978,10 +1012,16 @@
  <td><span class="status-badge s-${b.status}">${b.status}</span></td>
  <td>${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
  </tr>`).join('')
+ } catch(e) {
+ console.error('loadBookings error:', e)
+ const tb = document.getElementById('tbody-bookings')
+ if (tb) tb.innerHTML = '<tr class="empty-row"><td colspan="5">Error loading bookings.</td></tr>'
+ }
  }
 
- // Reports 
+ // Reports
  async function loadReports() {
+ try {
  const { data } = await db.from('reports').select('*').order('created_at', { ascending: false })
  const tb = document.getElementById('tbody-reports')
  if (!data || data.length === 0) {
@@ -995,6 +1035,11 @@
  <td>${new Date(r.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short' })}</td>
  <td><button class="btn-sm btn-suspend" onclick="dismissReport('${r.id}')">Dismiss</button></td>
  </tr>`).join('')
+ } catch(e) {
+ console.error('loadReports error:', e)
+ const tb = document.getElementById('tbody-reports')
+ if (tb) tb.innerHTML = '<tr class="empty-row"><td colspan="5">Error loading reports.</td></tr>'
+ }
  }
 
  // Actions 
@@ -1037,8 +1082,9 @@
  }
 
 
- // Asnaf Verifications 
+ // Asnaf Verifications
  async function loadAsnafVerifications() {
+ try {
  const { data: pending } = await db
  .from('verifications')
  .select('*')
@@ -1082,6 +1128,13 @@
  <td>Admin</td>
  <td>${new Date(u.updated_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
  </tr>`).join('')
+ }
+ } catch(e) {
+ console.error('loadAsnafVerifications error:', e)
+ const tbPending = document.getElementById('tbody-asnaf-pending')
+ const tbVerified = document.getElementById('tbody-asnaf-verified')
+ if (tbPending) tbPending.innerHTML = '<tr class="empty-row"><td colspan="5">Error loading verifications.</td></tr>'
+ if (tbVerified) tbVerified.innerHTML = '<tr class="empty-row"><td colspan="4">Error loading verifications.</td></tr>'
  }
  }
 

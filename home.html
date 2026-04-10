@@ -470,7 +470,10 @@
 
  // Protect page and check role
  (async function initHome() {
- const { data: { session } } = await db.auth.getSession()
+ try {
+ const { data, error: sessErr } = await db.auth.getSession()
+ if (sessErr) { console.error('Session error:', sessErr); window.location.href = 'index.html'; return }
+ const session = data?.session
  if (!session) {
  window.location.href = 'index.html'
  return
@@ -504,6 +507,9 @@
  // Load profile picture (cache-busted so new uploads reflect immediately)
  if (profile?.avatar_url) {
  document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
+ }
+ } catch(e) {
+ console.error('initHome fatal error:', e)
  }
  })()
 
