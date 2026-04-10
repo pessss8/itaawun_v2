@@ -2,178 +2,178 @@
 <html lang="en">
 
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>iTa'awun - Login</title>
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <style>
- body {
- font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
- margin: 0;
- height: 100vh;
- display: flex;
- justify-content: center;
- align-items: center;
- background: linear-gradient(135deg, rgba(0, 31, 63, 0.85), #6A5ACD),
- url('assets/images/bi1.png') no-repeat center center / cover;
- }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iTa'awun - Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0, 31, 63, 0.85), #6A5ACD),
+                url('assets/images/bi1.png') no-repeat center center / cover;
+        }
 
- .login-container {
- background: #fff;
- padding: 40px;
- border-radius: 15px;
- box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
- width: 360px;
- text-align: center;
- }
+        .login-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            width: 360px;
+            text-align: center;
+        }
 
- .logo {
- font-size: 28px;
- font-weight: bold;
- color: #001f3f;
- margin-bottom: 10px;
- }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #001f3f;
+            margin-bottom: 10px;
+        }
 
- .tagline {
- font-size: 14px;
- color: #666;
- margin-bottom: 25px;
- }
+        .tagline {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
 
- h2 {
- margin-bottom: 20px;
- color: #001f3f;
- }
+        h2 {
+            margin-bottom: 20px;
+            color: #001f3f;
+        }
 
- input {
- width: 90%;
- padding: 12px;
- margin: 10px 0;
- border: 1px solid #ccc;
- border-radius: 8px;
- font-size: 14px;
- }
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
 
- button {
- width: 100%;
- padding: 12px;
- background: #001f3f;
- color: #fff;
- border: none;
- border-radius: 8px;
- cursor: pointer;
- font-size: 16px;
- transition: 0.3s;
- }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #001f3f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
 
- button:hover {
- background: #003366;
- }
+        button:hover {
+            background: #003366;
+        }
 
- button:disabled {
- opacity: 0.6;
- cursor: not-allowed;
- }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
- #msg {
- min-height: 20px;
- font-size: 13px;
- margin: 8px 0;
- padding: 6px 10px;
- border-radius: 6px;
- }
+        #msg {
+            min-height: 20px;
+            font-size: 13px;
+            margin: 8px 0;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
 
- #msg.error {
- background: #fef2f2;
- color: #dc2626;
- }
+        #msg.error {
+            background: #fef2f2;
+            color: #dc2626;
+        }
 
- #msg.success {
- background: #f0fdf4;
- color: #16a34a;
- }
+        #msg.success {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
 
- .links {
- margin-top: 15px;
- font-size: 14px;
- }
+        .links {
+            margin-top: 15px;
+            font-size: 14px;
+        }
 
- .links a {
- color: #6b21a8;
- text-decoration: none;
- margin: 0 8px;
- }
+        .links a {
+            color: #6b21a8;
+            text-decoration: none;
+            margin: 0 8px;
+        }
 
- .links a:hover {
- text-decoration: underline;
- }
+        .links a:hover {
+            text-decoration: underline;
+        }
 
- .divider {
- border: none;
- border-top: 1px solid #eee;
- margin: 16px 0;
- }
- </style>
+        .divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 16px 0;
+        }
+    </style>
 </head>
 
 <body>
- <div class="login-container">
- <div class="logo">iTa'awun</div>
- <div class="tagline">Student Freelance Collaboration</div>
- <h2>Login</h2>
+    <div class="login-container">
+        <div class="logo">iTa'awun</div>
+        <div class="tagline">Student Freelance Collaboration</div>
+        <h2>Login</h2>
 
- <div id="msg"></div>
- <input id="email" type="email" placeholder="Email">
- <input id="pass" type="password" placeholder="Password">
- <button id="btn-login" onclick="doLogin()">Login</button>
+        <div id="msg"></div>
+        <input id="email" type="email" placeholder="Email">
+        <input id="pass" type="password" placeholder="Password">
+        <button id="btn-login" onclick="doLogin()">Login</button>
 
- <hr class="divider">
- <div class="links">
- <a href="signup.html">Create Account</a> | <a href="forgot.html">Forgot Password?</a>
- </div>
- </div>
+        <hr class="divider">
+        <div class="links">
+            <a href="signup.html">Create Account</a> | <a href="forgot.html">Forgot Password?</a>
+        </div>
+    </div>
 
- <script>
- const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
- const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
- const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    <script>
+        const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
- // If arriving from logout, sign out first then stay on this page
- const params = new URLSearchParams(window.location.search)
- if (params.get('logged') === 'out') {
- db.auth.signOut().then(() => {
- window.history.replaceState({}, '', 'index.html')
- })
- } else {
- // If already logged in (and not logging out), skip login
- db.auth.getSession().then(({ data: { session } }) => {
- if (session) window.location.href = 'home.html'
- })
- }
+        // If arriving from logout, sign out first then stay on this page
+        const params = new URLSearchParams(window.location.search)
+        if (params.get('logged') === 'out') {
+            db.auth.signOut().then(() => {
+                window.history.replaceState({}, '', 'index.html')
+            })
+        } else {
+            // If already logged in (and not logging out), skip login
+            db.auth.getSession().then(({ data: { session } }) => {
+                if (session) window.location.href = 'home.html'
+            })
+        }
 
- function setMsg(text, type = 'error') {
- const el = document.getElementById('msg')
- el.textContent = text
- el.className = type
- }
+        function setMsg(text, type = 'error') {
+            const el = document.getElementById('msg')
+            el.textContent = text
+            el.className = type
+        }
 
- async function doLogin() {
- const email = document.getElementById('email').value.trim()
- const pass = document.getElementById('pass').value
- if (!email || !pass) { setMsg('Please fill in both fields.'); return }
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim()
+            const pass = document.getElementById('pass').value
+            if (!email || !pass) { setMsg('Please fill in both fields.'); return }
 
- document.getElementById('btn-login').disabled = true
- setMsg('Logging in...', 'success')
+            document.getElementById('btn-login').disabled = true
+            setMsg('Logging in...', 'success')
 
- const { error } = await db.auth.signInWithPassword({ email, password: pass })
- document.getElementById('btn-login').disabled = false
+            const { error } = await db.auth.signInWithPassword({ email, password: pass })
+            document.getElementById('btn-login').disabled = false
 
- if (error) { setMsg(error.message); return }
- window.location.href = 'home.html'
- }
+            if (error) { setMsg(error.message); return }
+            window.location.href = 'home.html'
+        }
 
- document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
- </script>
+        document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
+    </script>
 </body>
 
 </html>
