@@ -68,6 +68,64 @@
  color: white;
  }
 
+ /* Profile dropdown */
+ .profile-container {
+ position: relative;
+ display: inline-block;
+ }
+ .profile-container::before {
+ content: '';
+ position: absolute;
+ top: -10px;
+ left: -10px;
+ right: -10px;
+ bottom: -10px;
+ z-index: -1;
+ }
+ .profile-pic {
+ width: 40px;
+ height: 40px;
+ border-radius: 50%;
+ cursor: pointer;
+ border: 2px solid white;
+ transition: transform 0.2s, box-shadow 0.2s;
+ display: block;
+ }
+ .profile-container:hover .profile-pic {
+ transform: scale(1.1);
+ box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+ }
+ .dropdown {
+ display: none;
+ position: absolute;
+ right: 0;
+ top: 48px;
+ background: white;
+ color: #333;
+ border-radius: 10px;
+ box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+ min-width: 160px;
+ z-index: 100;
+ overflow: hidden;
+ animation: fadeIn 0.15s ease;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(-6px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ .dropdown.open { display: block; }
+ .dropdown a {
+ display: block; padding: 11px 16px;
+ text-decoration: none; color: #333; font-size: 14px;
+ transition: background 0.15s;
+ }
+ .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
+ .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
+ .dropdown .logout-link { color: #dc2626 !important; }
+ .dropdown .logout-link:hover { background: #fef2f2 !important; }
+ .vendor-link.hidden { display: none; }
+ .admin-link.hidden { display: none; }
+
  .profile-card {
  background: rgba(255, 255, 255, 0.95);
  max-width: 600px;
@@ -294,6 +352,17 @@
 
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+ <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
+ <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
+ <div class="dropdown" id="profileDropdown">
+ <a href="profile.html"> My Profile</a>
+ <a href="bookings.html"> My Bookings</a>
+ <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink"> Vendor Dashboard</a>
+ <a href="admin.html" class="admin-link hidden" id="adminDropdownLink"> Admin Dashboard</a>
+ <hr class="divider">
+ <a href="#" class="logout-link" onclick="doLogout()"> Logout</a>
+ </div>
+ </div>
  </header>
 
  <div class="back-button" onclick="window.location.href='home.html'">
@@ -422,7 +491,17 @@
  const date = new Date(profile.created_at)
  document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
  }
- if (profile.avatar_url) document.getElementById('pfp').src = profile.avatar_url + '?t=' + Date.now()
+ if (profile.avatar_url) {
+ document.getElementById('pfp').src = profile.avatar_url + '?t=' + Date.now()
+ document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
+ }
+ // Show role-specific dropdown links
+ if (profile?.role === 'vendor') {
+ document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
+ }
+ if (profile?.role === 'admin') {
+ document.getElementById('adminDropdownLink')?.classList.remove('hidden')
+ }
  document.getElementById('editFullName').value = profile.full_name || ''
  document.getElementById('editStudentId').value = profile.student_id || ''
  document.getElementById('editPhone').value = profile.phone || ''
@@ -533,6 +612,7 @@
  if (updateError) throw updateError
 
  document.getElementById('pfp').src = publicUrl + '?t=' + Date.now()
+ document.getElementById('profilePic').src = publicUrl + '?t=' + Date.now()
  statusEl.textContent = ''
  btn.disabled = false
  showToast('Profile photo updated!', 'success')
@@ -543,6 +623,12 @@
  btn.disabled = false
  }
  }
+
+ function toggleDropdown(e) {
+ e.stopPropagation()
+ document.getElementById('profileDropdown').classList.toggle('open')
+ }
+ document.addEventListener('click', () => document.getElementById('profileDropdown')?.classList.remove('open'))
  </script>
 </body>
 

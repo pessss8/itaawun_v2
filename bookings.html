@@ -2,616 +2,694 @@
 <html lang="en">
 
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>My Bookings - iTa'awun</title>
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- <style>
- body {
- margin: 0;
- font-family: 'Segoe UI', sans-serif;
- min-height: 100vh;
- display: flex;
- flex-direction: column;
- background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
- background-size: 400% 400%;
- animation: gradientBG 15s ease infinite;
- color: #333;
- }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - iTa'awun</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #333;
+    }
 
- @keyframes gradientBG {
- 0% {
- background-position: 0% 50%;
- }
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
 
- 50% {
- background-position: 100% 50%;
- }
+      50% {
+        background-position: 100% 50%;
+      }
 
- 100% {
- background-position: 0% 50%;
- }
- }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
- header {
- background: rgba(0, 0, 0, 0.2);
- color: white;
- padding: 15px 40px;
- display: flex;
- justify-content: space-between;
- align-items: center;
- }
+    header {
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
- header .logo {
- font-size: 22px;
- font-weight: bold;
- cursor: pointer;
- color: white;
- text-decoration: none;
- }
+    header .logo {
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      text-decoration: none;
+    }
 
- /* Profile dropdown - hover-based with extended hit area */
- .profile-container {
- position: relative;
- display: inline-block;
- }
- .profile-container::before {
- content: '';
- position: absolute;
- top: -10px;
- left: -10px;
- right: -10px;
- bottom: -10px;
- z-index: -1;
- }
- .profile-pic {
- width: 40px;
- height: 40px;
- border-radius: 50%;
- cursor: pointer;
- border: 2px solid white;
- transition: transform 0.2s, box-shadow 0.2s;
- display: block;
- }
- .profile-container:hover .profile-pic {
- transform: scale(1.1);
- box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
- }
- .dropdown {
- display: none;
- position: absolute;
- right: 0;
- top: 48px;
- background: white;
- color: #333;
- border-radius: 10px;
- box-shadow: 0 6px 20px rgba(0,0,0,0.25);
- min-width: 160px;
- z-index: 100;
- overflow: hidden;
- animation: fadeIn 0.15s ease;
- }
- @keyframes fadeIn {
- from { opacity: 0; transform: translateY(-6px); }
- to { opacity: 1; transform: translateY(0); }
- }
- .dropdown.open { display: block; }
- .dropdown a {
- display: block; padding: 11px 16px;
- text-decoration: none; color: #333; font-size: 14px;
- transition: background 0.15s;
- }
- .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
- .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
- .dropdown .logout-link { color: #dc2626 !important; }
- .dropdown .logout-link:hover { background: #fef2f2 !important; }
- .vendor-link.hidden { display: none; }
+    /* Profile dropdown - hover-based with extended hit area */
+    .profile-container {
+      position: relative;
+      display: inline-block;
+    }
 
- .back-button {
- padding: 10px 40px;
- display: flex;
- align-items: center;
- cursor: pointer;
- font-weight: bold;
- color: #001f3f;
- font-size: 16px;
- }
+    .profile-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      z-index: -1;
+    }
 
- .back-button i {
- margin-right: 8px;
- }
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
+    }
 
- .back-button:hover {
- color: #004f80;
- }
+    .profile-container:hover .profile-pic {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+    }
 
- .page-title {
- text-align: center;
- padding: 10px 20px 20px;
- color: #001f3f;
- font-size: 28px;
- font-weight: bold;
- text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
- }
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 48px;
+      background: white;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      min-width: 160px;
+      z-index: 100;
+      overflow: hidden;
+      animation: fadeIn 0.15s ease;
+    }
 
- /* Tabs */
- .tabs {
- display: flex;
- justify-content: center;
- gap: 10px;
- margin-bottom: 24px;
- flex-wrap: wrap;
- padding: 0 20px;
- }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
 
- .tab-btn {
- padding: 10px 24px;
- border: none;
- border-radius: 8px;
- font-size: 14px;
- font-weight: bold;
- cursor: pointer;
- background: rgba(255, 255, 255, 0.3);
- color: #001f3f;
- transition: 0.2s;
- }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
- .tab-btn.active {
- background: #001f3f;
- color: white;
- }
+    .dropdown.open {
+      display: block;
+    }
 
- .tab-btn:hover:not(.active) {
- background: rgba(255, 255, 255, 0.6);
- }
+    .dropdown a {
+      display: block;
+      padding: 11px 16px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+      transition: background 0.15s;
+    }
 
- /* Booking cards */
- .booking-list {
- display: flex;
- flex-wrap: wrap;
- justify-content: center;
- gap: 20px;
- padding: 0 20px 30px;
- }
+    .dropdown a:hover {
+      background: #f5f0ff;
+      color: #6b21a8;
+    }
 
- .booking-card {
- background: rgba(255, 255, 255, 0.95);
- width: 100%;
- max-width: 420px;
- border-radius: 12px;
- box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
- padding: 20px;
- display: flex;
- flex-direction: column;
- gap: 8px;
- }
+    .dropdown .divider {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 0;
+    }
 
- .booking-card .svc-title {
- font-size: 17px;
- font-weight: bold;
- color: #001f3f;
- margin: 0;
- }
+    .dropdown .logout-link {
+      color: #dc2626 !important;
+    }
 
- .booking-card .meta {
- font-size: 13px;
- color: #666;
- }
+    .dropdown .logout-link:hover {
+      background: #fef2f2 !important;
+    }
 
- .booking-card .note-text {
- font-size: 13px;
- color: #444;
- background: #f8f4ff;
- border-radius: 6px;
- padding: 8px 10px;
- border-left: 3px solid #6b21a8;
- }
+    .vendor-link.hidden {
+      display: none;
+    }
 
- .status-badge {
- display: inline-block;
- padding: 3px 12px;
- border-radius: 20px;
- font-size: 12px;
- font-weight: bold;
- text-transform: capitalize;
- }
+    .back-button {
+      padding: 10px 40px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+      color: #001f3f;
+      font-size: 16px;
+    }
 
- .status-pending {
- background: #fef9c3;
- color: #854d0e;
- }
+    .back-button i {
+      margin-right: 8px;
+    }
 
- .status-accepted {
- background: #dcfce7;
- color: #166534;
- }
+    .back-button:hover {
+      color: #004f80;
+    }
 
- .status-done {
- background: #dbeafe;
- color: #1e40af;
- }
+    .page-title {
+      text-align: center;
+      padding: 10px 20px 20px;
+      color: #001f3f;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    }
 
- .status-cancelled {
- background: #fee2e2;
- color: #991b1b;
- }
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      padding: 0 20px;
+    }
 
- .btn-row {
- display: flex;
- gap: 8px;
- margin-top: 4px;
- flex-wrap: wrap;
- }
+    .tab-btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.3);
+      color: #001f3f;
+      transition: 0.2s;
+    }
 
- .btn-action {
- flex: 1;
- padding: 9px 12px;
- border: none;
- border-radius: 6px;
- font-size: 13px;
- font-weight: bold;
- cursor: pointer;
- transition: 0.2s;
- min-width: 80px;
- }
+    .tab-btn.active {
+      background: #001f3f;
+      color: white;
+    }
 
- .btn-accept {
- background: #166534;
- color: white;
- }
+    .tab-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.6);
+    }
 
- .btn-accept:hover {
- background: #14532d;
- }
+    /* Booking cards */
+    .booking-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 0 20px 30px;
+    }
 
- .btn-reject {
- background: #dc2626;
- color: white;
- }
+    .booking-card {
+      background: rgba(255, 255, 255, 0.95);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
- .btn-reject:hover {
- background: #b91c1c;
- }
+    .booking-card .svc-title {
+      font-size: 17px;
+      font-weight: bold;
+      color: #001f3f;
+      margin: 0;
+    }
 
- .btn-done {
- background: #1d4ed8;
- color: white;
- }
+    .booking-card .meta {
+      font-size: 13px;
+      color: #666;
+    }
 
- .btn-done:hover {
- background: #1e3a8a;
- }
+    .booking-card .note-text {
+      font-size: 13px;
+      color: #444;
+      background: #f8f4ff;
+      border-radius: 6px;
+      padding: 8px 10px;
+      border-left: 3px solid #6b21a8;
+    }
 
- .btn-cancel {
- background: #6b7280;
- color: white;
- }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
 
- .btn-cancel:hover {
- background: #4b5563;
- }
+    .status-pending {
+      background: #fef9c3;
+      color: #854d0e;
+    }
 
- .btn-req-cancel {
- background: #ea580c;
- color: white;
- }
- .btn-req-cancel:hover {
- background: #c2410c;
- }
+    .status-accepted {
+      background: #dcfce7;
+      color: #166534;
+    }
 
- .cancel-form {
- margin-top: 8px;
- padding: 10px 12px;
- background: #fff7ed;
- border-radius: 8px;
- border-left: 3px solid #f97316;
- }
- .cancel-form p {
- margin: 0 0 6px;
- font-size: 13px;
- color: #9a3412;
- font-weight: 600;
- }
- .cancel-form textarea {
- width: calc(100% - 20px);
- padding: 8px;
- border: 1px solid #fed7aa;
- border-radius: 6px;
- font-size: 13px;
- font-family: 'Segoe UI', sans-serif;
- resize: none;
- }
- .cancel-form .form-btns {
- display: flex;
- gap: 8px;
- margin-top: 8px;
- }
+    .status-done {
+      background: #dbeafe;
+      color: #1e40af;
+    }
 
- .btn-rate {
- background: #6b21a8;
- color: white;
- }
+    .status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
 
- .btn-rate:hover {
- background: #581c87;
- }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
 
- .empty-state {
- text-align: center;
- padding: 40px 20px;
- color: #001f3f;
- font-size: 16px;
- opacity: 0.7;
- width: 100%;
- }
+    .btn-action {
+      flex: 1;
+      padding: 9px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      min-width: 80px;
+    }
 
- /* Rating Modal */
- #ratingModal {
- display: none;
- position: fixed;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- background: rgba(0, 0, 0, 0.5);
- z-index: 200;
- }
+    .btn-accept {
+      background: #166534;
+      color: white;
+    }
 
- .modal-content {
- background: white;
- max-width: 400px;
- margin: 80px auto;
- padding: 28px;
- border-radius: 14px;
- text-align: center;
- position: relative;
- }
+    .btn-accept:hover {
+      background: #14532d;
+    }
 
- .modal-content h3 {
- color: #001f3f;
- margin-bottom: 16px;
- }
+    .btn-reject {
+      background: #dc2626;
+      color: white;
+    }
 
- .close-modal {
- position: absolute;
- top: 12px;
- right: 16px;
- font-size: 24px;
- cursor: pointer;
- color: #666;
- }
+    .btn-reject:hover {
+      background: #b91c1c;
+    }
 
- .stars {
- display: flex;
- justify-content: center;
- gap: 8px;
- margin: 12px 0;
- }
+    .btn-done {
+      background: #1d4ed8;
+      color: white;
+    }
 
- .star {
- font-size: 32px;
- cursor: pointer;
- color: #d1d5db;
- transition: color 0.15s;
- }
+    .btn-done:hover {
+      background: #1e3a8a;
+    }
 
- .star.selected,
- .star:hover {
- color: #f59e0b;
- }
+    .btn-cancel {
+      background: #6b7280;
+      color: white;
+    }
 
- .modal-content textarea {
- width: 90%;
- padding: 10px;
- border: 1px solid #ccc;
- border-radius: 8px;
- font-size: 14px;
- resize: none;
- font-family: 'Segoe UI', sans-serif;
- margin-top: 8px;
- }
+    .btn-cancel:hover {
+      background: #4b5563;
+    }
 
- .btn-submit-rating {
- margin-top: 14px;
- width: 100%;
- padding: 11px;
- background: #6b21a8;
- color: white;
- border: none;
- border-radius: 8px;
- font-size: 15px;
- font-weight: bold;
- cursor: pointer;
- transition: 0.2s;
- }
+    .btn-req-cancel {
+      background: #ea580c;
+      color: white;
+    }
 
- .btn-submit-rating:hover {
- background: #581c87;
- }
+    .btn-req-cancel:hover {
+      background: #c2410c;
+    }
 
- footer {
- margin-top: auto;
- background: rgba(0, 0, 0, 0.2);
- color: white;
- text-align: center;
- padding: 15px;
- }
+    .cancel-form {
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: #fff7ed;
+      border-radius: 8px;
+      border-left: 3px solid #f97316;
+    }
 
- @media (max-width: 600px) {
- header {
- padding: 15px 20px;
- }
+    .cancel-form p {
+      margin: 0 0 6px;
+      font-size: 13px;
+      color: #9a3412;
+      font-weight: 600;
+    }
 
- .back-button {
- padding: 10px 20px;
- }
+    .cancel-form textarea {
+      width: calc(100% - 20px);
+      padding: 8px;
+      border: 1px solid #fed7aa;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'Segoe UI', sans-serif;
+      resize: none;
+    }
 
- .booking-card {
- max-width: 95%;
- }
- }
- </style>
+    .cancel-form .form-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-rate {
+      background: #6b21a8;
+      color: white;
+    }
+
+    .btn-rate:hover {
+      background: #581c87;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #001f3f;
+      font-size: 16px;
+      opacity: 0.7;
+      width: 100%;
+    }
+
+    /* Rating Modal */
+    #ratingModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+    }
+
+    .modal-content {
+      background: white;
+      max-width: 400px;
+      margin: 80px auto;
+      padding: 28px;
+      border-radius: 14px;
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-content h3 {
+      color: #001f3f;
+      margin-bottom: 16px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .star {
+      font-size: 32px;
+      cursor: pointer;
+      color: #d1d5db;
+      transition: color 0.15s;
+    }
+
+    .star.selected,
+    .star:hover {
+      color: #f59e0b;
+    }
+
+    .modal-content textarea {
+      width: 90%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: none;
+      font-family: 'Segoe UI', sans-serif;
+      margin-top: 8px;
+    }
+
+    .btn-submit-rating {
+      margin-top: 14px;
+      width: 100%;
+      padding: 11px;
+      background: #6b21a8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-submit-rating:hover {
+      background: #581c87;
+    }
+
+    footer {
+      margin-top: auto;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 15px 20px;
+      }
+
+      .back-button {
+        padding: 10px 20px;
+      }
+
+      .booking-card {
+        max-width: 95%;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
- <header>
- <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
- <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
- <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
- <div class="dropdown" id="profileDropdown">
- <a href="profile.html"> My Profile</a>
- <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink"> Vendor Dashboard</a>
- <a href="admin.html" class="hidden" id="adminDropdownLink"> Admin Dashboard</a>
- <hr class="divider">
- <a href="#" class="logout-link" onclick="doLogout()"> Logout</a>
- </div>
- </div>
- </header>
+  <header>
+    <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
+    <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
+      <img
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E"
+        class="profile-pic" id="profilePic"
+        onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
+      <div class="dropdown" id="profileDropdown">
+        <a href="profile.html"> My Profile</a>
+        <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink"> Vendor Dashboard</a>
+        <a href="admin.html" class="hidden" id="adminDropdownLink"> Admin Dashboard</a>
+        <hr class="divider">
+        <a href="#" class="logout-link" onclick="doLogout()"> Logout</a>
+      </div>
+    </div>
+  </header>
 
- <div class="back-button" onclick="window.location.href='home.html'">
- <i class="fa-solid fa-arrow-left"></i> Back
- </div>
+  <div class="back-button" onclick="window.location.href='home.html'">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </div>
 
- <div class="page-title">My Bookings</div>
+  <div class="page-title">My Bookings</div>
 
- <div class="tabs">
- <button class="tab-btn active" onclick="showTab('as-student')"> My Orders</button>
- <button class="tab-btn" onclick="showTab('as-vendor')"> Incoming Requests</button>
- <button class="tab-btn" onclick="showTab('as-applications')"> My Applications</button>
- </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab(event, 'as-student')"> My Orders</button>
+    <button class="tab-btn" onclick="showTab(event, 'as-vendor')"> Incoming Requests</button>
+    <button class="tab-btn" onclick="showTab(event, 'as-applications')"> My Applications</button>
+  </div>
 
- <!-- Student view: bookings I made -->
- <div id="tab-as-student" class="booking-list">
- <div class="empty-state">Loading...</div>
- </div>
+  <!-- Student view: bookings I made -->
+  <div id="tab-as-student" class="booking-list">
+    <div class="empty-state">Loading...</div>
+  </div>
 
- <!-- Vendor view: bookings made to my services -->
- <div id="tab-as-vendor" class="booking-list" style="display:none">
- <div class="empty-state">Loading...</div>
- </div>
+  <!-- Vendor view: bookings made to my services -->
+  <div id="tab-as-vendor" class="booking-list" style="display:none">
+    <div class="empty-state">Loading...</div>
+  </div>
 
- <!-- Applications view: role applications I submitted -->
- <div id="tab-as-applications" class="booking-list" style="display:none">
- <div class="empty-state">Loading...</div>
- </div>
+  <!-- Applications view: role applications I submitted -->
+  <div id="tab-as-applications" class="booking-list" style="display:none">
+    <div class="empty-state">Loading...</div>
+  </div>
 
- <!-- Rating Modal -->
- <div id="ratingModal">
- <div class="modal-content">
- <span class="close-modal" onclick="closeRatingModal()">&times;</span>
- <h3>Rate this service</h3>
- <div class="stars" id="starRow">
- <span class="star" onclick="setStar(1)"></span>
- <span class="star" onclick="setStar(2)"></span>
- <span class="star" onclick="setStar(3)"></span>
- <span class="star" onclick="setStar(4)"></span>
- <span class="star" onclick="setStar(5)"></span>
- </div>
- <textarea id="ratingComment" rows="3" placeholder="Leave a comment (optional)"></textarea>
- <button class="btn-submit-rating" onclick="submitRating()">Submit Rating</button>
- </div>
- </div>
+  <!-- Rating Modal -->
+  <div id="ratingModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeRatingModal()">&times;</span>
+      <h3>Rate this service</h3>
+      <div class="stars" id="starRow">
+        <span class="star" onclick="setStar(1)"></span>
+        <span class="star" onclick="setStar(2)"></span>
+        <span class="star" onclick="setStar(3)"></span>
+        <span class="star" onclick="setStar(4)"></span>
+        <span class="star" onclick="setStar(5)"></span>
+      </div>
+      <textarea id="ratingComment" rows="3" placeholder="Leave a comment (optional)"></textarea>
+      <button class="btn-submit-rating" onclick="submitRating()">Submit Rating</button>
+    </div>
+  </div>
 
- <footer>&copy; 2025 iTa'awun | Student Freelance Collaboration</footer>
+  <footer>&copy; 2025 iTa'awun | Student Freelance Collaboration</footer>
 
- <script>
- const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
- const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
- const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  <script>
+    const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
- let currentUser = null
- let selectedStar = 0
- let ratingBookingId = null
- let ratingTargetId = null
+    let currentUser = null
+    let selectedStar = 0
+    let ratingBookingId = null
+    let ratingTargetId = null
 
- // Init 
- (async function initBookings() {
- const { data: { session } } = await db.auth.getSession()
- if (!session) { window.location.href = 'index.html'; return }
- currentUser = session.user
+    // Toast notification
+    function showToast(msg) {
+      let t = document.getElementById('bookingsToast')
+      if (!t) {
+        t = document.createElement('div')
+        t.id = 'bookingsToast'
+        t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e1b4b;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);opacity:0;transition:opacity 0.3s'
+        document.body.appendChild(t)
+      }
+      t.textContent = msg
+      t.style.opacity = '1'
+      clearTimeout(t._timer)
+      t._timer = setTimeout(() => { t.style.opacity = '0' }, 3000)
+    }
 
- // Load profile for vendor link and avatar
- const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).maybeSingle()
- if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
- if (profile?.role === 'vendor') {
- document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
- } else if (profile?.role === 'admin') {
- document.getElementById('adminDropdownLink')?.classList.remove('hidden')
- }
+    // Init
+    (async function initBookings() {
+      const { data: { session } } = await db.auth.getSession()
+      if (!session) { window.location.href = 'index.html'; return }
+      currentUser = session.user
 
- // Hide Incoming Requests tab for non-vendors
- if (profile?.role !== 'vendor' && profile?.role !== 'admin') {
- const incomingTab = document.querySelector('[onclick*="as-vendor"]')
- if (incomingTab) incomingTab.style.display = 'none'
- // Auto-switch to My Orders tab
- const ordersTab = document.querySelector('[onclick*="as-student"]')
- if (ordersTab) ordersTab?.click()
- }
+      // Load profile for vendor/admin link and avatar
+      const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).maybeSingle()
+      if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
 
- loadStudentBookings()
- loadVendorBookings()
- })()
+      // Show role-specific dropdown links
+      if (profile?.role === 'vendor') {
+        document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
+      }
+      if (profile?.role === 'admin') {
+        document.getElementById('adminDropdownLink')?.classList.remove('hidden')
+      }
 
- // Tabs 
- function showTab(tab) {
- document.getElementById('tab-as-student').style.display = tab === 'as-student' ? 'flex' : 'none'
- document.getElementById('tab-as-vendor').style.display = tab === 'as-vendor' ? 'flex' : 'none'
- document.getElementById('tab-as-applications').style.display = tab === 'as-applications' ? 'flex' : 'none'
- if (tab === 'as-applications') loadApplications()
- document.querySelectorAll('.tab-btn').forEach((b, i) => {
- b.classList.toggle('active', (i === 0 && tab === 'as-student') || (i === 1 && tab === 'as-vendor') || (i === 2 && tab === 'as-applications'))
- })
- }
+      // Hide Incoming Requests tab for non-vendors
+      if (profile?.role !== 'vendor' && profile?.role !== 'admin') {
+        const incomingTab = document.querySelector('[onclick*="as-vendor"]')
+        if (incomingTab) incomingTab.style.display = 'none'
+      }
 
- // Load bookings I made (as student)
- async function loadStudentBookings() {
- try {
- const { data, error } = await db
- .from('bookings')
- .select('*, services(title, price, whatsapp, category)')
- .eq('student_id', currentUser.id)
- .order('created_at', { ascending: false })
+      // Load data based on role
+      loadStudentBookings()
+      if (profile?.role === 'vendor' || profile?.role === 'admin') {
+        loadVendorBookings()
+      }
+    })()
 
- const container = document.getElementById('tab-as-student')
- if (!data || data.length === 0) {
- container.innerHTML = '<div class="empty-state">You have not made any bookings yet.</div>'
- return
- }
+    // Tabs 
+    function showTab(e, tab) {
+      // 1. Hide/Show the actual content for all three tabs
+      document.getElementById('tab-as-student').style.display = tab === 'as-student' ? 'flex' : 'none';
+      document.getElementById('tab-as-vendor').style.display = tab === 'as-vendor' ? 'flex' : 'none';
+      document.getElementById('tab-as-applications').style.display = tab === 'as-applications' ? 'flex' : 'none';
 
- const SHORT_TERM = ['food', 'runner', 'printing']
- const active = data.filter(b => ['pending','accepted'].includes(b.status))
- const history = data.filter(b => ['done','cancelled'].includes(b.status))
+      // 2. Trigger data loading specifically for applications
+      if (tab === 'as-applications') {
+        loadApplications();
+      }
 
- // Fetch pending cancellation requests for accepted bookings
- const acceptedBookingIds = data.filter(b => b.status === 'accepted').map(b => b.id)
- let pendingCancelSet = new Set()
- if (acceptedBookingIds.length > 0) {
-   try {
-     const { data: cancelReqs } = await db.from('cancellation_requests')
-       .select('booking_id')
-       .in('booking_id', acceptedBookingIds)
-       .eq('student_id', currentUser.id)
-       .eq('status', 'pending')
-     if (cancelReqs) cancelReqs.forEach(r => pendingCancelSet.add(r.booking_id))
-   } catch(e) { console.warn('Could not load cancel requests (student):', e) }
- }
+      // 3. Remove 'active' class from ALL buttons to reset UI state
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
- function renderCard(b) {
-   const svc = b.services || {}
-   const canRate = b.status === 'done'
-   const isPending = b.status === 'pending'
-   const isAccepted = b.status === 'accepted'
-   const hasPendingCancel = pendingCancelSet.has(b.id)
-   // 3-min lock: short-term services cannot be cancelled after 3 minutes
-   const isShortTerm = SHORT_TERM.includes(svc.category)
-   const minsOld = (Date.now() - new Date(b.created_at).getTime()) / 60000
-   const cancelLocked = isShortTerm && minsOld > 3
-   const canCancel = isPending && !cancelLocked
-   const lockedMsg = isPending && cancelLocked
-     ? `<p class="meta" style="color:#dc2626;font-size:12px">🔒 Cancellation locked — short-term orders cannot be cancelled after 3 minutes.</p>` : ''
-   return `
+      // 4. Add 'active' class to the clicked button using the passed event
+      if (e && e.currentTarget) {
+        e.currentTarget.classList.add('active');
+      }
+    }
+
+    // Load bookings I made (as student)
+    async function loadStudentBookings() {
+      try {
+        const { data, error } = await db
+          .from('bookings')
+          .select('*, services(title, price, whatsapp, category)')
+          .eq('student_id', currentUser.id)
+          .order('created_at', { ascending: false })
+
+        const container = document.getElementById('tab-as-student')
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="empty-state">You have not made any bookings yet.</div>'
+          return
+        }
+
+        const SHORT_TERM = ['food', 'runner', 'printing']
+        const active = data.filter(b => ['pending', 'accepted'].includes(b.status))
+        const history = data.filter(b => ['done', 'cancelled'].includes(b.status))
+
+        // Fetch pending cancellation requests for accepted bookings
+        const acceptedBookingIds = data.filter(b => b.status === 'accepted').map(b => b.id)
+        let pendingCancelSet = new Set();
+
+        if (acceptedBookingIds.length > 0) {
+          const { data: cancelReqs, error: cancelError } = await db
+            .from('cancellation_requests')
+            .select('booking_id')
+            .in('booking_id', acceptedBookingIds)
+            .eq('student_id', currentUser.id)
+            .eq('status', 'pending');
+
+          // Check if there was an error or if data is null before using it
+          if (cancelError) {
+            console.error('Error fetching cancel requests:', cancelError);
+          } else if (cancelReqs) {
+            cancelReqs.forEach(r => pendingCancelSet.add(r.booking_id));
+          }
+        }
+
+        function renderCard(b) {
+          const svc = b.services || {}
+          const canRate = b.status === 'done'
+          const isPending = b.status === 'pending'
+          const isAccepted = b.status === 'accepted'
+          const hasPendingCancel = pendingCancelSet.has(b.id)
+          // 3-min lock: short-term services cannot be cancelled after 3 minutes
+          const isShortTerm = SHORT_TERM.includes(svc.category)
+          const minsOld = (Date.now() - new Date(b.created_at).getTime()) / 60000
+          const cancelLocked = isShortTerm && minsOld > 3
+          const canCancel = isPending && !cancelLocked
+          const lockedMsg = isPending && cancelLocked
+            ? `<p class="meta" style="color:#dc2626;font-size:12px">🔒 Cancellation locked — short-term orders cannot be cancelled after 3 minutes.</p>` : ''
+          return `
    <div class="booking-card" id="bcard-${b.id}">
    <p class="svc-title">${svc.title || '(Service deleted)'}</p>
    <p class="meta">📅 ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
@@ -637,229 +715,197 @@
      </div>
    </div>` : ''}
    </div>`
- }
+        }
 
- let html = ''
- if (active.length > 0) {
-   html += `<div style="width:100%;font-weight:600;color:#6b21a8;padding:4px 0 8px;font-size:15px;border-bottom:2px solid #e9d5ff;margin-bottom:8px"> Active Orders</div>`
-   html += active.map(renderCard).join('')
- }
- if (history.length > 0) {
-   html += `<div style="width:100%;font-weight:600;color:#888;padding:12px 0 8px;font-size:15px;border-bottom:1px solid #eee;margin-bottom:8px"> Past Orders</div>`
-   html += history.map(renderCard).join('')
- }
- if (!html) html = '<div class="empty-state">You have not made any bookings yet.</div>'
- container.innerHTML = html
- } catch(e) {
-   console.error('loadStudentBookings error:', e)
-   const c = document.getElementById('tab-as-student')
-   if (c) c.innerHTML = '<div class="empty-state">Could not load your orders. Please refresh the page.</div>'
- }
- }
+        let html = ''
+        if (active.length > 0) {
+          html += `<div style="width:100%;font-weight:600;color:#6b21a8;padding:4px 0 8px;font-size:15px;border-bottom:2px solid #e9d5ff;margin-bottom:8px"> Active Orders</div>`
+          html += active.map(renderCard).join('')
+        }
+        if (history.length > 0) {
+          html += `<div style="width:100%;font-weight:600;color:#888;padding:12px 0 8px;font-size:15px;border-bottom:1px solid #eee;margin-bottom:8px"> Past Orders</div>`
+          html += history.map(renderCard).join('')
+        }
+        if (!html) html = '<div class="empty-state">You have not made any bookings yet.</div>'
+        container.innerHTML = html
+      } catch (e) {
+        console.error('loadStudentBookings error:', e)
+        const c = document.getElementById('tab-as-student')
+        if (c) c.innerHTML = '<div class="empty-state">Could not load your orders. Please refresh the page.</div>'
+      }
+    }
 
- // Load bookings to my services (as vendor)
- async function loadVendorBookings() {
- try {
- const { data, error } = await db
- .from('bookings')
- .select('*, services(title, price)')
- .eq('vendor_id', currentUser.id)
- .order('created_at', { ascending: false })
+    // Load bookings to my services (as vendor)
+    async function loadVendorBookings() {
+      try {
+        const { data, error } = await db
+          .from('bookings')
+          .select('*, services(title, price)')
+          // CHANGE: Fetch orders where YOU are the vendor
+          .eq('vendor_id', currentUser.id)
+          .order('created_at', { ascending: false });
 
- const container = document.getElementById('tab-as-vendor')
- if (!data || data.length === 0) {
- container.innerHTML = '<div class="empty-state">No incoming booking requests yet.</div>'
- return
- }
+        if (error) throw error;
 
- // Fetch student names
- const studentIds = [...new Set(data.map(b => b.student_id))]
- const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', studentIds)
- const nameMap = {}
- if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name })
+        const container = document.getElementById('tab-as-vendor');
 
- // Fetch pending cancellation requests for accepted bookings
- const acceptedIds = data.filter(b => b.status === 'accepted').map(b => b.id)
- let cancelReqMap = {}
- if (acceptedIds.length > 0) {
-   try {
-     const { data: creqs } = await db.from('cancellation_requests')
-       .select('id, booking_id, reason, status')
-       .in('booking_id', acceptedIds)
-       .eq('status', 'pending')
-     if (creqs) creqs.forEach(r => { cancelReqMap[r.booking_id] = r })
-   } catch(e) { console.warn('Could not load cancel requests (vendor):', e) }
- }
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="empty-state">No incoming booking requests yet.</div>';
+          return;
+        }
 
- container.innerHTML = data.map(b => {
- const svc = b.services || {}
- const studentName = nameMap[b.student_id] || 'Student'
- const isPending = b.status === 'pending'
- const isAccepted = b.status === 'accepted'
- const cancelReq = cancelReqMap[b.id]
- return `
- <div class="booking-card">
- <p class="svc-title">${svc.title || '(Service deleted)'}</p>
- <p class="meta">👤 ${studentName} &nbsp;|&nbsp; 📅 ${new Date(b.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
- ${b.note ? `<div class="note-text">📌 "${b.note}"</div>` : ''}
- <div>
-   <span class="status-badge status-${b.status}">${b.status}</span>
-   ${cancelReq ? `<span class="status-badge status-cancelled" style="margin-left:6px">⚠️ Cancel Requested</span>` : ''}
- </div>
- ${svc.price ? `<p class="meta">💰 RM ${svc.price}</p>` : ''}
- ${cancelReq ? `<div class="note-text" style="border-left-color:#f97316;background:#fff7ed">📋 Student's reason: "${cancelReq.reason || '—'}"</div>` : ''}
- <div class="btn-row">
- ${isPending ? `<button class="btn-action btn-accept" onclick="updateStatus('${b.id}','accepted','vendor')">✓ Accept</button>` : ''}
- ${isPending ? `<button class="btn-action btn-reject" onclick="updateStatus('${b.id}','cancelled','vendor')">✕ Reject</button>` : ''}
- ${isAccepted && !cancelReq ? `<button class="btn-action btn-done" onclick="updateStatus('${b.id}','done','vendor')">✓ Mark Done</button>` : ''}
- ${cancelReq ? `<button class="btn-action btn-accept" onclick="approveCancelRequest('${b.id}','${cancelReq.id}')">✓ Approve Cancel</button>` : ''}
- ${cancelReq ? `<button class="btn-action btn-cancel" style="background:#6b7280" onclick="denyCancelRequest('${cancelReq.id}','${b.id}')">✕ Deny</button>` : ''}
- </div>
- </div>`
- }).join('')
- } catch(e) {
-   console.error('loadVendorBookings error:', e)
-   const c = document.getElementById('tab-as-vendor')
-   if (c) c.innerHTML = '<div class="empty-state">Could not load incoming requests. Please refresh the page.</div>'
- }
- }
+        // Fetch student names to display who is ordering from you
+        const studentIds = [...new Set(data.map(b => b.student_id))];
+        const { data: profiles } = await db.from('profiles').select('id, full_name').in('id', studentIds);
+        const nameMap = {};
+        if (profiles) profiles.forEach(p => { nameMap[p.id] = p.full_name; });
 
- // Update booking status
- async function updateStatus(bookingId, newStatus, view) {
- const { error } = await db.from('bookings').update({ status: newStatus }).eq('id', bookingId)
- if (error) { alert('Error: ' + error.message); return }
- if (view === 'student') loadStudentBookings()
- else loadVendorBookings()
- }
+        // Render the cards
+        container.innerHTML = data.map(b => {
+          const svc = b.services || {};
+          const studentName = nameMap[b.student_id] || 'Student';
+          return `
+        <div class="booking-card">
+          <p class="svc-title">${svc.title || '(Service deleted)'}</p>
+          <p class="meta">👤 ${studentName} | 📅 ${new Date(b.created_at).toLocaleDateString()}</p>
+          ${b.note ? `<div class="note-text">📌 "${b.note}"</div>` : ''}
+          <div><span class="status-badge status-${b.status}">${b.status}</span></div>
+          ${svc.price ? `<p class="meta">💰 RM ${svc.price}</p>` : ''}
+          <div class="btn-row">
+            ${b.status === 'pending' ? `<button class="btn-action btn-accept" onclick="updateStatus('${b.id}','accepted','vendor')">✓ Accept</button>` : ''}
+            ${b.status === 'pending' ? `<button class="btn-action btn-reject" onclick="updateStatus('${b.id}','cancelled','vendor')">✕ Reject</button>` : ''}
+            ${b.status === 'accepted' ? `<button class="btn-action btn-done" onclick="updateStatus('${b.id}','done','vendor')">✓ Mark Done</button>` : ''}
+          </div>
+        </div>`;
+        }).join('');
 
- // Rating 
- function openRatingModal(bookingId, vendorId) {
- ratingBookingId = bookingId
- ratingTargetId = vendorId
- selectedStar = 0
- document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'))
- document.getElementById('ratingComment').value = ''
- document.getElementById('ratingModal').style.display = 'block'
- }
- function closeRatingModal() {
- document.getElementById('ratingModal').style.display = 'none'
- }
- function setStar(n) {
- selectedStar = n
- document.querySelectorAll('.star').forEach((s, i) => {
- s.classList.toggle('selected', i < n)
- })
- }
- async function submitRating() {
- if (!selectedStar) { alert('Please select a star rating.'); return }
- const comment = document.getElementById('ratingComment').value.trim()
- const { error } = await db.from('ratings').insert({
- booking_id: ratingBookingId,
- reviewer_id: currentUser.id,
- target_id: ratingTargetId,
- score: selectedStar,
- comment: comment
- })
- if (error) { alert('Error: ' + error.message); return }
- closeRatingModal()
- alert('Thank you for your rating!')
- loadStudentBookings()
- }
+      } catch (e) {
+        console.error('loadVendorBookings error:', e);
+        document.getElementById('tab-as-vendor').innerHTML = '<div class="empty-state">Error loading requests.</div>';
+      }
+    }
 
- // Load role applications submitted by this user
- async function loadApplications() {
- const container = document.getElementById('tab-as-applications')
- container.innerHTML = '<div class="empty-state">Loading...</div>'
- const { data, error } = await db
-   .from('admin_applications')
-   .select('*')
-   .eq('user_id', currentUser.id)
-   .order('created_at', { ascending: false })
- if (error || !data || data.length === 0) {
-   container.innerHTML = '<div class="empty-state">You have not submitted any role applications yet.</div>'
-   return
- }
- const roleLabels = {
-   vendor: '🛒 Vendor',
-   barista: '☕ Barista — Campus Cafe',
-   parcel: '📦 Parcel Hub Staff',
-   website_admin: '💻 Website Admin (CFSConnect)',
-   other: '📝 Other Official Work'
- }
- const statusColor = { pending: '#f59e0b', approved: '#16a34a', rejected: '#dc2626' }
- container.innerHTML = data.map(a => `
+    // Update booking status
+    async function updateStatus(bookingId, newStatus, view) {
+      const { error } = await db.from('bookings').update({ status: newStatus }).eq('id', bookingId)
+      if (error) { alert('Error: ' + error.message); return }
+      if (view === 'student') loadStudentBookings()
+      else loadVendorBookings()
+    }
+
+    // Rating 
+    function openRatingModal(bookingId, vendorId) {
+      ratingBookingId = bookingId
+      ratingTargetId = vendorId
+      selectedStar = 0
+      document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'))
+      document.getElementById('ratingComment').value = ''
+      document.getElementById('ratingModal').style.display = 'block'
+    }
+    function closeRatingModal() {
+      document.getElementById('ratingModal').style.display = 'none'
+    }
+    function setStar(n) {
+      selectedStar = n
+      document.querySelectorAll('.star').forEach((s, i) => {
+        s.classList.toggle('selected', i < n)
+      })
+    }
+    async function submitRating() {
+      if (!selectedStar) { alert('Please select a star rating.'); return }
+      const comment = document.getElementById('ratingComment').value.trim()
+      const { error } = await db.from('ratings').insert({
+        booking_id: ratingBookingId,
+        reviewer_id: currentUser.id,
+        target_id: ratingTargetId,
+        score: selectedStar,
+        comment: comment
+      })
+      if (error) { alert('Error: ' + error.message); return }
+      closeRatingModal()
+      alert('Thank you for your rating!')
+      loadStudentBookings()
+    }
+
+    // Load role applications submitted by this user
+    async function loadApplications() {
+      const container = document.getElementById('tab-as-applications')
+      container.innerHTML = '<div class="empty-state">Loading...</div>'
+      const { data, error } = await db
+        .from('admin_applications')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+      if (error || !data || data.length === 0) {
+        container.innerHTML = '<div class="empty-state">You have not submitted any role applications yet.</div>'
+        return
+      }
+      const roleLabels = {
+        vendor: '🛒 Vendor',
+        barista: '☕ Barista — Campus Cafe',
+        parcel: '📦 Parcel Hub Staff',
+        website_admin: '💻 Website Admin (CFSConnect)',
+        other: '📝 Other Official Work'
+      }
+      const statusColor = { pending: '#f59e0b', approved: '#16a34a', rejected: '#dc2626' }
+      container.innerHTML = data.map(a => `
    <div class="booking-card">
    <p class="svc-title">${roleLabels[a.position] || a.position}</p>
    <p class="meta"> ${new Date(a.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
    ${a.reason ? `<div class="note-text"> "${a.reason}"</div>` : ''}
-   <div><span class="status-badge" style="background:${statusColor[a.status]||'#888'};color:#fff;border-radius:12px;padding:3px 12px;font-size:12px">${a.status}</span></div>
+   <div><span class="status-badge" style="background:${statusColor[a.status] || '#888'};color:#fff;border-radius:12px;padding:3px 12px;font-size:12px">${a.status}</span></div>
    ${a.status === 'rejected' ? `<p class="meta" style="color:#dc2626;font-size:12px"> Rejected by admin. You may re-apply with updated qualifications.</p>` : ''}
    </div>`).join('')
- }
+    }
 
- // Cancel request flow
- function toggleCancelForm(bookingId) {
-   const form = document.getElementById('cancelform-' + bookingId)
-   if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none'
- }
+    // Cancel request flow
+    function toggleCancelForm(bookingId) {
+      const form = document.getElementById('cancelform-' + bookingId)
+      if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none'
+    }
 
- async function submitCancelRequest(bookingId, vendorId) {
-   const reasonEl = document.getElementById('cancelreason-' + bookingId)
-   const reason = reasonEl?.value.trim()
-   if (!reason) { showToast('Please provide a reason for cancellation.'); return }
-   const { error } = await db.from('cancellation_requests').insert({
-     booking_id: bookingId,
-     student_id: currentUser.id,
-     vendor_id: vendorId,
-     reason: reason,
-     status: 'pending'
-   })
-   if (error) { showToast('Error submitting request: ' + error.message); return }
-   showToast('✅ Cancellation request sent to vendor.')
-   loadStudentBookings()
- }
+    async function submitCancelRequest(bookingId, vendorId) {
+      const reasonEl = document.getElementById('cancelreason-' + bookingId)
+      const reason = reasonEl?.value.trim()
+      if (!reason) { showToast('Please provide a reason for cancellation.'); return }
+      const { error } = await db.from('cancellation_requests').insert({
+        booking_id: bookingId,
+        student_id: currentUser.id,
+        vendor_id: vendorId,
+        reason: reason,
+        status: 'pending'
+      })
+      if (error) { showToast('Error submitting request: ' + error.message); return }
+      showToast('✅ Cancellation request sent to vendor.')
+      loadStudentBookings()
+    }
 
- async function approveCancelRequest(bookingId, requestId) {
-   await db.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId)
-   await db.from('cancellation_requests').update({ status: 'approved' }).eq('id', requestId)
-   showToast('✅ Cancellation approved. Booking cancelled.')
-   loadVendorBookings()
- }
+    async function approveCancelRequest(bookingId, requestId) {
+      await db.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId)
+      await db.from('cancellation_requests').update({ status: 'approved' }).eq('id', requestId)
+      showToast('✅ Cancellation approved. Booking cancelled.')
+      loadVendorBookings()
+    }
 
- async function denyCancelRequest(requestId, bookingId) {
-   await db.from('cancellation_requests').update({ status: 'denied' }).eq('id', requestId)
-   showToast('❌ Cancellation request denied. Order continues.')
-   loadVendorBookings()
- }
+    async function denyCancelRequest(requestId, bookingId) {
+      await db.from('cancellation_requests').update({ status: 'denied' }).eq('id', requestId)
+      showToast('❌ Cancellation request denied. Order continues.')
+      loadVendorBookings()
+    }
 
- // Toast notification
- function showToast(msg) {
-   let t = document.getElementById('bookingsToast')
-   if (!t) {
-     t = document.createElement('div')
-     t.id = 'bookingsToast'
-     t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e1b4b;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);opacity:0;transition:opacity 0.3s'
-     document.body.appendChild(t)
-   }
-   t.textContent = msg
-   t.style.opacity = '1'
-   clearTimeout(t._timer)
-   t._timer = setTimeout(() => { t.style.opacity = '0' }, 3000)
- }
+    function toggleDropdown(e) {
+      e.stopPropagation()
+      document.getElementById('profileDropdown').classList.toggle('open')
+    }
+    document.addEventListener('click', () => document.getElementById('profileDropdown')?.classList.remove('open'))
 
- function toggleDropdown(e) {
-   e.stopPropagation()
-   document.getElementById('profileDropdown').classList.toggle('open')
- }
- document.addEventListener('click', () => document.getElementById('profileDropdown')?.classList.remove('open'))
-
- // Logout
- async function doLogout() {
- const { error } = await db.auth.signOut()
- if (error) { console.error('Logout error:', error) }
- window.location.replace('index.html?logged=out')
- }
- </script>
+    // Logout
+    async function doLogout() {
+      const { error } = await db.auth.signOut()
+      if (error) { console.error('Logout error:', error) }
+      window.location.replace('index.html?logged=out')
+    }
+  </script>
 </body>
 
 </html>

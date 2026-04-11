@@ -543,17 +543,11 @@
 
  <header>
  <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
- <nav>
- <a href="home.html">Home</a>
- <a href="find.html">Browse</a>
- <a href="bookings.html">My Bookings</a>
- </nav>
  <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
  <div class="dropdown" id="profileDropdown">
  <a href="profile.html"> My Profile</a>
  <a href="bookings.html"> My Bookings</a>
- <a href="#" id="previewShopLink"> Preview My Shop</a>
  <a href="admin.html" class="hidden" id="adminDropdownLink"> Admin Dashboard</a>
  <hr class="divider">
  <a href="#" class="logout-link" onclick="doLogout()"> Logout</a>
@@ -674,6 +668,48 @@
  <footer>
  <p>© 2025 iTa'awun | Vendor Dashboard</p>
  </footer>
+
+ <!-- Edit Service Modal -->
+ <div class="edit-modal-overlay" id="editServiceModal">
+ <div class="edit-modal-box">
+ <h3>Edit Service</h3>
+ <input type="hidden" id="editSvcId">
+ <label>Title</label>
+ <input type="text" id="editSvcTitle">
+ <label>Description</label>
+ <textarea id="editSvcDesc"></textarea>
+ <label>Category</label>
+ <select id="editSvcCategory">
+ <option value="food">Food & Drinks</option>
+ <option value="runner">Runner / Errand</option>
+ <option value="printing">Printing</option>
+ <option value="cleaning">Cleaning</option>
+ <option value="laundry">Laundry</option>
+ <option value="delivery">Delivery</option>
+ <option value="tutoring">Tutoring</option>
+ <option value="design">Design</option>
+ <option value="coding">Coding / IT</option>
+ <option value="photography">Photography</option>
+ <option value="repair">Repair</option>
+ <option value="other">Other</option>
+ </select>
+ <label>Price (RM)</label>
+ <input type="number" id="editSvcPrice" min="0" step="0.50">
+ <label>Location</label>
+ <input type="text" id="editSvcLocation">
+ <label>WhatsApp</label>
+ <input type="text" id="editSvcWhatsapp">
+ <label>Telegram</label>
+ <input type="text" id="editSvcTelegram">
+ <label>Variants <span style="font-weight:400;font-size:12px;color:#888">(optional — e.g. cup sizes with different prices)</span></label>
+ <div id="editVariantsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px"></div>
+ <button type="button" onclick="addEditVariant()" style="font-size:12px;padding:5px 12px;border:1px dashed #6b21a8;background:transparent;color:#6b21a8;border-radius:6px;cursor:pointer">+ Add Option</button>
+ <div class="edit-modal-actions">
+ <button class="btn-cancel-edit" onclick="closeEditModal()">Cancel</button>
+ <button class="btn-save-edit" id="btnSaveEdit" onclick="saveServiceEdit()">Save Changes</button>
+ </div>
+ </div>
+ </div>
 
  <script>
  const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
@@ -822,14 +858,24 @@
  }
 
  async function loadMyServices() {
- const { data: services } = await db
+ try {
+ const { data: services, error } = await db
  .from('services')
  .select('*')
  .eq('vendor_id', currentUser.id)
  .order('created_at', { ascending: false })
 
+ if (error) {
+ console.error('loadMyServices error:', error)
+ document.getElementById('my-services-list').innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>Error loading services</p></div>'
+ return
+ }
+
  vendorServices = services || []
  renderMyServices(vendorServices)
+ } catch (e) {
+ console.error('loadMyServices exception:', e)
+ }
  }
 
  function filterServices() {
@@ -1099,47 +1145,6 @@
  window.location.replace('index.html?logged=out')
  }
  </script>
- <!-- Edit Service Modal -->
- <div class="edit-modal-overlay" id="editServiceModal">
- <div class="edit-modal-box">
- <h3>Edit Service</h3>
- <input type="hidden" id="editSvcId">
- <label>Title</label>
- <input type="text" id="editSvcTitle">
- <label>Description</label>
- <textarea id="editSvcDesc"></textarea>
- <label>Category</label>
- <select id="editSvcCategory">
- <option value="food">Food & Drinks</option>
- <option value="runner">Runner / Errand</option>
- <option value="printing">Printing</option>
- <option value="cleaning">Cleaning</option>
- <option value="laundry">Laundry</option>
- <option value="delivery">Delivery</option>
- <option value="tutoring">Tutoring</option>
- <option value="design">Design</option>
- <option value="coding">Coding / IT</option>
- <option value="photography">Photography</option>
- <option value="repair">Repair</option>
- <option value="other">Other</option>
- </select>
- <label>Price (RM)</label>
- <input type="number" id="editSvcPrice" min="0" step="0.50">
- <label>Location</label>
- <input type="text" id="editSvcLocation">
- <label>WhatsApp</label>
- <input type="text" id="editSvcWhatsapp">
- <label>Telegram</label>
- <input type="text" id="editSvcTelegram">
- <label>Variants <span style="font-weight:400;font-size:12px;color:#888">(optional — e.g. cup sizes with different prices)</span></label>
- <div id="editVariantsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px"></div>
- <button type="button" onclick="addEditVariant()" style="font-size:12px;padding:5px 12px;border:1px dashed #6b21a8;background:transparent;color:#6b21a8;border-radius:6px;cursor:pointer">+ Add Option</button>
- <div class="edit-modal-actions">
- <button class="btn-cancel-edit" onclick="closeEditModal()">Cancel</button>
- <button class="btn-save-edit" id="btnSaveEdit" onclick="saveServiceEdit()">Save Changes</button>
- </div>
- </div>
- </div>
 </body>
 
 </html>
