@@ -535,11 +535,9 @@
  // Load profile for vendor link and avatar
  const { data: profile } = await db.from('profiles').select('role, avatar_url').eq('id', session.user.id).maybeSingle()
  if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
- if (profile?.role === 'vendor' || profile?.role === 'admin') {
- const vendorLink = document.getElementById('vendorDropdownLink')
- if (vendorLink) vendorLink.classList.remove('hidden')
- }
- if (profile?.role === 'admin') {
+ if (profile?.role === 'vendor') {
+ document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
+ } else if (profile?.role === 'admin') {
  document.getElementById('adminDropdownLink')?.classList.remove('hidden')
  }
 

@@ -497,11 +497,10 @@
  document.getElementById('adminDropdownLink')?.classList.remove('hidden')
  }
 
- // Hide create FAB and My Bookings for pure students
+ // Hide create FAB for pure students
  if (profile?.role === 'student' || !profile) {
  const fab = document.getElementById('createFab') || document.querySelector('.fab-btn') || document.querySelector('[onclick="toggleCreatePopup()"]')
  if (fab) fab.style.display = 'none'
- document.getElementById('myBookingsLink')?.classList.add('hidden')
  }
 
  // Load profile picture (cache-busted so new uploads reflect immediately)

@@ -269,7 +269,6 @@
       if (profile?.avatar_url) document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
       if (profile?.role === 'vendor') document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
       if (profile?.role === 'admin') {
-        document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
         document.getElementById('adminDropdownLink')?.classList.remove('hidden')
       }
 
