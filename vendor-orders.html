@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Orders — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --green-dark:  #15785a;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --red:         #ef4444;
+    --radius:      12px;
+    --shadow:      0 1px 3px rgba(0,0,0,.08);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 2rem; }
+
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn     { color: var(--gray-600); text-decoration: none; font-size: .9rem; flex-shrink: 0; }
+  .header-title { font-size: 1rem; font-weight: 700; flex: 1; }
+
+  /* ── TABS ── */
+  .tabs-wrap { background: #fff; border-bottom: 1px solid var(--gray-200); position: sticky; top: 52px; z-index: 90; }
+  .tabs { display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 1rem; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0; padding: .75rem .85rem;
+    font-size: .83rem; font-weight: 500; color: var(--gray-500);
+    border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: inherit; transition: color .15s, border-color .15s;
+  }
+  .tab:hover { color: var(--gray-900); }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); font-weight: 600; }
+  .tab .cnt { display: inline-flex; align-items: center; justify-content: center; background: var(--gray-200); color: var(--gray-600); font-size: .65rem; font-weight: 700; border-radius: 100px; padding: .05rem .35rem; margin-left: .3rem; min-width: 17px; line-height: 1.4; }
+  .tab.active .cnt { background: var(--green-light); color: var(--green-dark); }
+
+  /* ── ORDER CARDS ── */
+  .list-wrap { padding: .75rem; display: flex; flex-direction: column; gap: .6rem; }
+
+  .order-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; transition: box-shadow .1s; }
+  .order-card:hover { box-shadow: var(--shadow); }
+  .order-card.urgent { border-left: 3px solid var(--green); }
+
+  .order-top { display: flex; align-items: flex-start; gap: .75rem; padding: .85rem .85rem .6rem; }
+  .order-thumb { width: 44px; height: 44px; border-radius: 9px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; overflow: hidden; }
+  .order-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .order-info  { flex: 1; min-width: 0; }
+  .order-prod  { font-size: .875rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .order-buyer { font-size: .75rem; color: var(--gray-500); margin-top: .15rem; }
+  .order-meta  { font-size: .72rem; color: var(--gray-400); margin-top: .1rem; }
+  .order-right { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; flex-shrink: 0; }
+  .order-amt   { font-size: .9rem; font-weight: 700; }
+
+  /* badges */
+  .badge { display: inline-flex; align-items: center; gap: .2rem; font-size: .68rem; font-weight: 600; padding: .18rem .5rem; border-radius: 100px; white-space: nowrap; }
+  .badge-pending    { background: #fef3c7; color: #92400e; }
+  .badge-confirmed  { background: #dbeafe; color: #1e40af; }
+  .badge-in_progress{ background: #dcfce7; color: #166534; }
+  .badge-ready      { background: var(--green-light); color: var(--green-dark); }
+  .badge-completed  { background: var(--gray-100); color: var(--gray-500); }
+  .badge-cancelled  { background: #fee2e2; color: #991b1b; }
+  .badge-disputed   { background: #fff7ed; color: #9a3412; }
+
+  /* payment chip */
+  .pay-chip { font-size: .68rem; font-weight: 500; padding: .15rem .45rem; border-radius: 5px; }
+  .pay-tng      { background: #fef3c7; color: #92400e; }
+  .pay-duitnow  { background: #eff6ff; color: #1e40af; }
+  .pay-cash     { background: #f0fdf4; color: #166534; }
+
+  /* action bar */
+  .order-actions { display: flex; gap: .5rem; padding: 0 .85rem .85rem; flex-wrap: wrap; }
+  .act-btn {
+    flex: 1; min-width: 0; padding: .55rem .5rem; border-radius: 9px;
+    font-size: .78rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    border: none; transition: opacity .15s, transform .1s; white-space: nowrap;
+    text-align: center;
+  }
+  .act-btn:active { transform: scale(.97); }
+  .act-btn:disabled { opacity: .5; cursor: default; }
+  .act-accept  { background: var(--green); color: #fff; }
+  .act-progress{ background: #dbeafe; color: #1e40af; }
+  .act-ready   { background: var(--green-light); color: var(--green-dark); }
+  .act-cancel  { background: var(--gray-100); color: var(--gray-600); }
+
+  /* notes box */
+  .buyer-notes { background: var(--gray-50); border-radius: 7px; padding: .5rem .75rem; font-size: .78rem; color: var(--gray-600); margin: 0 .85rem .7rem; line-height: 1.5; }
+  .buyer-notes strong { color: var(--gray-900); }
+
+  /* ── EMPTY ── */
+  .empty-state { text-align: center; padding: 3rem 1.5rem; }
+  .empty-icon  { font-size: 2rem; margin-bottom: .6rem; }
+  .empty-title { font-size: .9rem; font-weight: 600; margin-bottom: .3rem; }
+  .empty-sub   { font-size: .82rem; color: var(--gray-400); }
+
+  /* ── SKELETON ── */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  #toast { display: none; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" id="back-btn" href="vendor-dashboard.html">&#8592;</a>
+  <div class="header-title">Incoming Orders</div>
+</header>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="pending"     onclick="switchTab('pending')">New <span class="cnt" id="cnt-pending">—</span></button>
+    <button class="tab"        data-tab="confirmed"   onclick="switchTab('confirmed')">Confirmed <span class="cnt" id="cnt-confirmed">—</span></button>
+    <button class="tab"        data-tab="in_progress" onclick="switchTab('in_progress')">In Progress <span class="cnt" id="cnt-in_progress">—</span></button>
+    <button class="tab"        data-tab="ready"       onclick="switchTab('ready')">Ready <span class="cnt" id="cnt-ready">—</span></button>
+    <button class="tab"        data-tab="all"         onclick="switchTab('all')">All <span class="cnt" id="cnt-all">—</span></button>
+    <button class="tab"        data-tab="completed"   onclick="switchTab('completed')">Done <span class="cnt" id="cnt-completed">—</span></button>
+  </div>
+</div>
+
+<div id="list-area">
+  <div class="list-wrap">
+    ${[1,2,3].map(() => `<div style="background:#fff;border:1px solid var(--gray-200);border-radius:12px;padding:.85rem;display:flex;gap:.75rem">
+      <div class="skeleton" style="width:44px;height:44px;border-radius:9px;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div class="skeleton" style="height:14px;width:65%;margin-bottom:.3rem"></div>
+        <div class="skeleton" style="height:11px;width:45%;margin-bottom:.3rem"></div>
+        <div class="skeleton" style="height:11px;width:35%"></div>
+      </div>
+    </div>`).join('')}
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const CATEGORY_COLORS = {
+  food_drinks:{bg:'#fff7ed',emoji:'🍱'}, runner:{bg:'#eff6ff',emoji:'🏃'},
+  printing:{bg:'#f3f4f6',emoji:'🖨️'},   cleaning:{bg:'#ecfdf5',emoji:'🧹'},
+  laundry:{bg:'#f5f3ff',emoji:'👕'},     delivery:{bg:'#fffbeb',emoji:'📦'},
+  tutoring:{bg:'#fef2f2',emoji:'📚'},    design:{bg:'#fdf2f8',emoji:'🎨'},
+  coding:{bg:'#f0fdfa',emoji:'💻'},      photography:{bg:'#fff7ed',emoji:'📷'},
+  repair:{bg:'#eef2ff',emoji:'🔧'},      sell_product:{bg:'#f7fee7',emoji:'🛍️'},
+  other:{bg:'#f3f4f6',emoji:'📌'}
+}
+
+// Next status transitions for vendor actions
+const NEXT_ACTIONS = {
+  pending:     [
+    { label: '✅ Accept',       status: 'confirmed',   cls: 'act-accept'   },
+    { label: '✖ Decline',       status: 'cancelled',   cls: 'act-cancel'   }
+  ],
+  confirmed:   [
+    { label: '🔄 Start Working', status: 'in_progress', cls: 'act-progress' },
+    { label: '✖ Cancel',         status: 'cancelled',   cls: 'act-cancel'   }
+  ],
+  in_progress: [
+    { label: '📦 Mark Ready',    status: 'ready',       cls: 'act-ready'    },
+    { label: '✖ Cancel',         status: 'cancelled',   cls: 'act-cancel'   }
+  ],
+  ready:       [
+    // Buyer confirms receipt — vendor just waits; show informational only
+  ]
+}
+
+const STATUS_LABELS = {
+  pending:'Pending', confirmed:'Confirmed', in_progress:'In Progress',
+  ready:'Ready for Pickup', completed:'Completed', cancelled:'Cancelled', disputed:'Disputed'
+}
+const PAY_LABELS = { tng: 'TNG', duitnow: 'DuitNow', cash: 'Cash' }
+const PAY_CLS    = { tng: 'pay-tng', duitnow: 'pay-duitnow', cash: 'pay-cash' }
+
+const params   = new URLSearchParams(window.location.search)
+const vendorId = params.get('vendor')
+let allOrders  = []
+let activeTab  = 'pending'
+
+const TAB_STATUSES = {
+  pending:     ['pending'],
+  confirmed:   ['confirmed'],
+  in_progress: ['in_progress'],
+  ready:       ['ready'],
+  all:         null,
+  completed:   ['completed', 'cancelled', 'disputed']
+}
+
+async function init() {
+  const session = await requireAuth()
+  if (!session) return
+
+  if (!vendorId) { window.location.href = 'vendor-dashboard.html'; return }
+  document.getElementById('back-btn').href = 'vendor-dashboard.html?vendor=' + vendorId
+
+  const { data, error } = await db.from('orders')
+    .select(`
+      id, status, quantity, total_amount, payment_method, payment_reference,
+      buyer_notes, created_at,
+      products(id, name, image_url, category),
+      public_profiles!buyer_id(full_name)
+    `)
+    .eq('vendor_id', vendorId)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    document.getElementById('list-area').innerHTML = '<div class="empty-state"><div class="empty-title">Failed to load orders.</div></div>'
+    return
+  }
+
+  allOrders = data || []
+  updateCounts()
+  renderTab(activeTab)
+}
+
+function updateCounts() {
+  Object.entries(TAB_STATUSES).forEach(([tab, statuses]) => {
+    const n = statuses ? allOrders.filter(o => statuses.includes(o.status)).length : allOrders.length
+    const el = document.getElementById('cnt-' + tab)
+    if (el) el.textContent = n
+  })
+}
+
+function switchTab(tab) {
+  activeTab = tab
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab))
+  renderTab(tab)
+}
+
+function renderTab(tab) {
+  const statuses = TAB_STATUSES[tab]
+  const filtered = statuses ? allOrders.filter(o => statuses.includes(o.status)) : allOrders
+
+  const area = document.getElementById('list-area')
+  if (!filtered.length) {
+    const msgs = {
+      pending:     { icon: '📭', title: 'No new orders', sub: 'New orders from students will appear here.' },
+      confirmed:   { icon: '✅', title: 'None confirmed', sub: '' },
+      in_progress: { icon: '🔄', title: 'Nothing in progress', sub: '' },
+      ready:       { icon: '📦', title: 'None awaiting pickup', sub: '' },
+      all:         { icon: '📋', title: 'No orders yet', sub: 'Share your shop link to start receiving orders.' },
+      completed:   { icon: '🎉', title: 'No completed orders yet', sub: '' }
+    }
+    const m = msgs[tab] || msgs.all
+    area.innerHTML = `<div class="empty-state"><div class="empty-icon">${m.icon}</div><div class="empty-title">${m.title}</div>${m.sub ? `<div class="empty-sub">${m.sub}</div>` : ''}</div>`
+    return
+  }
+
+  area.innerHTML = `<div class="list-wrap">${filtered.map(o => renderOrderCard(o)).join('')}</div>`
+}
+
+function renderOrderCard(o) {
+  const cat   = o.products?.category || 'other'
+  const col   = CATEGORY_COLORS[cat] || CATEGORY_COLORS.other
+  const thumb = o.products?.image_url ? `<img src="${o.products.image_url}" alt="">` : col.emoji
+  const buyer = o.public_profiles?.full_name || 'Student'
+  const date  = new Date(o.created_at).toLocaleString('en-MY', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  const pm    = o.payment_method || 'cash'
+  const isUrgent = o.status === 'pending'
+
+  const actions = NEXT_ACTIONS[o.status] || []
+  const actionHTML = actions.length
+    ? `<div class="order-actions">${actions.map(a =>
+        `<button class="act-btn ${a.cls}" onclick="updateStatus('${o.id}', '${a.status}', this)">${a.label}</button>`
+      ).join('')}</div>`
+    : o.status === 'ready'
+      ? `<div style="padding:.5rem .85rem .85rem;font-size:.78rem;color:var(--gray-400)">⏳ Waiting for buyer to confirm receipt.</div>`
+      : ''
+
+  const notesHTML = o.buyer_notes
+    ? `<div class="buyer-notes"><strong>Note:</strong> ${o.buyer_notes}</div>`
+    : ''
+
+  const refHTML = o.payment_reference
+    ? `<span style="font-size:.72rem;color:var(--gray-400)">Ref: ${o.payment_reference}</span>`
+    : ''
+
+  return `<div class="order-card ${isUrgent ? 'urgent' : ''}" id="card-${o.id}">
+    <div class="order-top">
+      <div class="order-thumb" style="background:${col.bg}">${thumb}</div>
+      <div class="order-info">
+        <div class="order-prod">${o.products?.name || 'Order'}</div>
+        <div class="order-buyer">from ${buyer} · qty ${o.quantity}</div>
+        <div class="order-meta">${date} ${refHTML}</div>
+      </div>
+      <div class="order-right">
+        <div class="order-amt">RM ${parseFloat(o.total_amount).toFixed(2)}</div>
+        <span class="badge badge-${o.status}">${STATUS_LABELS[o.status] || o.status}</span>
+        <span class="pay-chip ${PAY_CLS[pm]}">${PAY_LABELS[pm] || pm}</span>
+      </div>
+    </div>
+    ${notesHTML}
+    ${actionHTML}
+  </div>`
+}
+
+async function updateStatus(orderId, newStatus, btn) {
+  btn.disabled = true
+  const prev = btn.textContent
+  btn.textContent = '…'
+
+  const { error } = await db.from('orders').update({ status: newStatus }).eq('id', orderId)
+  if (error) {
+    btn.disabled = false
+    btn.textContent = prev
+    showToast('Failed to update order.')
+    return
+  }
+
+  // Update local data and re-render
+  const order = allOrders.find(o => o.id === orderId)
+  if (order) order.status = newStatus
+
+  const statusMsg = {
+    confirmed:   'Order accepted!',
+    in_progress: 'Marked as in progress.',
+    ready:       'Marked as ready for pickup.',
+    cancelled:   'Order cancelled.'
+  }
+  showToast(statusMsg[newStatus] || 'Status updated.')
+  updateCounts()
+  renderTab(activeTab)
+}
+
+init()
+</script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --green-dark:  #15785a;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --red:         #ef4444;
+    --orange:      #f97316;
+    --blue:        #3b82f6;
+    --radius:      12px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 2rem; }
+
+  /* ── HEADER ── */
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn { color: var(--gray-600); text-decoration: none; font-size: .9rem; flex-shrink: 0; }
+  .header-title { font-size: .95rem; font-weight: 600; flex: 1; }
+  .header-id { font-size: .78rem; color: var(--gray-400); font-weight: 400; }
+
+  /* ── NEW ORDER BANNER ── */
+  .new-banner {
+    background: linear-gradient(135deg, #1D9E75 0%, #15785a 100%);
+    color: #fff; padding: 1rem 1rem .9rem; text-align: center;
+    display: none;
+  }
+  .new-banner.visible { display: block; }
+  .new-banner-icon { font-size: 2rem; margin-bottom: .3rem; }
+  .new-banner-title { font-size: 1rem; font-weight: 700; margin-bottom: .2rem; }
+  .new-banner-sub { font-size: .82rem; opacity: .85; }
+
+  /* ── STATUS TIMELINE ── */
+  .timeline-card { background: #fff; border-bottom: 1px solid var(--gray-100); padding: 1rem; }
+  .timeline-label { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); margin-bottom: .85rem; }
+  .timeline { display: flex; align-items: flex-start; gap: 0; }
+  .tl-step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .tl-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 11px; left: 50%;
+    width: 100%; height: 2px;
+    background: var(--gray-200);
+    z-index: 0;
+  }
+  .tl-step.done:not(:last-child)::after { background: var(--green); }
+  .tl-step.active:not(:last-child)::after { background: linear-gradient(to right, var(--green) 50%, var(--gray-200) 50%); }
+  .tl-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--gray-200); border: 2px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .65rem; z-index: 1; flex-shrink: 0;
+    transition: background .3s, border-color .3s;
+  }
+  .tl-step.done .tl-dot { background: var(--green); border-color: var(--green); color: #fff; }
+  .tl-step.active .tl-dot { background: #fff; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
+  .tl-step.cancelled .tl-dot { background: #fee2e2; border-color: var(--red); }
+  .tl-step.disputed .tl-dot { background: #fff7ed; border-color: var(--orange); }
+  .tl-text { font-size: .68rem; color: var(--gray-400); margin-top: .35rem; text-align: center; line-height: 1.3; }
+  .tl-step.done .tl-text, .tl-step.active .tl-text { color: var(--gray-900); font-weight: 500; }
+
+  /* ── STATUS BADGE ── */
+  .status-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .75rem; font-weight: 600; padding: .25rem .65rem;
+    border-radius: 100px; letter-spacing: .02em;
+  }
+  .badge-pending    { background: #fffbeb; color: #92400e; }
+  .badge-confirmed  { background: #eff6ff; color: #1e40af; }
+  .badge-in_progress{ background: #f0fdf4; color: #166534; }
+  .badge-ready      { background: #e8f7f2; color: var(--green-dark); }
+  .badge-completed  { background: #f0fdf4; color: #14532d; }
+  .badge-cancelled  { background: #fee2e2; color: #991b1b; }
+  .badge-disputed   { background: #fff7ed; color: #9a3412; }
+
+  /* ── CARD SECTIONS ── */
+  .card { background: #fff; border-bottom: 1px solid var(--gray-100); padding: 1rem; }
+  .card-title { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); margin-bottom: .75rem; }
+
+  /* ── ORDER SUMMARY ── */
+  .product-row { display: flex; gap: .75rem; align-items: flex-start; margin-bottom: .85rem; }
+  .product-thumb {
+    width: 56px; height: 56px; border-radius: 10px;
+    background: var(--gray-100); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; overflow: hidden;
+  }
+  .product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .product-meta { flex: 1; min-width: 0; }
+  .product-meta .p-name { font-size: .9rem; font-weight: 600; margin-bottom: .15rem; }
+  .product-meta .p-vendor { font-size: .78rem; color: var(--gray-500); }
+  .product-meta .p-qty { font-size: .78rem; color: var(--gray-400); margin-top: .15rem; }
+
+  .line-rows { border-top: 1px solid var(--gray-100); padding-top: .65rem; margin-top: .65rem; }
+  .line-row { display: flex; justify-content: space-between; font-size: .875rem; color: var(--gray-600); margin-bottom: .3rem; }
+  .line-row.total { font-weight: 700; color: var(--gray-900); font-size: .95rem; border-top: 1px solid var(--gray-200); padding-top: .4rem; margin-top: .3rem; }
+  .fee-note { font-size: .72rem; color: var(--gray-400); font-weight: 400; }
+
+  /* ── PAYMENT ROW ── */
+  .info-row { display: flex; justify-content: space-between; align-items: center; font-size: .875rem; padding: .35rem 0; border-bottom: 1px solid var(--gray-50); }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .label { color: var(--gray-500); }
+  .info-row .value { font-weight: 500; }
+  .info-row .value.mono { font-family: monospace; font-size: .85rem; }
+
+  .pay-method-chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem; font-weight: 500; padding: .2rem .55rem; border-radius: 6px; }
+  .chip-tng      { background: #fef3c7; color: #92400e; }
+  .chip-duitnow  { background: #eff6ff; color: #1e40af; }
+  .chip-cash     { background: #f0fdf4; color: #166534; }
+
+  /* ── VENDOR ROW ── */
+  .vendor-row { display: flex; align-items: center; gap: .75rem; text-decoration: none; color: inherit; padding: .85rem 1rem; background: #fff; border-bottom: 1px solid var(--gray-100); transition: background .1s; }
+  .vendor-row:hover { background: var(--gray-50); }
+  .vendor-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .vendor-info .v-name { font-size: .875rem; font-weight: 600; }
+  .vendor-info .v-sub { font-size: .75rem; color: var(--gray-400); margin-top: .1rem; }
+  .vendor-arrow { margin-left: auto; color: var(--gray-400); }
+
+  /* ── NOTES ── */
+  .notes-box { background: var(--gray-50); border-radius: 8px; padding: .65rem .85rem; font-size: .875rem; color: var(--gray-600); line-height: 1.5; }
+
+  /* ── ACTION AREA ── */
+  .action-area { padding: 1rem; background: #fff; border-bottom: 1px solid var(--gray-100); display: flex; flex-direction: column; gap: .6rem; }
+  .btn-confirm-received {
+    width: 100%; padding: .85rem;
+    background: var(--green); color: #fff;
+    border: none; border-radius: 10px; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: opacity .15s, transform .1s;
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+  }
+  .btn-confirm-received:hover { opacity: .9; }
+  .btn-confirm-received:active { transform: scale(.98); }
+  .btn-confirm-received:disabled { opacity: .5; cursor: default; }
+  .btn-raise-issue {
+    width: 100%; padding: .7rem;
+    background: none; border: 1.5px solid var(--gray-200); border-radius: 10px;
+    font-size: .875rem; font-weight: 500; color: var(--gray-600);
+    cursor: pointer; font-family: inherit; transition: border-color .15s, color .15s;
+  }
+  .btn-raise-issue:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── REVIEW SECTION ── */
+  .review-section { background: #fff; border-bottom: 1px solid var(--gray-100); padding: 1rem; }
+  .review-title { font-size: .95rem; font-weight: 700; margin-bottom: .3rem; }
+  .review-sub { font-size: .82rem; color: var(--gray-500); margin-bottom: .85rem; }
+
+  .star-row { display: flex; gap: .4rem; margin-bottom: 1rem; }
+  .star-btn { font-size: 1.75rem; background: none; border: none; cursor: pointer; padding: 0; transition: transform .1s; line-height: 1; }
+  .star-btn:hover { transform: scale(1.15); }
+  .star-btn.lit { filter: none; }
+  .star-btn.dim { filter: grayscale(1) opacity(.4); }
+
+  .review-textarea { width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: .75rem .9rem; font-size: .875rem; font-family: inherit; outline: none; resize: none; height: 80px; transition: border-color .15s; margin-bottom: .85rem; }
+  .review-textarea:focus { border-color: var(--green); }
+  .review-textarea::placeholder { color: var(--gray-400); }
+
+  .btn-submit-review {
+    width: 100%; padding: .8rem;
+    background: var(--green); color: #fff;
+    border: none; border-radius: 10px; font-size: .9rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: opacity .15s;
+  }
+  .btn-submit-review:hover { opacity: .9; }
+  .btn-submit-review:disabled { opacity: .5; cursor: default; }
+
+  .review-done { display: flex; align-items: center; gap: .6rem; background: var(--green-light); border-radius: 10px; padding: .75rem 1rem; }
+  .review-done .stars-display { font-size: 1.1rem; }
+  .review-done .review-text { font-size: .875rem; color: var(--green-dark); }
+  .review-done .review-comment { font-size: .8rem; color: var(--gray-500); margin-top: .15rem; }
+
+  /* ── DISPUTE CARD ── */
+  .dispute-card { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: .85rem; margin: 1rem; }
+  .dispute-title { font-size: .875rem; font-weight: 600; color: #9a3412; margin-bottom: .3rem; }
+  .dispute-sub { font-size: .8rem; color: #c2410c; line-height: 1.5; }
+
+  /* ── CANCELLED CARD ── */
+  .cancelled-card { background: #fee2e2; border: 1px solid #fecaca; border-radius: 10px; padding: .85rem; margin: 1rem; }
+  .cancelled-title { font-size: .875rem; font-weight: 600; color: #991b1b; margin-bottom: .3rem; }
+  .cancelled-sub { font-size: .8rem; color: #b91c1c; line-height: 1.5; }
+
+  /* ── SKELETON ── */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  #toast { display: none; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" id="back-btn" href="home.html">&#8592;</a>
+  <div class="header-title">
+    Order <span class="header-id" id="header-id"></span>
+  </div>
+  <div id="header-badge"></div>
+</header>
+
+<!-- New order success banner -->
+<div class="new-banner" id="new-banner">
+  <div class="new-banner-icon">🎉</div>
+  <div class="new-banner-title">Order placed!</div>
+  <div class="new-banner-sub">The vendor will confirm your order shortly.</div>
+</div>
+
+<!-- Page content populated by JS -->
+<div id="page-content">
+  <!-- skeleton -->
+  <div style="background:#fff;border-bottom:1px solid var(--gray-100);padding:1rem">
+    <div class="skeleton" style="height:12px;width:80px;margin-bottom:.85rem"></div>
+    <div style="display:flex;gap:8px">
+      <div class="skeleton" style="height:22px;flex:1;border-radius:100px"></div>
+      <div class="skeleton" style="height:22px;flex:1;border-radius:100px"></div>
+      <div class="skeleton" style="height:22px;flex:1;border-radius:100px"></div>
+      <div class="skeleton" style="height:22px;flex:1;border-radius:100px"></div>
+      <div class="skeleton" style="height:22px;flex:1;border-radius:100px"></div>
+    </div>
+  </div>
+  <div style="background:#fff;border-bottom:1px solid var(--gray-100);padding:1rem;margin-top:8px">
+    <div class="skeleton" style="height:12px;width:90px;margin-bottom:.75rem"></div>
+    <div style="display:flex;gap:.75rem;align-items:flex-start">
+      <div class="skeleton" style="width:56px;height:56px;border-radius:10px;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div class="skeleton" style="height:14px;width:70%;margin-bottom:.3rem"></div>
+        <div class="skeleton" style="height:12px;width:50%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const CATEGORY_COLORS = {
+  food_drinks:{bg:'#fff7ed',text:'#c2410c',emoji:'🍱'}, runner:{bg:'#eff6ff',text:'#1d4ed8',emoji:'🏃'},
+  printing:{bg:'#f3f4f6',text:'#374151',emoji:'🖨️'}, cleaning:{bg:'#ecfdf5',text:'#065f46',emoji:'🧹'},
+  laundry:{bg:'#f5f3ff',text:'#5b21b6',emoji:'👕'}, delivery:{bg:'#fffbeb',text:'#92400e',emoji:'📦'},
+  tutoring:{bg:'#fef2f2',text:'#991b1b',emoji:'📚'}, design:{bg:'#fdf2f8',text:'#9d174d',emoji:'🎨'},
+  coding:{bg:'#f0fdfa',text:'#0f766e',emoji:'💻'}, photography:{bg:'#fff7ed',text:'#9a3412',emoji:'📷'},
+  repair:{bg:'#eef2ff',text:'#3730a3',emoji:'🔧'}, sell_product:{bg:'#f7fee7',text:'#3f6212',emoji:'🛍️'},
+  other:{bg:'#f3f4f6',text:'#6b7280',emoji:'📌'}
+}
+
+const STATUS_CONFIG = {
+  pending:     { label: 'Pending',     emoji: '⏳', badgeClass: 'badge-pending'   },
+  confirmed:   { label: 'Confirmed',   emoji: '✅', badgeClass: 'badge-confirmed' },
+  in_progress: { label: 'In Progress', emoji: '🔄', badgeClass: 'badge-in_progress'},
+  ready:       { label: 'Ready',       emoji: '📦', badgeClass: 'badge-ready'     },
+  completed:   { label: 'Completed',   emoji: '🎉', badgeClass: 'badge-completed' },
+  cancelled:   { label: 'Cancelled',   emoji: '✖️', badgeClass: 'badge-cancelled' },
+  disputed:    { label: 'Disputed',    emoji: '⚠️', badgeClass: 'badge-disputed'  }
+}
+
+// Status timeline steps (linear flow)
+const TIMELINE_STEPS = [
+  { key: 'pending',     label: 'Placed'  },
+  { key: 'confirmed',   label: 'Accepted'},
+  { key: 'in_progress', label: 'Working' },
+  { key: 'ready',       label: 'Ready'   },
+  { key: 'completed',   label: 'Done'    }
+]
+const TIMELINE_ORDER = ['pending', 'confirmed', 'in_progress', 'ready', 'completed']
+
+const params  = new URLSearchParams(window.location.search)
+const orderId = params.get('id')
+const isNew   = params.get('new') === '1'
+if (!orderId) window.location.href = 'home.html'
+
+let currentSession = null
+let order          = null
+let existingReview = null
+let selectedRating = 0
+
+async function init() {
+  currentSession = await requireAuth()
+  if (!currentSession) return
+
+  if (isNew) {
+    document.getElementById('new-banner').classList.add('visible')
+    // Clean URL without triggering a reload
+    history.replaceState(null, '', 'order-detail.html?id=' + orderId)
+  }
+
+  const [orderRes, reviewRes] = await Promise.all([
+    db.from('orders')
+      .select(`*, products(id, name, price, image_url, category), vendors(id, shop_name, avg_rating)`)
+      .eq('id', orderId)
+      .single(),
+    db.from('reviews').select('id, rating, comment, created_at').eq('order_id', orderId).maybeSingle()
+  ])
+
+  if (orderRes.error || !orderRes.data) {
+    document.getElementById('page-content').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--gray-400)">Order not found.</div>'
+    return
+  }
+
+  order          = orderRes.data
+  existingReview = reviewRes.data || null
+
+  // Security: only the buyer or an admin should see this order
+  const profile = await getMyProfile(currentSession.user.id)
+  if (order.buyer_id !== currentSession.user.id && profile?.role !== 'admin') {
+    document.getElementById('page-content').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--gray-400)">You don\'t have access to this order.</div>'
+    return
+  }
+
+  renderPage(profile)
+}
+
+function renderPage(profile) {
+  const sc    = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending
+  const prod  = order.products
+  const vendor = order.vendors
+  const isBuyer = order.buyer_id === currentSession.user.id
+
+  // Header
+  document.title = 'Order #' + orderId.slice(0, 8).toUpperCase() + ' — iTa\'awun'
+  document.getElementById('header-id').textContent = '#' + orderId.slice(0, 8).toUpperCase()
+  document.getElementById('header-badge').innerHTML =
+    `<span class="status-badge ${sc.badgeClass}">${sc.emoji} ${sc.label}</span>`
+
+  // Back button → orders list if coming from there, else home
+  document.getElementById('back-btn').href = isNew ? 'home.html' : (document.referrer.includes('orders') ? 'orders.html' : 'home.html')
+
+  let html = ''
+
+  // ── TIMELINE ──
+  const currentIdx = TIMELINE_ORDER.indexOf(order.status)
+  const isTerminal = order.status === 'cancelled' || order.status === 'disputed'
+
+  if (!isTerminal) {
+    const dotsHTML = TIMELINE_STEPS.map((step, i) => {
+      const stepIdx = TIMELINE_ORDER.indexOf(step.key)
+      let cls = ''
+      if (stepIdx < currentIdx)  cls = 'done'
+      if (stepIdx === currentIdx) cls = 'active'
+      const dotContent = stepIdx < currentIdx ? '✓' : (stepIdx === currentIdx ? '●' : '')
+      return `<div class="tl-step ${cls}">
+        <div class="tl-dot">${dotContent}</div>
+        <div class="tl-text">${step.label}</div>
+      </div>`
+    }).join('')
+
+    html += `<div class="timeline-card">
+      <div class="timeline-label">Order progress</div>
+      <div class="timeline">${dotsHTML}</div>
+    </div>`
+  }
+
+  // ── PRODUCT SUMMARY ──
+  const cat     = prod?.category || 'other'
+  const col     = CATEGORY_COLORS[cat] || CATEGORY_COLORS.other
+  const thumbHTML = prod?.image_url
+    ? `<img src="${prod.image_url}" alt="${prod?.name}">`
+    : col.emoji
+
+  const subtotal   = parseFloat(order.total_amount) - parseFloat(order.service_fee || 0)
+  const serviceFee = parseFloat(order.service_fee || 0)
+  const total      = parseFloat(order.total_amount)
+
+  html += `<div class="card">
+    <div class="card-title">Order summary</div>
+    <div class="product-row">
+      <div class="product-thumb" style="background:${col.bg}">${thumbHTML}</div>
+      <div class="product-meta">
+        <div class="p-name">${prod?.name || 'Product'}</div>
+        <div class="p-vendor">from ${vendor?.shop_name || 'Vendor'}</div>
+        <div class="p-qty">Qty: ${order.quantity}</div>
+      </div>
+    </div>
+    <div class="line-rows">
+      <div class="line-row"><span>${prod?.name || 'Item'} × ${order.quantity}</span><span>RM ${subtotal.toFixed(2)}</span></div>
+      <div class="line-row"><span>Service fee <span class="fee-note">(2.5%)</span></span><span>RM ${serviceFee.toFixed(2)}</span></div>
+      <div class="line-row total"><span>Total paid</span><span>RM ${total.toFixed(2)}</span></div>
+    </div>
+  </div>`
+
+  // ── PAYMENT INFO ──
+  const payLabels = { tng: '💳 TNG eWallet', duitnow: '🏦 DuitNow', cash: '💵 Cash' }
+  const payChipCls = { tng: 'chip-tng', duitnow: 'chip-duitnow', cash: 'chip-cash' }
+  const payMethod = order.payment_method || 'cash'
+
+  html += `<div class="card">
+    <div class="card-title">Payment details</div>
+    <div class="info-row">
+      <span class="label">Method</span>
+      <span class="value"><span class="pay-method-chip ${payChipCls[payMethod]}">${payLabels[payMethod] || payMethod}</span></span>
+    </div>`
+
+  if (order.payment_reference) {
+    html += `<div class="info-row">
+      <span class="label">Reference</span>
+      <span class="value mono">${order.payment_reference}</span>
+    </div>`
+  }
+
+  const orderedAt = order.created_at ? new Date(order.created_at).toLocaleString('en-MY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
+  html += `<div class="info-row">
+      <span class="label">Ordered</span>
+      <span class="value">${orderedAt}</span>
+    </div>
+  </div>`
+
+  // ── BUYER NOTES ──
+  if (order.buyer_notes) {
+    html += `<div class="card">
+      <div class="card-title">Your notes to vendor</div>
+      <div class="notes-box">${order.buyer_notes}</div>
+    </div>`
+  }
+
+  // ── VENDOR LINK ──
+  if (vendor) {
+    html += `<a class="vendor-row" href="vendor-shop.html?vendor=${order.vendor_id}">
+      <div class="vendor-avatar">🏪</div>
+      <div class="vendor-info">
+        <div class="v-name">${vendor.shop_name}</div>
+        <div class="v-sub">View shop</div>
+      </div>
+      <div class="vendor-arrow">›</div>
+    </a>`
+  }
+
+  // ── TERMINAL STATUS CARDS ──
+  if (order.status === 'cancelled') {
+    html += `<div class="cancelled-card">
+      <div class="cancelled-title">✖️ Order Cancelled</div>
+      <div class="cancelled-sub">This order was cancelled. If you believe this is an error, please contact support.</div>
+    </div>`
+  } else if (order.status === 'disputed') {
+    html += `<div class="dispute-card">
+      <div class="dispute-title">⚠️ Dispute Raised</div>
+      <div class="dispute-sub">An issue has been raised for this order. Our team will review it and contact you shortly.</div>
+    </div>`
+  }
+
+  // ── ACTION AREA (buyer actions) ──
+  const canConfirm = isBuyer && order.status === 'ready'
+  const canRaise   = isBuyer && ['confirmed', 'in_progress', 'ready'].includes(order.status)
+  if (canConfirm || canRaise) {
+    html += `<div class="action-area" id="action-area">`
+    if (canConfirm) {
+      html += `<button class="btn-confirm-received" id="confirm-received-btn" onclick="confirmReceived()">
+        ✅ Confirm Received
+      </button>
+      <p style="font-size:.78rem;color:var(--gray-400);text-align:center">
+        Tap once you've received your order. This releases payment to the vendor.
+      </p>`
+    }
+    if (canRaise) {
+      html += `<button class="btn-raise-issue" onclick="raiseIssue()">Raise an issue</button>`
+    }
+    html += `</div>`
+  }
+
+  // ── REVIEW SECTION ──
+  if (order.status === 'completed' && isBuyer) {
+    if (existingReview) {
+      const reviewStars = '⭐'.repeat(existingReview.rating)
+      html += `<div class="review-section">
+        <div class="card-title">Your review</div>
+        <div class="review-done">
+          <div class="stars-display">${reviewStars}</div>
+          <div>
+            <div class="review-text">${existingReview.rating}.0 / 5.0</div>
+            ${existingReview.comment ? `<div class="review-comment">"${existingReview.comment}"</div>` : ''}
+          </div>
+        </div>
+      </div>`
+    } else {
+      html += `<div class="review-section" id="review-section">
+        <div class="review-title">Leave a review</div>
+        <div class="review-sub">How was your experience with ${vendor?.shop_name || 'this vendor'}?</div>
+        <div class="star-row" id="star-row">
+          ${[1,2,3,4,5].map(n => `<button class="star-btn dim" data-val="${n}" onclick="setRating(${n})">⭐</button>`).join('')}
+        </div>
+        <textarea class="review-textarea" id="review-text" placeholder="Share what you liked or any feedback… (optional)" maxlength="500"></textarea>
+        <button class="btn-submit-review" id="submit-review-btn" onclick="submitReview()">Submit Review</button>
+      </div>`
+    }
+  }
+
+  document.getElementById('page-content').innerHTML = html
+}
+
+// ── CONFIRM RECEIVED ──────────────────────────────────────────
+async function confirmReceived() {
+  const btn = document.getElementById('confirm-received-btn')
+  btn.disabled = true
+  btn.textContent = 'Confirming…'
+
+  const { error } = await db.from('orders')
+    .update({ status: 'completed' })
+    .eq('id', orderId)
+    .eq('buyer_id', currentSession.user.id)
+
+  if (error) {
+    btn.disabled = false
+    btn.textContent = '✅ Confirm Received'
+    showToast('Failed to confirm. Please try again.')
+    return
+  }
+
+  order.status = 'completed'
+  showToast('Order confirmed! Thank you.')
+  setTimeout(() => {
+    window.location.reload()
+  }, 1200)
+}
+
+// ── RAISE ISSUE ───────────────────────────────────────────────
+async function raiseIssue() {
+  if (!confirm('Are you sure you want to raise an issue with this order? Our team will review it.')) return
+
+  const { error } = await db.from('orders')
+    .update({ status: 'disputed' })
+    .eq('id', orderId)
+    .eq('buyer_id', currentSession.user.id)
+
+  if (error) { showToast('Failed to raise issue. Please try again.'); return }
+
+  showToast('Issue raised. We\'ll look into it.')
+  setTimeout(() => window.location.reload(), 1200)
+}
+
+// ── REVIEW ────────────────────────────────────────────────────
+function setRating(val) {
+  selectedRating = val
+  document.querySelectorAll('#star-row .star-btn').forEach(btn => {
+    btn.classList.toggle('lit', parseInt(btn.dataset.val) <= val)
+    btn.classList.toggle('dim', parseInt(btn.dataset.val) > val)
+  })
+}
+
+async function submitReview() {
+  if (selectedRating === 0) { showToast('Please select a star rating.'); return }
+
+  const btn  = document.getElementById('submit-review-btn')
+  const text = document.getElementById('review-text').value.trim()
+  btn.disabled = true
+  btn.textContent = 'Submitting…'
+
+  const { error } = await db.from('reviews').insert({
+    order_id:    orderId,
+    vendor_id:   order.vendor_id,
+    reviewer_id: currentSession.user.id,
+    rating:      selectedRating,
+    comment:     text || null
+  })
+
+  if (error) {
+    btn.disabled = false
+    btn.textContent = 'Submit Review'
+    showToast('Failed to submit review. Please try again.')
+    return
+  }
+
+  existingReview = { rating: selectedRating, comment: text || null }
+  showToast('Review submitted. Thank you!')
+  setTimeout(() => window.location.reload(), 1200)
+}
+
+init()
+</script>
+</body>
+</html>

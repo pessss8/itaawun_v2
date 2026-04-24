@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Dashboard — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --green-dark:  #15785a;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --red:         #ef4444;
+    --orange:      #f97316;
+    --radius:      12px;
+    --shadow:      0 1px 3px rgba(0,0,0,.08);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 80px; }
+
+  /* ── HEADER ── */
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn     { color: var(--gray-600); text-decoration: none; font-size: .9rem; flex-shrink: 0; }
+  .header-title { font-size: 1rem; font-weight: 700; flex: 1; }
+  .header-shop  { font-size: .75rem; color: var(--gray-400); font-weight: 400; }
+  .btn-view-shop { font-size: .8rem; color: var(--green); text-decoration: none; font-weight: 600; white-space: nowrap; }
+
+  /* ── SHOP HERO ── */
+  .shop-hero { background: linear-gradient(135deg, #1D9E75 0%, #15785a 100%); color: #fff; padding: 1.25rem 1rem 1.5rem; }
+  .shop-hero-top  { display: flex; align-items: center; gap: .75rem; margin-bottom: .85rem; }
+  .shop-avatar    { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; overflow: hidden; }
+  .shop-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .shop-name      { font-size: 1.05rem; font-weight: 700; }
+  .shop-status    { display: inline-flex; align-items: center; gap: .25rem; font-size: .72rem; background: rgba(255,255,255,.2); border-radius: 100px; padding: .15rem .55rem; margin-top: .25rem; }
+  .status-dot     { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; }
+
+  /* ── STATS GRID ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; background: var(--gray-50); padding: .75rem; }
+  .stat-card  { background: #fff; border-radius: var(--radius); padding: .85rem; border: 1px solid var(--gray-100); }
+  .stat-label { font-size: .7rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: .05em; font-weight: 500; margin-bottom: .3rem; }
+  .stat-num   { font-size: 1.35rem; font-weight: 800; color: var(--gray-900); }
+  .stat-sub   { font-size: .72rem; color: var(--gray-400); margin-top: .2rem; }
+  .stat-card.highlight .stat-num { color: var(--green); }
+
+  /* ── SECTION ── */
+  .section      { background: #fff; border-top: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); margin-top: .5rem; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; padding: .85rem 1rem .5rem; }
+  .section-title { font-size: .875rem; font-weight: 700; }
+  .section-link  { font-size: .8rem; color: var(--green); text-decoration: none; font-weight: 500; }
+
+  /* ── ORDER ITEMS ── */
+  .order-item {
+    display: flex; align-items: flex-start; gap: .75rem;
+    padding: .75rem 1rem; border-bottom: 1px solid var(--gray-50);
+    text-decoration: none; color: inherit; transition: background .1s;
+  }
+  .order-item:last-child { border-bottom: none; }
+  .order-item:hover { background: var(--gray-50); }
+  .order-thumb { width: 40px; height: 40px; border-radius: 8px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; overflow: hidden; }
+  .order-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .order-info  { flex: 1; min-width: 0; }
+  .order-prod  { font-size: .875rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .order-buyer { font-size: .75rem; color: var(--gray-400); margin-top: .1rem; }
+  .order-right { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; flex-shrink: 0; }
+  .order-amt   { font-size: .875rem; font-weight: 600; }
+
+  /* ── STATUS BADGES ── */
+  .badge { display: inline-flex; align-items: center; font-size: .68rem; font-weight: 600; padding: .18rem .5rem; border-radius: 100px; white-space: nowrap; }
+  .badge-pending    { background: #fef3c7; color: #92400e; }
+  .badge-confirmed  { background: #dbeafe; color: #1e40af; }
+  .badge-in_progress{ background: #dcfce7; color: #166534; }
+  .badge-ready      { background: var(--green-light); color: var(--green-dark); }
+  .badge-completed  { background: var(--gray-100); color: var(--gray-500); }
+  .badge-cancelled  { background: #fee2e2; color: #991b1b; }
+  .badge-disputed   { background: #fff7ed; color: #9a3412; }
+
+  /* ── ACTION NEEDED ── */
+  .action-badge { background: var(--red); color: #fff; font-size: .65rem; font-weight: 700; border-radius: 100px; padding: .1rem .4rem; margin-left: .35rem; }
+
+  /* ── PRODUCT ITEMS ── */
+  .product-item {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .75rem 1rem; border-bottom: 1px solid var(--gray-50);
+    transition: background .1s;
+  }
+  .product-item:last-child { border-bottom: none; }
+  .product-item:hover { background: var(--gray-50); }
+  .prod-thumb { width: 40px; height: 40px; border-radius: 8px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; overflow: hidden; }
+  .prod-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .prod-info  { flex: 1; min-width: 0; }
+  .prod-name  { font-size: .875rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prod-meta  { font-size: .75rem; color: var(--gray-400); margin-top: .1rem; }
+  .prod-right { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; flex-shrink: 0; }
+  .prod-price { font-size: .875rem; font-weight: 600; }
+  .stock-chip { font-size: .68rem; padding: .15rem .45rem; border-radius: 100px; }
+  .stock-ok   { background: var(--green-light); color: var(--green-dark); }
+  .stock-low  { background: #fef3c7; color: #92400e; }
+  .stock-out  { background: #fee2e2; color: #991b1b; }
+  .toggle-btn {
+    font-size: .72rem; padding: .2rem .55rem; border-radius: 100px;
+    border: 1px solid var(--gray-200); background: none; cursor: pointer;
+    font-family: inherit; color: var(--gray-500); transition: border-color .15s;
+  }
+  .toggle-btn:hover { border-color: var(--gray-400); }
+  .toggle-btn.active-btn { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+  /* ── ADD PRODUCT BUTTON ── */
+  .add-product-btn {
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    margin: .75rem 1rem; padding: .75rem;
+    border: 1.5px dashed var(--gray-200); border-radius: 10px;
+    font-size: .875rem; font-weight: 500; color: var(--green);
+    cursor: pointer; background: none; font-family: inherit;
+    transition: border-color .15s, background .15s; width: calc(100% - 2rem);
+    text-decoration: none;
+  }
+  .add-product-btn:hover { border-color: var(--green); background: var(--green-light); }
+
+  /* ── QUICK ACTIONS ── */
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; padding: .75rem; background: var(--gray-50); margin-top: .5rem; }
+  .quick-btn {
+    background: #fff; border: 1px solid var(--gray-100); border-radius: var(--radius);
+    padding: .85rem .75rem; display: flex; align-items: center; gap: .6rem;
+    cursor: pointer; text-decoration: none; color: var(--gray-900);
+    transition: box-shadow .1s; font-family: inherit; font-size: .875rem; font-weight: 500;
+  }
+  .quick-btn:hover { box-shadow: var(--shadow); }
+  .quick-icon { font-size: 1.2rem; }
+
+  /* ── EMPTY STATES ── */
+  .empty-row { padding: 1.25rem 1rem; text-align: center; font-size: .82rem; color: var(--gray-400); }
+
+  /* ── SKELETON ── */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--gray-200); display: flex; height: 60px; z-index: 100; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: var(--gray-400); font-size: .65rem; font-weight: 500; transition: color .15s; position: relative; }
+  .nav-item.active { color: var(--green); }
+  .nav-icon { font-size: 1.2rem; line-height: 1; }
+  .nav-badge { position: absolute; top: 7px; right: calc(50% - 18px); background: var(--red); color: #fff; font-size: .6rem; font-weight: 700; border-radius: 100px; padding: .05rem .3rem; min-width: 16px; text-align: center; }
+
+  #toast { display: none; position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" href="home.html">&#8592;</a>
+  <div class="header-title">
+    Dashboard
+    <div class="header-shop" id="header-shop"></div>
+  </div>
+  <a class="btn-view-shop" id="view-shop-link" href="vendor-shop.html">View Shop →</a>
+</header>
+
+<div id="page-content">
+  <!-- skeleton -->
+  <div style="background:linear-gradient(135deg,#1D9E75,#15785a);padding:1.25rem 1rem 1.5rem">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem">
+      <div class="skeleton" style="width:48px;height:48px;border-radius:12px;flex-shrink:0;opacity:.4"></div>
+      <div>
+        <div class="skeleton" style="height:16px;width:120px;margin-bottom:.3rem;opacity:.4"></div>
+        <div class="skeleton" style="height:12px;width:70px;opacity:.3"></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;padding:.75rem;background:var(--gray-50)">
+    <div class="skeleton" style="height:72px;border-radius:12px"></div>
+    <div class="skeleton" style="height:72px;border-radius:12px"></div>
+    <div class="skeleton" style="height:72px;border-radius:12px"></div>
+    <div class="skeleton" style="height:72px;border-radius:12px"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="home.html"><span class="nav-icon">🏠</span>Home</a>
+  <a class="nav-item" href="vendors.html"><span class="nav-icon">🏪</span>Browse</a>
+  <a class="nav-item active" href="vendor-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
+  <a class="nav-item" href="profile.html"><span class="nav-icon">👤</span>Profile</a>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+const CATEGORY_COLORS = {
+  food_drinks:{bg:'#fff7ed',emoji:'🍱'}, runner:{bg:'#eff6ff',emoji:'🏃'},
+  printing:{bg:'#f3f4f6',emoji:'🖨️'}, cleaning:{bg:'#ecfdf5',emoji:'🧹'},
+  laundry:{bg:'#f5f3ff',emoji:'👕'}, delivery:{bg:'#fffbeb',emoji:'📦'},
+  tutoring:{bg:'#fef2f2',emoji:'📚'}, design:{bg:'#fdf2f8',emoji:'🎨'},
+  coding:{bg:'#f0fdfa',emoji:'💻'}, photography:{bg:'#fff7ed',emoji:'📷'},
+  repair:{bg:'#eef2ff',emoji:'🔧'}, sell_product:{bg:'#f7fee7',emoji:'🛍️'},
+  other:{bg:'#f3f4f6',emoji:'📌'}
+}
+
+const STATUS_LABELS = {
+  pending:'Pending', confirmed:'Confirmed', in_progress:'In Progress',
+  ready:'Ready', completed:'Completed', cancelled:'Cancelled', disputed:'Disputed'
+}
+
+const params   = new URLSearchParams(window.location.search)
+let vendorId   = params.get('vendor')
+let vendor     = null
+let allOrders  = []
+let products   = []
+
+async function init() {
+  const session = await requireAuth()
+  if (!session) return
+
+  // Resolve vendor ID from URL param or owner lookup
+  if (!vendorId) {
+    const { data } = await db.from('vendors').select('id').eq('owner_id', session.user.id).maybeSingle()
+    if (!data) { window.location.href = 'vendor-apply.html'; return }
+    vendorId = data.id
+    history.replaceState(null, '', 'vendor-dashboard.html?vendor=' + vendorId)
+  }
+
+  // Parallel load everything
+  const [vendorRes, ordersRes, productsRes, revenueRes] = await Promise.all([
+    db.from('vendors').select('id, shop_name, description, category, is_active, avg_rating, banner_url').eq('id', vendorId).single(),
+    db.from('orders')
+      .select('id, status, quantity, total_amount, created_at, products(id, name, image_url, category), public_profiles!buyer_id(full_name)')
+      .eq('vendor_id', vendorId)
+      .order('created_at', { ascending: false })
+      .limit(50),
+    db.from('products').select('id, name, price, stock, category, is_active, image_url, listing_type').eq('vendor_id', vendorId).order('created_at', { ascending: false }),
+    db.from('orders').select('total_amount').eq('vendor_id', vendorId).eq('status', 'completed')
+  ])
+
+  if (vendorRes.error || !vendorRes.data) {
+    document.getElementById('page-content').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--gray-400)">Shop not found.</div>'
+    return
+  }
+
+  vendor    = vendorRes.data
+  allOrders = ordersRes.data || []
+  products  = productsRes.data || []
+
+  const totalRevenue = (revenueRes.data || []).reduce((s, o) => s + parseFloat(o.total_amount), 0)
+
+  // Verify ownership
+  const { data: { session: sess } } = await db.auth.getSession()
+  const { data: profile } = await db.from('users').select('role').eq('id', sess.user.id).single()
+  const isOwner = profile?.role === 'admin' // admin can view any; check vendor owner via join
+  // (RLS will block non-owners from mutating anyway)
+
+  renderPage(totalRevenue)
+}
+
+function renderPage(totalRevenue) {
+  const pendingOrders  = allOrders.filter(o => o.status === 'pending').length
+  const activeOrders   = allOrders.filter(o => ['pending','confirmed','in_progress','ready'].includes(o.status)).length
+  const completedCount = allOrders.filter(o => o.status === 'completed').length
+
+  // Update view-shop link
+  document.getElementById('view-shop-link').href = 'vendor-shop.html?vendor=' + vendorId
+  document.getElementById('header-shop').textContent = vendor.shop_name
+
+  const html = `
+    <!-- Shop hero -->
+    <div class="shop-hero">
+      <div class="shop-hero-top">
+        <div class="shop-avatar">${vendor.banner_url ? `<img src="${db.storage.from('vendor-assets').getPublicUrl(vendor.banner_url).data.publicUrl}" alt="${vendor.shop_name}">` : '🏪'}</div>
+        <div>
+          <div class="shop-name">${vendor.shop_name}</div>
+          <div class="shop-status">
+            <div class="status-dot" style="background:${vendor.is_active ? '#4ade80' : '#f87171'}"></div>
+            ${vendor.is_active ? 'Live' : 'Paused'}
+            ${vendor.avg_rating ? ` · ★ ${parseFloat(vendor.avg_rating).toFixed(1)}` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="stat-label">Revenue (completed)</div>
+        <div class="stat-num">RM ${totalRevenue.toFixed(2)}</div>
+        <div class="stat-sub">${completedCount} completed orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active orders</div>
+        <div class="stat-num">${activeOrders}</div>
+        <div class="stat-sub">${pendingOrders > 0 ? pendingOrders + ' need action' : 'All caught up'}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Products listed</div>
+        <div class="stat-num">${products.length}</div>
+        <div class="stat-sub">${products.filter(p => p.is_active).length} active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg rating</div>
+        <div class="stat-num">${vendor.avg_rating ? parseFloat(vendor.avg_rating).toFixed(1) : '—'}</div>
+        <div class="stat-sub">out of 5.0</div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="quick-actions">
+      <a class="quick-btn" href="vendor-products.html?vendor=${vendorId}&mode=add">
+        <span class="quick-icon">➕</span>Add Product
+      </a>
+      <a class="quick-btn" href="vendor-shop.html?vendor=${vendorId}">
+        <span class="quick-icon">👁️</span>View Shop
+      </a>
+      <div class="quick-btn" onclick="toggleShopStatus()">
+        <span class="quick-icon">${vendor.is_active ? '⏸️' : '▶️'}</span>
+        <span id="toggle-label">${vendor.is_active ? 'Pause Shop' : 'Resume Shop'}</span>
+      </div>
+      <a class="quick-btn" href="orders.html">
+        <span class="quick-icon">📋</span>My Buys
+      </a>
+    </div>
+
+    <!-- Incoming orders -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-title">
+          Incoming Orders
+          ${pendingOrders > 0 ? `<span class="action-badge">${pendingOrders} new</span>` : ''}
+        </span>
+        <a class="section-link" href="vendor-orders.html?vendor=${vendorId}">See all →</a>
+      </div>
+      ${renderOrderRows(allOrders.filter(o => ['pending','confirmed','in_progress','ready'].includes(o.status)).slice(0, 5))}
+    </div>
+
+    <!-- Products -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-title">Your Products</span>
+        <a class="section-link" href="vendor-products.html?vendor=${vendorId}">Manage →</a>
+      </div>
+      ${renderProductRows(products.slice(0, 6))}
+      <a class="add-product-btn" href="vendor-products.html?vendor=${vendorId}&mode=add">
+        ＋ Add a new product
+      </a>
+    </div>
+  `
+
+  document.getElementById('page-content').innerHTML = html
+}
+
+function renderOrderRows(orders) {
+  if (!orders.length) return '<div class="empty-row">No active orders right now.</div>'
+  return orders.map(o => {
+    const cat  = o.products?.category || 'other'
+    const col  = CATEGORY_COLORS[cat] || CATEGORY_COLORS.other
+    const thumb = o.products?.image_url
+      ? `<img src="${o.products.image_url}" alt="">`
+      : col.emoji
+    const buyer = o.public_profiles?.full_name || 'Student'
+    const date  = new Date(o.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short' })
+    return `<a class="order-item" href="order-detail.html?id=${o.id}">
+      <div class="order-thumb" style="background:${col.bg}">${thumb}</div>
+      <div class="order-info">
+        <div class="order-prod">${o.products?.name || 'Order'}</div>
+        <div class="order-buyer">${buyer} · ${date}</div>
+      </div>
+      <div class="order-right">
+        <div class="order-amt">RM ${parseFloat(o.total_amount).toFixed(2)}</div>
+        <span class="badge badge-${o.status}">${STATUS_LABELS[o.status] || o.status}</span>
+      </div>
+    </a>`
+  }).join('')
+}
+
+function renderProductRows(prods) {
+  if (!prods.length) return '<div class="empty-row">No products yet. Add your first one!</div>'
+  return prods.map(p => {
+    const col  = CATEGORY_COLORS[p.category] || CATEGORY_COLORS.other
+    const thumb = p.image_url ? `<img src="${p.image_url}" alt="">` : col.emoji
+    const stockCls = p.stock === 0 ? 'stock-out' : p.stock <= 3 ? 'stock-low' : 'stock-ok'
+    const stockTxt = p.stock === 0 ? 'Out of stock' : p.stock <= 3 ? `${p.stock} left` : `${p.stock} in stock`
+    return `<div class="product-item">
+      <div class="prod-thumb" style="background:${col.bg}">${thumb}</div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-meta">RM ${parseFloat(p.price).toFixed(2)} · ${p.listing_type === 'one_off' ? 'One-off' : 'Permanent'}</div>
+      </div>
+      <div class="prod-right">
+        <span class="stock-chip ${stockCls}">${stockTxt}</span>
+        <button class="toggle-btn ${p.is_active ? 'active-btn' : ''}" onclick="toggleProduct('${p.id}', ${p.is_active}, this)">
+          ${p.is_active ? 'Active' : 'Hidden'}
+        </button>
+      </div>
+    </div>`
+  }).join('')
+}
+
+async function toggleProduct(productId, currentActive, btn) {
+  btn.disabled = true
+  const { error } = await db.from('products').update({ is_active: !currentActive }).eq('id', productId)
+  if (error) { btn.disabled = false; showToast('Failed to update.'); return }
+  btn.textContent = !currentActive ? 'Active' : 'Hidden'
+  btn.classList.toggle('active-btn', !currentActive)
+  btn.disabled = false
+  showToast(!currentActive ? 'Product is now visible.' : 'Product hidden from shop.')
+  // Update local state
+  const prod = products.find(p => p.id === productId)
+  if (prod) prod.is_active = !currentActive
+}
+
+async function toggleShopStatus() {
+  const newStatus = !vendor.is_active
+  const { error } = await db.from('vendors').update({ is_active: newStatus }).eq('id', vendorId)
+  if (error) { showToast('Failed to update shop status.'); return }
+  vendor.is_active = newStatus
+  document.getElementById('toggle-label').textContent = newStatus ? 'Pause Shop' : 'Resume Shop'
+  showToast(newStatus ? 'Shop is now live!' : 'Shop paused — hidden from browse.')
+}
+
+init()
+</script>
+</body>
+</html>

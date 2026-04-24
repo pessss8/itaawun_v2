@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --green-dark:  #15785a;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --red:         #ef4444;
+    --radius:      12px;
+    --shadow:      0 1px 3px rgba(0,0,0,.08);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 2rem; }
+
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn     { color: var(--gray-600); text-decoration: none; font-size: .9rem; flex-shrink: 0; }
+  .header-title { font-size: 1rem; font-weight: 700; flex: 1; }
+  .btn-add-header {
+    font-size: .82rem; font-weight: 600; color: var(--green);
+    background: var(--green-light); border: none; border-radius: 8px;
+    padding: .35rem .75rem; cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+  }
+
+  /* ── PRODUCT LIST VIEW ── */
+  .list-wrap { padding: .75rem; display: flex; flex-direction: column; gap: .5rem; }
+
+  .product-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    padding: .85rem; display: flex; align-items: flex-start; gap: .75rem;
+    transition: box-shadow .1s;
+  }
+  .product-card:hover { box-shadow: var(--shadow); }
+  .prod-thumb { width: 52px; height: 52px; border-radius: 10px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; overflow: hidden; }
+  .prod-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .prod-body  { flex: 1; min-width: 0; }
+  .prod-name  { font-size: .875rem; font-weight: 600; margin-bottom: .2rem; }
+  .prod-price { font-size: .95rem; font-weight: 700; color: var(--green); margin-bottom: .25rem; }
+  .prod-chips { display: flex; gap: .3rem; flex-wrap: wrap; }
+  .chip { font-size: .68rem; font-weight: 500; padding: .18rem .5rem; border-radius: 100px; }
+  .chip-active  { background: var(--green-light); color: var(--green-dark); }
+  .chip-hidden  { background: var(--gray-100); color: var(--gray-500); }
+  .chip-stock-ok  { background: #f0fdf4; color: #166534; }
+  .chip-stock-low { background: #fef3c7; color: #92400e; }
+  .chip-stock-out { background: #fee2e2; color: #991b1b; }
+  .chip-oneoff { background: #eff6ff; color: #1e40af; }
+  .prod-actions { display: flex; flex-direction: column; gap: .35rem; flex-shrink: 0; }
+  .btn-edit { font-size: .78rem; padding: .3rem .7rem; border: 1.5px solid var(--gray-200); border-radius: 8px; background: none; cursor: pointer; font-family: inherit; color: var(--gray-600); transition: border-color .15s; }
+  .btn-edit:hover { border-color: var(--green); color: var(--green); }
+  .btn-delete { font-size: .78rem; padding: .3rem .7rem; border: 1.5px solid var(--gray-200); border-radius: 8px; background: none; cursor: pointer; font-family: inherit; color: var(--gray-400); transition: border-color .15s, color .15s; }
+  .btn-delete:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 3rem 1.5rem; }
+  .empty-icon  { font-size: 2.5rem; margin-bottom: .75rem; }
+  .empty-title { font-size: .95rem; font-weight: 600; margin-bottom: .3rem; }
+  .empty-sub   { font-size: .83rem; color: var(--gray-400); line-height: 1.6; }
+
+  /* ── ADD / EDIT FORM (bottom sheet) ── */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; }
+  .overlay.open { display: block; }
+  .sheet {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-radius: 20px 20px 0 0;
+    padding: 1.25rem 1rem 2.5rem; z-index: 201;
+    transform: translateY(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+    max-height: 94vh; overflow-y: auto;
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet-handle { width: 36px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 auto 1.1rem; }
+  .sheet-title  { font-size: 1rem; font-weight: 700; margin-bottom: 1.1rem; }
+
+  .field { margin-bottom: .95rem; }
+  .field label { display: block; font-size: .78rem; font-weight: 500; color: var(--gray-600); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .4rem; }
+  .field input, .field textarea, .field select {
+    width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px;
+    padding: .7rem .9rem; font-size: .9rem; font-family: inherit;
+    outline: none; transition: border-color .15s; color: var(--gray-900); background: #fff;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--green); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--gray-400); }
+  .field textarea { resize: none; height: 72px; }
+  .field .hint   { font-size: .74rem; color: var(--gray-400); margin-top: .3rem; }
+  .error-msg { font-size: .78rem; color: var(--red); margin-top: .3rem; display: none; }
+  .error-msg.visible { display: block; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+  /* category chips in sheet */
+  .cat-grid { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .cat-chip {
+    padding: .3rem .65rem; border-radius: 100px;
+    border: 1.5px solid var(--gray-200); font-size: .75rem; font-weight: 500;
+    cursor: pointer; background: #fff; color: var(--gray-600);
+    transition: border-color .15s, background .15s; white-space: nowrap;
+  }
+  .cat-chip.selected { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+
+  /* listing type toggle */
+  .type-row { display: flex; gap: .5rem; }
+  .type-opt {
+    flex: 1; padding: .6rem; border: 1.5px solid var(--gray-200); border-radius: 10px;
+    text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .type-opt.selected { border-color: var(--green); background: var(--green-light); }
+  .type-opt .t-label { font-size: .82rem; font-weight: 600; margin-bottom: .15rem; }
+  .type-opt .t-sub   { font-size: .72rem; color: var(--gray-400); }
+  .type-opt.selected .t-sub { color: var(--green-dark); }
+
+  /* image upload in sheet */
+  .img-upload {
+    border: 1.5px dashed var(--gray-200); border-radius: 10px;
+    padding: 1rem; text-align: center; cursor: pointer;
+    position: relative; overflow: hidden; transition: border-color .15s, background .15s;
+  }
+  .img-upload:hover { border-color: var(--green); background: var(--green-light); }
+  .img-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .img-upload img   { width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; display: none; }
+  .img-placeholder  { font-size: .82rem; color: var(--gray-400); }
+
+  .btn-save-product {
+    width: 100%; padding: .85rem; background: var(--green); color: #fff;
+    border: none; border-radius: 10px; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: opacity .15s; margin-top: .25rem;
+  }
+  .btn-save-product:hover { opacity: .9; }
+  .btn-save-product:disabled { opacity: .5; cursor: default; }
+
+  /* ── SKELETON ── */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  #toast { display: none; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" id="back-btn" href="vendor-dashboard.html">&#8592;</a>
+  <div class="header-title">My Products</div>
+  <button class="btn-add-header" onclick="openSheet(null)">＋ Add</button>
+</header>
+
+<div id="list-area">
+  <!-- skeleton -->
+  <div class="list-wrap">
+    ${[1,2,3].map(() => `<div style="background:#fff;border:1px solid var(--gray-200);border-radius:12px;padding:.85rem;display:flex;gap:.75rem">
+      <div class="skeleton" style="width:52px;height:52px;border-radius:10px;flex-shrink:0"></div>
+      <div style="flex:1"><div class="skeleton" style="height:14px;width:60%;margin-bottom:.3rem"></div><div class="skeleton" style="height:16px;width:35%;margin-bottom:.3rem"></div><div class="skeleton" style="height:12px;width:50%"></div></div>
+    </div>`).join('')}
+  </div>
+</div>
+
+<!-- Add / Edit sheet -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="product-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheet-title">Add Product</div>
+
+  <div class="field">
+    <label>Product name <span style="color:var(--red)">*</span></label>
+    <input type="text" id="f-name" placeholder="e.g. A4 Printing (per page)" maxlength="120">
+    <div class="error-msg" id="f-name-err">Product name is required.</div>
+  </div>
+
+  <div class="field">
+    <label>Description <span style="font-weight:400;text-transform:none;font-size:.76rem;color:var(--gray-400)">(optional)</span></label>
+    <textarea id="f-desc" placeholder="What's included? Any conditions?" maxlength="500"></textarea>
+  </div>
+
+  <div class="row-2">
+    <div class="field">
+      <label>Price (RM) <span style="color:var(--red)">*</span></label>
+      <input type="number" id="f-price" placeholder="0.00" min="0" step="0.01">
+      <div class="error-msg" id="f-price-err">Enter a valid price.</div>
+    </div>
+    <div class="field">
+      <label>Stock qty <span style="color:var(--red)">*</span></label>
+      <input type="number" id="f-stock" placeholder="e.g. 10" min="0" step="1">
+      <div class="error-msg" id="f-stock-err">Enter stock quantity.</div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Category <span style="color:var(--red)">*</span></label>
+    <div class="cat-grid" id="f-cat-grid"></div>
+    <div class="error-msg" id="f-cat-err">Please select a category.</div>
+  </div>
+
+  <div class="field">
+    <label>Listing type</label>
+    <div class="type-row">
+      <div class="type-opt selected" id="type-permanent" onclick="selectType('permanent')">
+        <div class="t-label">Permanent</div>
+        <div class="t-sub">Always available</div>
+      </div>
+      <div class="type-opt" id="type-one_off" onclick="selectType('one_off')">
+        <div class="t-label">One-off</div>
+        <div class="t-sub">Single sale item</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Product photo <span style="font-weight:400;text-transform:none;font-size:.76rem;color:var(--gray-400)">(optional)</span></label>
+    <div class="img-upload" id="img-upload-area">
+      <input type="file" id="f-image" accept="image/jpeg,image/png" onchange="previewImage(this)">
+      <img id="img-preview" alt="Preview">
+      <div class="img-placeholder" id="img-placeholder">📷 Tap to add a photo</div>
+    </div>
+  </div>
+
+  <button class="btn-save-product" id="save-product-btn" onclick="saveProduct()">Save Product</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const CATEGORIES = [
+  { key: 'food_drinks', label: '🍱 Food & Drinks' }, { key: 'runner',       label: '🏃 Runner'       },
+  { key: 'printing',    label: '🖨️ Printing'      }, { key: 'cleaning',     label: '🧹 Cleaning'     },
+  { key: 'laundry',     label: '👕 Laundry'        }, { key: 'delivery',     label: '📦 Delivery'     },
+  { key: 'tutoring',    label: '📚 Tutoring'       }, { key: 'design',       label: '🎨 Design'       },
+  { key: 'coding',      label: '💻 Coding'         }, { key: 'photography',  label: '📷 Photography'  },
+  { key: 'repair',      label: '🔧 Repair'         }, { key: 'sell_product', label: '🛍️ Sell Product' },
+  { key: 'other',       label: '📌 Other'          }
+]
+const CATEGORY_COLORS = {
+  food_drinks:{bg:'#fff7ed',emoji:'🍱'}, runner:{bg:'#eff6ff',emoji:'🏃'},
+  printing:{bg:'#f3f4f6',emoji:'🖨️'},   cleaning:{bg:'#ecfdf5',emoji:'🧹'},
+  laundry:{bg:'#f5f3ff',emoji:'👕'},     delivery:{bg:'#fffbeb',emoji:'📦'},
+  tutoring:{bg:'#fef2f2',emoji:'📚'},    design:{bg:'#fdf2f8',emoji:'🎨'},
+  coding:{bg:'#f0fdfa',emoji:'💻'},      photography:{bg:'#fff7ed',emoji:'📷'},
+  repair:{bg:'#eef2ff',emoji:'🔧'},      sell_product:{bg:'#f7fee7',emoji:'🛍️'},
+  other:{bg:'#f3f4f6',emoji:'📌'}
+}
+
+const params   = new URLSearchParams(window.location.search)
+const vendorId = params.get('vendor')
+const initMode = params.get('mode') // 'add' to open sheet immediately
+
+let products       = []
+let editingId      = null
+let selectedCat    = null
+let selectedType   = 'permanent'
+let imageFile      = null
+let currentSession = null
+
+// Build category chips
+const catGrid = document.getElementById('f-cat-grid')
+CATEGORIES.forEach(c => {
+  const btn = document.createElement('button')
+  btn.type = 'button'; btn.className = 'cat-chip'
+  btn.textContent = c.label; btn.dataset.key = c.key
+  btn.onclick = () => selectCat(c.key, btn)
+  catGrid.appendChild(btn)
+})
+
+function selectCat(key, btn) {
+  selectedCat = key
+  document.querySelectorAll('#f-cat-grid .cat-chip').forEach(c => c.classList.remove('selected'))
+  btn.classList.add('selected')
+  document.getElementById('f-cat-err').classList.remove('visible')
+}
+
+function selectType(type) {
+  selectedType = type
+  document.getElementById('type-permanent').classList.toggle('selected', type === 'permanent')
+  document.getElementById('type-one_off').classList.toggle('selected',   type === 'one_off')
+}
+
+function previewImage(input) {
+  imageFile = input.files[0] || null
+  const preview = document.getElementById('img-preview')
+  const placeholder = document.getElementById('img-placeholder')
+  if (imageFile) {
+    preview.src = URL.createObjectURL(imageFile)
+    preview.style.display = 'block'
+    placeholder.style.display = 'none'
+  } else {
+    preview.style.display = 'none'
+    placeholder.style.display = 'block'
+  }
+}
+
+// ── SHEET OPEN / CLOSE ────────────────────────────────────
+function openSheet(product) {
+  editingId   = product?.id || null
+  imageFile   = null
+
+  document.getElementById('sheet-title').textContent = product ? 'Edit Product' : 'Add Product'
+  document.getElementById('f-name').value   = product?.name        || ''
+  document.getElementById('f-desc').value   = product?.description || ''
+  document.getElementById('f-price').value  = product?.price       || ''
+  document.getElementById('f-stock').value  = product?.stock ?? ''
+  document.getElementById('save-product-btn').textContent = product ? 'Save Changes' : 'Save Product'
+
+  // Reset image
+  document.getElementById('img-preview').style.display    = 'none'
+  document.getElementById('img-placeholder').style.display = 'block'
+  document.getElementById('f-image').value = ''
+  if (product?.image_url) {
+    document.getElementById('img-preview').src = product.image_url
+    document.getElementById('img-preview').style.display = 'block'
+    document.getElementById('img-placeholder').style.display = 'none'
+  }
+
+  // Category
+  selectedCat = product?.category || null
+  document.querySelectorAll('#f-cat-grid .cat-chip').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.key === selectedCat)
+  })
+
+  // Type
+  selectedType = product?.listing_type || 'permanent'
+  selectType(selectedType)
+
+  // Clear errors
+  ;['f-name-err','f-price-err','f-stock-err','f-cat-err'].forEach(id => {
+    document.getElementById(id).classList.remove('visible')
+  })
+
+  document.getElementById('overlay').classList.add('open')
+  document.getElementById('product-sheet').classList.add('open')
+  document.body.style.overflow = 'hidden'
+  setTimeout(() => document.getElementById('f-name').focus(), 350)
+}
+
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('open')
+  document.getElementById('product-sheet').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+// ── SAVE ──────────────────────────────────────────────────
+async function saveProduct() {
+  const name  = document.getElementById('f-name').value.trim()
+  const desc  = document.getElementById('f-desc').value.trim()
+  const price = parseFloat(document.getElementById('f-price').value)
+  const stock = parseInt(document.getElementById('f-stock').value, 10)
+  let ok = true
+
+  ;['f-name-err','f-price-err','f-stock-err','f-cat-err'].forEach(id =>
+    document.getElementById(id).classList.remove('visible'))
+
+  if (!name)                   { document.getElementById('f-name-err').classList.add('visible');  ok = false }
+  if (isNaN(price) || price < 0) { document.getElementById('f-price-err').classList.add('visible'); ok = false }
+  if (isNaN(stock) || stock < 0) { document.getElementById('f-stock-err').classList.add('visible'); ok = false }
+  if (!selectedCat)            { document.getElementById('f-cat-err').classList.add('visible');   ok = false }
+  if (!ok) return
+
+  const btn = document.getElementById('save-product-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
+
+  let imageUrl = editingId ? (products.find(p => p.id === editingId)?.image_url || null) : null
+
+  if (imageFile) {
+    btn.textContent = 'Uploading image…'
+    const ext  = imageFile.name.split('.').pop()
+    const path = vendorId + '/' + Date.now() + '.' + ext
+    const { error: upErr } = await db.storage.from('vendor-assets').upload(path, imageFile, { upsert: true })
+    if (!upErr) {
+      const { data } = db.storage.from('vendor-assets').getPublicUrl(path)
+      imageUrl = data.publicUrl
+    }
+  }
+
+  btn.textContent = editingId ? 'Saving…' : 'Adding product…'
+
+  const payload = {
+    name, description: desc || null, price, stock,
+    category: selectedCat, listing_type: selectedType,
+    vendor_id: vendorId, is_active: true
+  }
+  if (imageUrl) payload.image_url = imageUrl
+
+  let error
+  if (editingId) {
+    ;({ error } = await db.from('products').update(payload).eq('id', editingId))
+  } else {
+    ;({ error } = await db.from('products').insert(payload))
+  }
+
+  if (error) {
+    btn.disabled = false
+    btn.textContent = editingId ? 'Save Changes' : 'Save Product'
+    showToast('Failed to save. Please try again.')
+    return
+  }
+
+  closeSheet()
+  btn.disabled = false
+  btn.textContent = editingId ? 'Save Changes' : 'Save Product'
+  showToast(editingId ? 'Product updated!' : 'Product added!')
+  loadProducts()
+}
+
+// ── DELETE ────────────────────────────────────────────────
+async function deleteProduct(id, name) {
+  if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+  const { error } = await db.from('products').delete().eq('id', id)
+  if (error) { showToast('Failed to delete.'); return }
+  showToast('Product deleted.')
+  loadProducts()
+}
+
+// ── LOAD & RENDER ─────────────────────────────────────────
+async function loadProducts() {
+  const { data } = await db.from('products')
+    .select('id, name, description, price, stock, category, listing_type, is_active, image_url')
+    .eq('vendor_id', vendorId)
+    .order('created_at', { ascending: false })
+  products = data || []
+  renderList()
+}
+
+function renderList() {
+  const area = document.getElementById('list-area')
+  if (!products.length) {
+    area.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <div class="empty-title">No products yet</div>
+      <div class="empty-sub">Tap "+ Add" to list your first product and start selling.</div>
+    </div>`
+    return
+  }
+
+  area.innerHTML = `<div class="list-wrap">${products.map(p => {
+    const col   = CATEGORY_COLORS[p.category] || CATEGORY_COLORS.other
+    const thumb = p.image_url
+      ? `<img src="${p.image_url}" alt="${p.name}">`
+      : col.emoji
+    const stockCls = p.stock === 0 ? 'chip-stock-out' : p.stock <= 3 ? 'chip-stock-low' : 'chip-stock-ok'
+    const stockTxt = p.stock === 0 ? '❌ Out of stock' : p.stock <= 3 ? `⚠️ ${p.stock} left` : `✅ ${p.stock} in stock`
+    return `<div class="product-card">
+      <div class="prod-thumb" style="background:${col.bg}">${thumb}</div>
+      <div class="prod-body">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-price">RM ${parseFloat(p.price).toFixed(2)}</div>
+        <div class="prod-chips">
+          <span class="chip ${p.is_active ? 'chip-active' : 'chip-hidden'}">${p.is_active ? 'Active' : 'Hidden'}</span>
+          <span class="chip ${stockCls}">${stockTxt}</span>
+          ${p.listing_type === 'one_off' ? '<span class="chip chip-oneoff">One-off</span>' : ''}
+        </div>
+      </div>
+      <div class="prod-actions">
+        <button class="btn-edit"   onclick='openSheet(${JSON.stringify(p)})'>Edit</button>
+        <button class="btn-delete" onclick="deleteProduct('${p.id}', '${p.name.replace(/'/g,"\\'")}')">Delete</button>
+      </div>
+    </div>`
+  }).join('')}</div>`
+}
+
+async function init() {
+  currentSession = await requireAuth()
+  if (!currentSession) return
+
+  if (!vendorId) { window.location.href = 'vendor-dashboard.html'; return }
+
+  document.getElementById('back-btn').href = 'vendor-dashboard.html?vendor=' + vendorId
+  await loadProducts()
+
+  if (initMode === 'add') openSheet(null)
+}
+
+init()
+</script>
+</body>
+</html>

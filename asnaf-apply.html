@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asnaf Application — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:#1D9E75; --green-light:#e8f7f2; --green-dark:#15785a;
+    --blue:#2563eb; --blue-light:#eff6ff; --blue-dark:#1e40af;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-400:#9ca3af; --gray-500:#6b7280; --gray-600:#4b5563; --gray-900:#111827;
+    --red:#ef4444; --radius:12px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 2rem; }
+
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn     { color: var(--gray-600); text-decoration: none; font-size: .9rem; }
+  .header-title { font-size: 1rem; font-weight: 700; flex: 1; }
+
+  /* ── HERO ── */
+  .hero { background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: #fff; padding: 1.75rem 1rem 2rem; text-align: center; }
+  .hero-icon  { font-size: 2.5rem; margin-bottom: .5rem; }
+  .hero-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .3rem; }
+  .hero-sub   { font-size: .83rem; opacity: .85; line-height: 1.6; max-width: 320px; margin: 0 auto; }
+
+  /* ── INFO CARD ── */
+  .info-card { background: var(--blue-light); border: 1px solid #bfdbfe; border-radius: var(--radius); margin: .85rem; padding: .85rem; }
+  .info-row  { display: flex; gap: .65rem; align-items: flex-start; margin-bottom: .5rem; font-size: .82rem; color: var(--blue-dark); line-height: 1.5; }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-icon { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+
+  /* ── STEPS ── */
+  .steps-bar { display: flex; align-items: center; background: #fff; border-bottom: 1px solid var(--gray-100); padding: .7rem 1rem; gap: .25rem; }
+  .step-item { display: flex; align-items: center; gap: .35rem; flex: 1; }
+  .step-dot  { width: 20px; height: 20px; border-radius: 50%; background: var(--gray-200); color: var(--gray-500); font-size: .65rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .3s; }
+  .step-dot.active { background: var(--blue); color: #fff; }
+  .step-dot.done   { background: var(--blue-dark); color: #fff; }
+  .step-label { font-size: .72rem; color: var(--gray-400); white-space: nowrap; }
+  .step-item.active .step-label { color: var(--blue); font-weight: 600; }
+  .step-sep  { color: var(--gray-300); font-size: .85rem; flex-shrink: 0; }
+
+  /* ── FORM ── */
+  .form-card  { background: #fff; border-top: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); padding: 1rem; margin-top: .5rem; }
+  .form-title { font-size: .95rem; font-weight: 700; margin-bottom: .25rem; }
+  .form-sub   { font-size: .82rem; color: var(--gray-500); margin-bottom: 1rem; line-height: 1.5; }
+
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-size: .78rem; font-weight: 500; color: var(--gray-600); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .4rem; }
+  .field input, .field textarea, .field select { width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: .7rem .9rem; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .15s; color: var(--gray-900); background: #fff; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--blue); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--gray-400); }
+  .field textarea { resize: none; height: 80px; }
+  .field .hint { font-size: .74rem; color: var(--gray-400); margin-top: .3rem; line-height: 1.4; }
+  .error-msg { font-size: .78rem; color: var(--red); margin-top: .3rem; display: none; }
+  .error-msg.visible { display: block; }
+
+  /* ── UPLOAD AREA ── */
+  .upload-area {
+    border: 1.5px dashed var(--gray-200); border-radius: 10px;
+    padding: 1.1rem; text-align: center; cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: border-color .15s, background .15s;
+  }
+  .upload-area:hover { border-color: var(--blue); background: var(--blue-light); }
+  .upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-icon  { font-size: 1.5rem; margin-bottom: .3rem; }
+  .upload-label { font-size: .82rem; color: var(--gray-500); }
+  .upload-name  { font-size: .8rem; color: var(--blue); font-weight: 500; margin-top: .25rem; display: none; }
+
+  /* ── PRIVACY NOTICE ── */
+  .privacy-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 9px; padding: .75rem; font-size: .78rem; color: #92400e; line-height: 1.55; margin-bottom: 1rem; }
+
+  /* ── BUTTONS ── */
+  .btn-primary { width: 100%; padding: .85rem; background: var(--blue); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity .15s; }
+  .btn-primary:hover { opacity: .9; }
+  .btn-primary:disabled { opacity: .5; cursor: default; }
+  .btn-ghost { width: 100%; padding: .75rem; background: none; border: 1.5px solid var(--gray-200); border-radius: 10px; font-size: .875rem; font-weight: 500; color: var(--gray-600); cursor: pointer; font-family: inherit; margin-top: .5rem; transition: border-color .15s; }
+  .btn-ghost:hover { border-color: var(--gray-400); }
+
+  /* ── SUCCESS ── */
+  .success-wrap { text-align: center; padding: 3rem 1.5rem; display: none; }
+  .success-icon  { font-size: 3rem; margin-bottom: .75rem; }
+  .success-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .4rem; }
+  .success-sub   { font-size: .875rem; color: var(--gray-500); line-height: 1.6; margin-bottom: 1.5rem; }
+  .btn-home { display: block; padding: .85rem; background: var(--blue); color: #fff; border-radius: 10px; text-decoration: none; font-size: .95rem; font-weight: 600; text-align: center; }
+
+  #toast { display: none; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" href="profile.html">&#8592;</a>
+  <div class="header-title">Asnaf Application</div>
+</header>
+
+<div id="main-content">
+
+  <div class="hero">
+    <div class="hero-icon">🤝</div>
+    <div class="hero-title">Apply for Asnaf Support</div>
+    <div class="hero-sub">Low-income students receive reduced platform fees and priority assistance from the iTa'awun community.</div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-row"><span class="info-icon">💸</span><span>Reduced service fee — pay less on every transaction</span></div>
+    <div class="info-row"><span class="info-icon">🔒</span><span>Your income documents are kept strictly private — only admins can view them</span></div>
+    <div class="info-row"><span class="info-icon">⏱️</span><span>Applications are reviewed within 3 working days</span></div>
+  </div>
+
+  <div class="steps-bar">
+    <div class="step-item active" id="si-1"><div class="step-dot active" id="sd-1">1</div><span class="step-label">Personal Info</span></div>
+    <span class="step-sep">›</span>
+    <div class="step-item" id="si-2"><div class="step-dot" id="sd-2">2</div><span class="step-label">Documents</span></div>
+    <span class="step-sep">›</span>
+    <div class="step-item" id="si-3"><div class="step-dot" id="sd-3">3</div><span class="step-label">Submit</span></div>
+  </div>
+
+  <!-- Step 1 -->
+  <div id="step1" class="form-card">
+    <div class="form-title">Personal details</div>
+    <div class="form-sub">Basic information to verify your eligibility.</div>
+
+    <div class="field">
+      <label>Full name (as on IC) <span style="color:var(--red)">*</span></label>
+      <input type="text" id="f-fullname" placeholder="e.g. Ahmad bin Abdullah" maxlength="100" autocomplete="name">
+      <div class="error-msg" id="name-err">Full name is required.</div>
+    </div>
+
+    <div class="field">
+      <label>IC number <span style="color:var(--red)">*</span></label>
+      <input type="text" id="f-ic" placeholder="e.g. 001231-14-1234" maxlength="14" inputmode="numeric">
+      <div class="error-msg" id="ic-err">Enter a valid IC number.</div>
+    </div>
+
+    <div class="field">
+      <label>Household monthly income (RM) <span style="color:var(--red)">*</span></label>
+      <input type="number" id="f-income" placeholder="e.g. 1500" min="0" step="1">
+      <div class="hint">Combined income of all household members.</div>
+      <div class="error-msg" id="income-err">Please enter your household income.</div>
+    </div>
+
+    <div class="field">
+      <label>Number of household dependants <span style="color:var(--red)">*</span></label>
+      <input type="number" id="f-dependants" placeholder="e.g. 5" min="0" step="1">
+      <div class="error-msg" id="dep-err">Please enter the number of dependants.</div>
+    </div>
+
+    <div class="field">
+      <label>Brief situation <span style="color:var(--red)">*</span></label>
+      <textarea id="f-situation" placeholder="Describe your financial situation briefly. E.g. single parent household, no steady income, etc." maxlength="500"></textarea>
+      <div class="error-msg" id="sit-err">Please describe your situation.</div>
+    </div>
+
+    <button class="btn-primary" onclick="goStep(2)">Continue →</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="step2" class="form-card" style="display:none">
+    <div class="form-title">Supporting documents</div>
+    <div class="form-sub">Upload proof of income. Accepted: pay slips, EPF statement, welfare letter, or B40 certificate.</div>
+
+    <div class="field">
+      <label>Income document <span style="color:var(--red)">*</span></label>
+      <div class="upload-area" id="doc-area">
+        <input type="file" id="f-doc" accept="image/jpeg,image/png,application/pdf" onchange="handleDoc(this)">
+        <div class="upload-icon">📄</div>
+        <div class="upload-label">Tap to upload (JPG, PNG, or PDF)</div>
+        <div class="upload-name" id="doc-name"></div>
+      </div>
+      <div class="error-msg" id="doc-err">Please upload a supporting document.</div>
+      <div class="hint">Max 10 MB. This document is private and only accessible to platform admins.</div>
+    </div>
+
+    <div class="field">
+      <label>Additional document <span style="font-weight:400;text-transform:none;font-size:.76rem;color:var(--gray-400)">(optional)</span></label>
+      <div class="upload-area" id="doc2-area">
+        <input type="file" id="f-doc2" accept="image/jpeg,image/png,application/pdf" onchange="handleDoc2(this)">
+        <div class="upload-icon">📎</div>
+        <div class="upload-label">Tap to upload a second document</div>
+        <div class="upload-name" id="doc2-name"></div>
+      </div>
+    </div>
+
+    <div class="privacy-box">
+      🔒 Your documents are uploaded to a private, encrypted storage bucket. They are never shown to other users or vendors — only reviewed by CFS IIUM Gambang administrators.
+    </div>
+
+    <button class="btn-primary" onclick="goStep(3)">Continue →</button>
+    <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+  </div>
+
+  <!-- Step 3: Review & submit -->
+  <div id="step3" class="form-card" style="display:none">
+    <div class="form-title">Review & Submit</div>
+    <div class="form-sub">Check your details before submitting.</div>
+
+    <div id="review-summary" style="background:var(--gray-50);border-radius:10px;padding:.85rem;margin-bottom:1rem"></div>
+
+    <div class="privacy-box" style="margin-bottom:1rem">
+      By submitting, you confirm that all information provided is true and accurate. False declarations may result in removal from the Asnaf programme.
+    </div>
+
+    <button class="btn-primary" id="submit-btn" onclick="submitApplication()">Submit Application</button>
+    <button class="btn-ghost" onclick="goStep(2)">← Back</button>
+  </div>
+
+</div>
+
+<div class="success-wrap" id="success-state">
+  <div class="success-icon">📬</div>
+  <div class="success-title">Application received!</div>
+  <div class="success-sub">Thank you. Your application is under review. We'll update your account status within 3 working days. You'll see a notification on your home screen when it's approved.</div>
+  <a class="btn-home" href="home.html">Back to Home</a>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let docFile  = null
+let doc2File = null
+
+function handleDoc(input) {
+  docFile = input.files[0] || null
+  const n = document.getElementById('doc-name')
+  n.textContent = docFile ? '✅ ' + docFile.name : ''
+  n.style.display = docFile ? 'block' : 'none'
+  document.getElementById('doc-err').classList.remove('visible')
+}
+
+function handleDoc2(input) {
+  doc2File = input.files[0] || null
+  const n = document.getElementById('doc2-name')
+  n.textContent = doc2File ? '✅ ' + doc2File.name : ''
+  n.style.display = doc2File ? 'block' : 'none'
+}
+
+function goStep(n) {
+  if (n === 2 && !validateStep1()) return
+  if (n === 3 && !validateStep2()) return
+
+  ;[1,2,3].forEach(i => {
+    document.getElementById('step' + i).style.display = i === n ? 'block' : 'none'
+    const dot = document.getElementById('sd-' + i)
+    dot.classList.toggle('active', i === n)
+    dot.classList.toggle('done',   i < n)
+    document.getElementById('si-' + i).classList.toggle('active', i === n)
+  })
+
+  if (n === 3) buildReview()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function validateStep1() {
+  const name   = document.getElementById('f-fullname').value.trim()
+  const ic     = document.getElementById('f-ic').value.trim()
+  const income = document.getElementById('f-income').value
+  const dep    = document.getElementById('f-dependants').value
+  const sit    = document.getElementById('f-situation').value.trim()
+  let ok = true
+
+  ;['name-err','ic-err','income-err','dep-err','sit-err'].forEach(id =>
+    document.getElementById(id).classList.remove('visible'))
+
+  if (!name)                      { document.getElementById('name-err').classList.add('visible');   ok = false }
+  if (ic.replace(/\D/g,'').length < 12) { document.getElementById('ic-err').classList.add('visible');     ok = false }
+  if (!income || income < 0)      { document.getElementById('income-err').classList.add('visible'); ok = false }
+  if (!dep    || dep < 0)         { document.getElementById('dep-err').classList.add('visible');    ok = false }
+  if (!sit)                       { document.getElementById('sit-err').classList.add('visible');    ok = false }
+  return ok
+}
+
+function validateStep2() {
+  if (!docFile) { document.getElementById('doc-err').classList.add('visible'); return false }
+  return true
+}
+
+function buildReview() {
+  const name   = document.getElementById('f-fullname').value.trim()
+  const ic     = document.getElementById('f-ic').value.trim()
+  const income = document.getElementById('f-income').value
+  const dep    = document.getElementById('f-dependants').value
+
+  document.getElementById('review-summary').innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.35rem;color:var(--gray-600)"><span>Name</span><strong style="color:var(--gray-900)">${name}</strong></div>
+    <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.35rem;color:var(--gray-600)"><span>IC</span><strong style="color:var(--gray-900);font-family:monospace">${ic}</strong></div>
+    <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.35rem;color:var(--gray-600)"><span>Monthly income</span><strong style="color:var(--gray-900)">RM ${parseFloat(income).toLocaleString()}</strong></div>
+    <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.35rem;color:var(--gray-600)"><span>Dependants</span><strong style="color:var(--gray-900)">${dep} person(s)</strong></div>
+    <div style="display:flex;justify-content:space-between;font-size:.875rem;color:var(--gray-600)"><span>Document</span><strong style="color:var(--green)">✅ ${docFile.name}</strong></div>
+    ${doc2File ? `<div style="display:flex;justify-content:space-between;font-size:.875rem;margin-top:.35rem;color:var(--gray-600)"><span>Document 2</span><strong style="color:var(--green)">✅ ${doc2File.name}</strong></div>` : ''}`
+}
+
+async function submitApplication() {
+  const btn = document.getElementById('submit-btn')
+  btn.disabled = true; btn.textContent = 'Submitting…'
+
+  const session = await requireAuth()
+  if (!session) return
+
+  const uid     = session.user.id
+  const name    = document.getElementById('f-fullname').value.trim()
+  const ic      = document.getElementById('f-ic').value.trim()
+  const income  = parseFloat(document.getElementById('f-income').value)
+  const dep     = parseInt(document.getElementById('f-dependants').value, 10)
+  const sit     = document.getElementById('f-situation').value.trim()
+
+  // Upload primary doc
+  btn.textContent = 'Uploading documents…'
+  const ext1  = docFile.name.split('.').pop()
+  const path1 = uid + '/income_doc_1.' + ext1
+  const { error: up1 } = await db.storage.from('income-docs').upload(path1, docFile, { upsert: true })
+  if (up1) { btn.disabled = false; btn.textContent = 'Submit Application'; showToast('Upload failed. Please try again.'); return }
+
+  let path2 = null
+  if (doc2File) {
+    const ext2 = doc2File.name.split('.').pop()
+    path2 = uid + '/income_doc_2.' + ext2
+    await db.storage.from('income-docs').upload(path2, doc2File, { upsert: true })
+  }
+
+  btn.textContent = 'Saving application…'
+
+  // Update user record with asnaf application data
+  const { error } = await db.from('users').update({
+    asnaf_ic:            ic,
+    asnaf_income:        income,
+    asnaf_dependants:    dep,
+    asnaf_situation:     sit,
+    asnaf_doc_url:       path1,
+    asnaf_doc2_url:      path2,
+    asnaf_applied_name:  name,
+    asnaf_status:        'pending'
+  }).eq('id', uid)
+
+  if (error) {
+    btn.disabled = false; btn.textContent = 'Submit Application'
+    showToast('Something went wrong. Please try again.')
+    return
+  }
+
+  document.getElementById('main-content').style.display = 'none'
+  document.getElementById('success-state').style.display = 'block'
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+async function init() {
+  const session = await requireAuth()
+  if (!session) return
+  // Pre-fill name from profile
+  const { data: user } = await db.from('users').select('full_name, role').eq('id', session.user.id).single()
+  if (user?.full_name) document.getElementById('f-fullname').value = user.full_name
+  if (user?.role === 'asnaf') {
+    document.getElementById('main-content').innerHTML = `<div style="text-align:center;padding:3rem 1.5rem">
+      <div style="font-size:2rem;margin-bottom:.75rem">✅</div>
+      <div style="font-size:.95rem;font-weight:600;margin-bottom:.4rem">You're already registered as Asnaf</div>
+      <div style="font-size:.83rem;color:var(--gray-500)">Your account already has Asnaf status.</div>
+      <a href="home.html" style="display:inline-block;margin-top:1.25rem;color:var(--blue);font-size:.875rem">← Back to Home</a>
+    </div>`
+  }
+}
+init()
+</script>
+</body>
+</html>

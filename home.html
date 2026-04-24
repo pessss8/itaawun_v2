@@ -1,750 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>iTa'awun - Home</title>
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <style>
- body {
- margin: 0;
- font-family: 'Segoe UI', sans-serif;
- min-height: 100vh;
- display: flex;
- flex-direction: column;
- color: #fff;
- background: linear-gradient(-45deg, #00008B, #ffffff, #3F00FF);
- background-size: 400% 400%;
- animation: gradientBG 15s ease infinite;
- }
- @keyframes gradientBG {
- 0% { background-position: 0% 50%; }
- 50% { background-position: 100% 50%; }
- 100% { background-position: 0% 50%; }
- }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --green-dark:  #15785a;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --radius:      12px;
+    --shadow:      0 1px 3px rgba(0,0,0,.08);
+    --shadow-md:   0 4px 6px rgba(0,0,0,.07);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 80px; }
 
- /* Header */
- header {
- background: rgba(0,0,0,0.2);
- color: white;
- padding: 15px 20px;
- display: flex;
- justify-content: space-between;
- align-items: center;
- flex-wrap: wrap;
- }
- header .logo {
- font-size: 24px; font-weight: bold;
- text-decoration: none; cursor: pointer;
- }
- nav a {
- color: white; margin: 0 15px;
- text-decoration: none; font-weight: 500;
- }
- nav a:hover { text-decoration: underline; }
+  /* ── HEADER ── */
+  .header {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { font-size: 1.1rem; font-weight: 700; color: var(--green); text-decoration: none; letter-spacing: -.02em; }
+  .logo span { color: var(--gray-900); }
+  .avatar-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--green-light);
+    color: var(--green);
+    font-size: .8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none; font-family: inherit;
+    position: relative;
+    flex-shrink: 0;
+  }
 
- /* Profile dropdown — click-based toggle */
- .profile-container {
- position: relative;
- display: inline-block;
- padding: 8px;
- margin: -8px;
- }
- .profile-pic {
- width: 40px; height: 40px;
- border-radius: 50%; cursor: pointer;
- border: 2px solid white;
- transition: transform 0.2s, box-shadow 0.2s;
- display: block;
- }
- /* Hover effect on profile pic */
- .profile-container:hover .profile-pic {
- transform: scale(1.1);
- box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
- }
- .dropdown {
- display: none;
- position: absolute;
- right: 0; top: 56px;
- background: white; color: #333;
- border-radius: 10px;
- box-shadow: 0 6px 20px rgba(0,0,0,0.25);
- min-width: 180px;
- z-index: 100;
- overflow: hidden;
- animation: fadeIn 0.15s ease;
- }
- .dropdown.open { display: block; }
- @keyframes fadeIn {
- from { opacity: 0; transform: translateY(-6px); }
- to { opacity: 1; transform: translateY(0); }
- }
- .dropdown a {
- display: block; padding: 11px 16px;
- text-decoration: none; color: #333; font-size: 14px;
- transition: background 0.15s;
- }
- .dropdown a:hover { background: #f5f0ff; color: #6b21a8; }
- .dropdown .divider { border: none; border-top: 1px solid #eee; margin: 0; }
- .dropdown .logout-link { color: #dc2626 !important; }
- .dropdown .logout-link:hover { background: #fef2f2 !important; }
+  /* ── DROPDOWN ── */
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    min-width: 180px;
+    overflow: hidden;
+    display: none;
+    z-index: 200;
+  }
+  .dropdown.open { display: block; }
+  .dropdown-name { padding: .65rem .9rem; font-size: .82rem; color: var(--gray-500); border-bottom: 1px solid var(--gray-100); }
+  .dropdown-name strong { display: block; font-size: .875rem; color: var(--gray-900); }
+  .dropdown a, .dropdown button {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .6rem .9rem;
+    font-size: .875rem; color: var(--gray-700);
+    text-decoration: none; background: none; border: none;
+    width: 100%; text-align: left; cursor: pointer; font-family: inherit;
+    transition: background .1s;
+  }
+  .dropdown a:hover, .dropdown button:hover { background: var(--gray-50); }
+  .dropdown .logout { color: #ef4444; }
 
- /* Hero */
- .hero {
- flex: 1; display: flex; flex-direction: column;
- justify-content: center; align-items: center;
- text-align: center; padding: 50px 20px;
- }
- .hero h1 {
- font-size: 42px; margin-bottom: 20px;
- text-shadow: 1px 1px 3px rgba(0,0,0,0.3); color: #ffffff;
- }
- .hero p {
- font-size: 18px; margin-bottom: 40px;
- text-shadow: 1px 1px 2px rgba(0,0,0,0.3); color: #ffffff;
- }
- .buttons {
- display: flex; flex-wrap: wrap;
- gap: 15px; justify-content: center;
- max-width: 500px; margin: 0 auto;
- }
- .buttons a {
- text-decoration: none; padding: 15px 30px;
- font-size: 16px; font-weight: bold;
- border-radius: 10px; transition: 0.3s;
- min-width: 160px; text-align: center;
- }
- .find-btn { background: #D8BFFD; color: #ffffff; }
- .find-btn:hover { background: #C29BFD; }
- .create-btn { background: #4B0082; color: white; }
- .create-btn:hover { background: #370066; }
- .needed-btn { background: #8A2BE2; color: white; }
- .needed-btn:hover { background: #7326C8; }
- .vendor-btn { background: #059669; color: white; }
- .vendor-btn:hover { background: #047857; }
- .hidden { display: none !important; }
- .vendor-btn.hidden { display: none; }
- .vendor-link.hidden { display: none; }
- .admin-link.hidden { display: none; }
+  /* ── HERO GREETING ── */
+  .greeting-bar {
+    background: linear-gradient(135deg, #0f7a56 0%, #1D9E75 100%);
+    color: #fff;
+    padding: 1.25rem 1rem 1.5rem;
+  }
+  .greeting-label { font-size: .78rem; opacity: .8; margin-bottom: .2rem; }
+  .greeting-name { font-size: 1.3rem; font-weight: 700; letter-spacing: -.02em; }
+  .greeting-role {
+    display: inline-block;
+    margin-top: .4rem;
+    background: rgba(255,255,255,.2);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 100px;
+    padding: .15rem .6rem;
+    font-size: .72rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
 
- /* Apply for Role — right-center fixed button */
- .apply-role-btn {
- position: fixed;
- right: 0;
- top: 50%;
- transform: translateY(-50%);
- background: rgba(107,33,168,0.85);
- color: white;
- padding: 12px 10px;
- border-radius: 10px 0 0 10px;
- font-size: 12px;
- font-weight: bold;
- cursor: pointer;
- writing-mode: vertical-rl;
- text-orientation: mixed;
- letter-spacing: 1px;
- z-index: 50;
- border: none;
- transition: background 0.2s, padding 0.2s;
- box-shadow: -2px 0 10px rgba(0,0,0,0.2);
- }
- .apply-role-btn:hover {
- background: rgba(107,33,168,1);
- padding: 12px 14px;
- }
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: .5rem;
+    padding: .75rem 1rem 0;
+    margin-top: -1px;
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: .75rem .65rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow .15s;
+  }
+  .stat-card:hover { box-shadow: var(--shadow); }
+  .stat-num { font-size: 1.4rem; font-weight: 700; color: var(--green); line-height: 1; }
+  .stat-label { font-size: .7rem; color: var(--gray-400); margin-top: .2rem; }
 
- /* Extended hover area for profile container */
- .profile-container::before {
- content: '';
- position: absolute;
- top: -10px;
- left: -10px;
- right: -10px;
- bottom: -10px;
- z-index: -1;
- }
+  /* ── SECTION ── */
+  .section { padding: 1rem; }
+  .section-title { font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); margin-bottom: .65rem; }
 
- /* Create FAB button */
- .create-fab {
- width: 60px;
- height: 60px;
- border-radius: 50%;
- background: #6b21a8;
- color: white;
- display: flex;
- align-items: center;
- justify-content: center;
- font-size: 32px;
- font-weight: bold;
- cursor: pointer;
- box-shadow: 0 4px 15px rgba(107,33,168,0.4);
- transition: 0.3s;
- margin: 10px auto;
- }
- .create-fab:hover {
- transform: scale(1.1);
- background: #7c3aed;
- }
- .create-fab-label {
- text-align: center;
- font-size: 13px;
- color: white;
- margin-top: 5px;
- text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
- }
+  /* ── QUICK LINKS ── */
+  .quick-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .6rem;
+  }
+  .quick-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1rem .9rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    transition: box-shadow .15s, transform .1s;
+  }
+  .quick-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .quick-icon { font-size: 1.5rem; }
+  .quick-label { font-size: .875rem; font-weight: 600; color: var(--gray-900); }
+  .quick-sub { font-size: .75rem; color: var(--gray-400); }
+  .quick-card.highlight { background: var(--green); border-color: var(--green); }
+  .quick-card.highlight .quick-label,
+  .quick-card.highlight .quick-sub { color: #fff; }
 
- /* Slide-in Panel */
- .slide-panel {
- display: none;
- position: fixed;
- top: 0;
- right: 0;
- width: 400px;
- max-width: 90%;
- height: 100vh;
- background: white;
- z-index: 1000;
- box-shadow: -5px 0 25px rgba(0,0,0,0.3);
- overflow-y: auto;
- }
- .slide-panel.active { display: block; animation: slideIn 0.3s ease forwards; }
- .slide-panel.closing { display: block; animation: slideOut 0.28s ease forwards; }
- @keyframes slideIn {
- from { transform: translateX(100%); }
- to { transform: translateX(0); }
- }
- @keyframes slideOut {
- from { transform: translateX(0); }
- to { transform: translateX(100%); }
- }
- .slide-panel-content { padding: 25px; }
- .close-panel {
- position: absolute;
- top: 15px;
- right: 20px;
- font-size: 28px;
- cursor: pointer;
- color: #666;
- }
- .close-panel:hover { color: #333; }
- .slide-panel h2 { color: #6b21a8; margin-bottom: 20px; }
- .slide-panel label {
- display: block;
- margin: 12px 0 5px;
- font-size: 14px;
- color: #333;
- }
- .slide-panel input,
- .slide-panel select,
- .slide-panel textarea {
- width: 100%;
- padding: 10px;
- border: 1px solid #ddd;
- border-radius: 6px;
- font-size: 14px;
- box-sizing: border-box;
- margin-bottom: 10px;
- }
- .slide-panel textarea { resize: vertical; }
- .submit-btn {
- width: 100%;
- padding: 12px;
- background: #6b21a8;
- color: white;
- border: none;
- border-radius: 8px;
- font-size: 16px;
- font-weight: bold;
- cursor: pointer;
- margin-top: 15px;
- }
- .submit-btn:hover { background: #5b1a8a; }
+  /* ── BANNER ── */
+  .banner {
+    background: #fff;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow .15s;
+  }
+  .banner:hover { box-shadow: var(--shadow); }
+  .banner-icon { font-size: 2rem; flex-shrink: 0; }
+  .banner-text .banner-title { font-size: .9rem; font-weight: 600; margin-bottom: .15rem; }
+  .banner-text .banner-sub { font-size: .78rem; color: var(--gray-500); line-height: 1.4; }
+  .banner-arrow { margin-left: auto; color: var(--gray-400); font-size: 1rem; flex-shrink: 0; }
+  .banner.pending-banner { border-color: #fde68a; background: #fffbeb; }
+  .banner.pending-banner .banner-title { color: #92400e; }
 
- /* Time slots */
- .time-slots { background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
- .time-slot { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
- .time-slot span { font-size: 13px; color: #555; min-width: 70px; }
- .time-slot input[type="time"] { flex: 1; margin: 0; }
+  /* ── RECENT ORDERS ── */
+  .order-list { display: flex; flex-direction: column; gap: .5rem; }
+  .order-item {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: .75rem .9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow .1s;
+  }
+  .order-item:hover { box-shadow: var(--shadow); }
+  .order-info { flex: 1; min-width: 0; }
+  .order-name { font-size: .875rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .order-vendor { font-size: .75rem; color: var(--gray-400); margin-top: .1rem; }
+  .order-badge {
+    font-size: .7rem;
+    font-weight: 600;
+    padding: .2rem .55rem;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-pending  { background: #fef3c7; color: #92400e; }
+  .badge-confirmed{ background: #dbeafe; color: #1e40af; }
+  .badge-ready    { background: #d1fae5; color: #065f46; }
+  .badge-completed{ background: var(--gray-100); color: var(--gray-500); }
+  .badge-cancelled{ background: #fee2e2; color: #991b1b; }
 
- /* Image upload row */
- .image-upload-row { display: flex; flex-direction: column; gap: 8px; }
- .image-upload-row span { font-size: 12px; color: #888; text-align: center; }
+  /* ── EMPTY ── */
+  .empty-box { text-align: center; padding: 1.5rem; color: var(--gray-400); font-size: .85rem; }
 
- footer {
- background: rgba(0,0,0,0.2); color: white;
- text-align: center; padding: 15px;
- }
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    height: 60px;
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-decoration: none;
+    color: var(--gray-400);
+    font-size: .65rem;
+    font-weight: 500;
+    transition: color .15s;
+    position: relative;
+  }
+  .nav-item.active { color: var(--green); }
+  .nav-icon { font-size: 1.2rem; line-height: 1; }
+  .nav-badge {
+    position: absolute;
+    top: 6px; right: calc(50% - 18px);
+    background: #ef4444;
+    color: #fff;
+    font-size: .6rem;
+    font-weight: 700;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
 
- @media (max-width: 600px) {
- .hero h1 { font-size: 28px; }
- .hero p { font-size: 16px; }
- header { flex-direction: column; align-items: flex-start; }
- .profile-container { align-self: flex-end; }
- }
- </style>
+  /* ── SKELETON ── */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ── TOAST ── */
+  #toast { display: none; position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
 </head>
 <body>
 
- <header>
- <div class="logo" onclick="window.location.href='home.html'">iTa'awun</div>
- <div class="profile-container" id="profileContainer" onclick="toggleDropdown(event)">
- <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='38' r='22' fill='%236b21a8'/%3E%3Cellipse cx='50' cy='85' rx='33' ry='22' fill='%236b21a8'/%3E%3C/svg%3E" alt="Profile" class="profile-pic" id="profilePic" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2738%27 r=%2722%27 fill=%27%236b21a8%27/%3E%3Cellipse cx=%2750%27 cy=%2785%27 rx=%2733%27 ry=%2722%27 fill=%27%236b21a8%27/%3E%3C/svg%3E'">
- <div class="dropdown" id="profileDropdown">
- <a href="profile.html">My Profile</a>
- <a href="bookings.html" id="myBookingsLink"> My Bookings</a>
- <a href="vendor.html" class="vendor-link hidden" id="vendorDropdownLink">Vendor Dashboard</a>
- <a href="admin.html" class="admin-link hidden" id="adminDropdownLink">Admin Dashboard</a>
- <hr class="divider">
- <a href="#" class="logout-link" onclick="doLogout()">Logout</a>
- </div>
- </div>
- </header>
+<!-- Header -->
+<header class="header">
+  <a class="logo" href="home.html">iTa<span>'awun</span></a>
+  <div style="position:relative">
+    <button class="avatar-btn" id="avatar-btn" onclick="toggleDropdown()">
+      <span id="avatar-initials">…</span>
+    </button>
+    <div class="dropdown" id="dropdown">
+      <div class="dropdown-name">
+        <strong id="dd-name">Loading…</strong>
+        <span id="dd-email"></span>
+      </div>
+      <a href="profile.html">👤 My Profile</a>
+      <a href="orders.html">📦 My Orders</a>
+      <a href="vendors.html">🏪 Campus Vendors</a>
+      <a href="vendor-dashboard.html" id="dd-vendor-link" style="display:none">🛒 Vendor Dashboard</a>
+      <a href="admin.html" id="dd-admin-link" style="display:none">⚙️ Admin Dashboard</a>
+      <button class="logout" onclick="logout()">🚪 Log Out</button>
+    </div>
+  </div>
+</header>
 
- <section class="hero">
- <h1>Welcome to iTa'awun</h1>
- <p>A freelance platform specifically for CFS IIUM students</p>
+<!-- Greeting -->
+<div class="greeting-bar">
+  <div class="greeting-label">Good day,</div>
+  <div class="greeting-name" id="greeting-name">…</div>
+  <span class="greeting-role" id="greeting-role">member</span>
+</div>
 
- <div class="buttons" style="margin-top: 20px;">
- <a href="find.html" class="find-btn">Service Offered</a>
- <a href="needed.html" class="needed-btn">Service Needed</a>
- </div>
+<!-- Stats -->
+<div class="stats-row">
+  <a class="stat-card" href="vendors.html">
+    <div class="stat-num" id="stat-vendors">—</div>
+    <div class="stat-label">Vendors live</div>
+  </a>
+  <a class="stat-card" href="orders.html">
+    <div class="stat-num" id="stat-orders">—</div>
+    <div class="stat-label">My orders</div>
+  </a>
+  <a class="stat-card" href="profile.html">
+    <div class="stat-num" id="stat-trust">—</div>
+    <div class="stat-label">Trust score</div>
+  </a>
+</div>
 
- <div class="create-fab" onclick="toggleCreatePopup()">+</div>
- <p class="create-fab-label">Create Service</p>
+<!-- Quick links -->
+<div class="section" style="padding-top:.85rem">
+  <div class="section-title">Quick links</div>
+  <div class="quick-grid" id="quick-grid">
+    <a class="quick-card highlight" href="vendors.html">
+      <div class="quick-icon">🏪</div>
+      <div class="quick-label">Campus Vendors</div>
+      <div class="quick-sub">Browse &amp; order</div>
+    </a>
+    <a class="quick-card" href="orders.html">
+      <div class="quick-icon">📦</div>
+      <div class="quick-label">My Orders</div>
+      <div class="quick-sub">Track your orders</div>
+    </a>
+    <a class="quick-card" href="profile.html">
+      <div class="quick-icon">👤</div>
+      <div class="quick-label">Profile</div>
+      <div class="quick-sub">Edit account</div>
+    </a>
+    <!-- Live Gigs card injected by JS if flag is ON -->
+  </div>
+</div>
 
- <div class="buttons" style="margin-top: 15px;">
- <a href="vendor.html" class="vendor-btn hidden" id="vendorBtn"> Vendor Dashboard</a>
- </div>
- </section>
+<!-- Banners (role-based, injected by JS) -->
+<div class="section" id="banners-section" style="display:none; padding-top:0">
+  <div class="section-title">For you</div>
+  <div id="banners"></div>
+</div>
 
- <!-- Apply for a Role — right-center tab -->
- <button class="apply-role-btn" onclick="toggleApplyPanel()"> Apply for a Role</button>
+<!-- Recent orders -->
+<div class="section" style="padding-top:0">
+  <div class="section-title">Recent orders</div>
+  <div id="recent-orders"><div class="skeleton" style="height:56px;margin-bottom:.5rem"></div><div class="skeleton" style="height:56px"></div></div>
+</div>
 
- <footer>
- <p>© 2025 iTa'awun | Student Freelance Collaboration</p>
- </footer>
+<!-- Bottom nav -->
+<nav class="bottom-nav">
+  <a class="nav-item active" href="home.html">
+    <span class="nav-icon">🏠</span>Home
+  </a>
+  <a class="nav-item" href="vendors.html">
+    <span class="nav-icon">🏪</span>Vendors
+  </a>
+  <a class="nav-item" href="orders.html">
+    <span class="nav-icon">📦</span>Orders
+    <span class="nav-badge" id="orders-badge" style="display:none"></span>
+  </a>
+  <a class="nav-item" href="profile.html">
+    <span class="nav-icon">👤</span>Profile
+  </a>
+</nav>
 
- <!-- Create Service Slide-in Panel -->
- <div id="createPanel" class="slide-panel">
- <div class="slide-panel-content">
- <span class="close-panel" onclick="toggleCreatePopup()">&times;</span>
- <h2>Create Service</h2>
- <form id="quickCreateForm">
- <label>Title</label>
- <input type="text" id="quickTitle" required>
- <label>Type</label>
- <select id="quickType" required onchange="toggleServiceType(this.value)">
- <option value="offered">Service Offered (I provide this)</option>
- <option value="needed">Service Needed (I need this)</option>
- </select>
- <label>Category</label>
- <select id="quickCategory" required>
- <option value="">Select Category</option>
- <option value="food">Food & Drinks</option>
- <option value="runner">Runner</option>
- <option value="printing">Printing</option>
- <option value="cleaning">Cleaning</option>
- <option value="laundry">Laundry</option>
- <option value="delivery">Delivery</option>
- <option value="tutoring">Tutoring</option>
- <option value="design">Design</option>
- <option value="coding">Coding</option>
- <option value="photography">Photography</option>
- <option value="repair">Repair</option>
- <option value="other">Other</option>
- </select>
- <label>Description</label>
- <textarea id="quickDesc" rows="3" required></textarea>
- <label>Pricing</label>
- <div style="display:flex;gap:8px;margin-bottom:8px;">
- <button type="button" id="btnFixed" onclick="setPricingMode('fixed')" style="flex:1;padding:8px;border-radius:6px;border:2px solid #6b21a8;background:#6b21a8;color:#fff;cursor:pointer;font-size:13px;font-weight:600">Fixed</button>
- <button type="button" id="btnNeg" onclick="setPricingMode('negotiable')" style="flex:1;padding:8px;border-radius:6px;border:2px solid #6b21a8;background:#fff;color:#6b21a8;cursor:pointer;font-size:13px;font-weight:600">Negotiable</button>
- </div>
- <div id="fixedPriceSection">
- <input type="number" id="quickPrice" step="0.5" placeholder="Price (RM)">
- </div>
- <div id="negPriceSection" style="display:none">
- <div style="display:flex;gap:8px;align-items:center;">
- <input type="number" id="priceMin" step="0.5" placeholder="Min (RM)" style="margin-bottom:0">
- <span style="color:#666;flex-shrink:0">–</span>
- <input type="number" id="priceMax" step="0.5" placeholder="Max (RM)" style="margin-bottom:0">
- </div>
- </div>
- <label>Location</label>
- <input type="text" id="quickLocation" placeholder="e.g. Mahallah Z, B15" required>
- <!-- Available Time (Service Offered only) -->
- <div id="timeSlotSection">
- <label>Available Time</label>
- <div class="time-slots">
- <div class="time-slot">
- <span>Weekday:</span>
- <input type="time" id="weekdayStart" value="09:00">
- <span>-</span>
- <input type="time" id="weekdayEnd" value="17:00">
- </div>
- <div class="time-slot">
- <span>Weekend:</span>
- <input type="time" id="weekendStart" value="10:00">
- <span>-</span>
- <input type="time" id="weekendEnd" value="18:00">
- </div>
- </div>
- </div>
- <!-- Urgency & Expiry (Service Needed only) -->
- <div id="urgencySection" style="display:none">
- <label>Urgency</label>
- <select id="quickUrgency">
- <option value="asap">ASAP — Need it urgently</option>
- <option value="1_day">Within 1 day</option>
- <option value="3_days">Within 3 days</option>
- <option value="1_week">Within 1 week</option>
- <option value="2_weeks">Within 2 weeks</option>
- <option value="flexible">Flexible</option>
- </select>
- <label>Request Expires On <span style="font-size:11px;color:#999">(auto-removes after this date)</span></label>
- <input type="date" id="quickExpiry">
- </div>
- <label>WhatsApp *</label>
- <input type="text" id="quickWhatsapp" placeholder="60123456789" required>
- <label>Telegram *</label>
- <input type="text" id="quickTelegram" placeholder="username" required>
- <label>Email (optional)</label>
- <input type="email" id="quickEmail">
- <label>Image</label>
- <div class="image-upload-row">
- <input type="text" id="quickImageUrl" placeholder="Image URL">
- <span>OR</span>
- <input type="file" id="quickImageFile" accept="image/*">
- </div>
- <button type="submit" class="submit-btn">Submit for Approval</button>
- </form>
- </div>
- </div>
+<div id="toast"></div>
 
- <!-- Apply for a Role Slide-in Panel -->
- <div id="applyPanel" class="slide-panel">
- <div class="slide-panel-content">
- <span class="close-panel" onclick="toggleApplyPanel()">&times;</span>
- <h2>Apply for a Role</h2>
- <p style="font-size:13px;color:#666;margin-bottom:8px">Want to sell services or work at a campus outlet? Apply here and an admin will review your request.</p>
- <p id="roleNote" style="font-size:12px;background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:8px;margin-bottom:16px;display:none"></p>
- <form id="applyRoleForm">
- <label>Role Type</label>
- <select id="applyCategory" required onchange="toggleRoleCategory(this.value)">
- <option value="">Select Role Type</option>
- <option value="vendor">🛒 Vendor (sell your services)</option>
- <option value="parttime">💼 Part-time Job</option>
- </select>
- <!-- Part-time sub-dropdown (hidden until Part-time is selected) -->
- <div id="parttimeSubSection" style="display:none;margin-top:4px">
- <label>Which Position?</label>
- <select id="applyPartTimeRole">
- <option value="">Select Position</option>
- <option value="barista">☕ Barista — Campus Cafe</option>
- <option value="parcel">📦 Parcel Hub Staff</option>
- <option value="website_admin">💻 Website Admin (CFSConnect)</option>
- <option value="library_assistant">📚 Library Assistant</option>
- <option value="sports_facility">🏟 Sports Facility Staff</option>
- <option value="other_work">📝 Others (specify below)</option>
- </select>
- </div>
- <label>Why do you want this role?</label>
- <textarea id="applyReason" rows="4" placeholder="Tell us why you're interested..." required></textarea>
- <label>Your Relevant Experience / Qualifications</label>
- <textarea id="applyQualifications" rows="3" placeholder="Any related skills or experience..." required></textarea>
- <label>WhatsApp Contact *</label>
- <input type="text" id="applyWhatsapp" placeholder="60123456789" required>
- <label>CV / Resume <span style="font-size:11px;color:#999">(optional — PDF or image)</span></label>
- <input type="file" id="applyResume" accept=".pdf,.doc,.docx,image/*" style="padding:6px;">
- <button type="submit" class="submit-btn">Submit Application</button>
- </form>
- </div>
- </div>
+<script>
+let userProfile = null
 
- <script>
- const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
- const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
- const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+// ── DROPDOWN ──────────────────────────────────────────────────
+function toggleDropdown() {
+  document.getElementById('dropdown').classList.toggle('open')
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#avatar-btn') && !e.target.closest('#dropdown')) {
+    document.getElementById('dropdown').classList.remove('open')
+  }
+})
 
- let currentUser = null
+async function logout() {
+  await db.auth.signOut()
+  window.location.href = 'index.html'
+}
 
- // Protect page and check role
- (async function initHome() {
- try {
- const { data, error: sessErr } = await db.auth.getSession()
- if (sessErr) { console.error('Session error:', sessErr); window.location.href = 'index.html'; return }
- const session = data?.session
- if (!session) {
- window.location.href = 'index.html'
- return
- }
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  const session = await requireAuth()
+  if (!session) return
 
- currentUser = session.user
+  const userId = session.user.id
 
- // Load profile to check role
- const { data: profile } = await db
- .from('profiles')
- .select('role, avatar_url')
- .eq('id', session.user.id)
- .maybeSingle()
+  // Load profile + stats + recent orders in parallel
+  const [profileData, vendorCount, ordersData, liveGigs] = await Promise.all([
+    getMyFullUser(userId),
+    db.from('vendors').select('id', { count: 'exact', head: true }).eq('is_active', true).eq('institution_id', INSTITUTION_ID),
+    db.from('orders').select('id, status, quantity, total_amount, products(name), vendors(shop_name)').eq('buyer_id', userId).order('created_at', { ascending: false }).limit(5),
+    isLiveGigsEnabled()
+  ])
 
- // Show role-based buttons and dropdown links
- if (profile?.role === 'vendor') {
- document.getElementById('vendorBtn')?.classList.remove('hidden')
- document.getElementById('vendorDropdownLink')?.classList.remove('hidden')
- }
- if (profile?.role === 'admin') {
- document.getElementById('adminDropdownLink')?.classList.remove('hidden')
- }
+  userProfile = profileData
 
- // Hide create FAB for pure students
- if (profile?.role === 'student' || !profile) {
- const fab = document.getElementById('createFab') || document.querySelector('.fab-btn') || document.querySelector('[onclick="toggleCreatePopup()"]')
- if (fab) fab.style.display = 'none'
- }
+  // ── Greeting & avatar
+  const firstName = (profileData?.full_name || 'Student').split(' ')[0]
+  const initials  = (profileData?.full_name || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  document.getElementById('greeting-name').textContent  = firstName
+  document.getElementById('greeting-role').textContent  = profileData?.role || 'member'
+  document.getElementById('avatar-initials').textContent = initials
+  document.getElementById('dd-name').textContent  = profileData?.full_name || 'Student'
+  document.getElementById('dd-email').textContent = session.user.email || ''
 
- // Load profile picture (cache-busted so new uploads reflect immediately)
- if (profile?.avatar_url) {
- document.getElementById('profilePic').src = profile.avatar_url + '?t=' + Date.now()
- }
- } catch(e) {
- console.error('initHome fatal error:', e)
- }
- })()
+  // ── Stats
+  document.getElementById('stat-vendors').textContent = vendorCount.count ?? '0'
+  document.getElementById('stat-trust').textContent   = profileData?.trust_score ?? '0'
 
- async function doLogout() {
- const { error } = await db.auth.signOut()
- if (error) console.error('Logout error:', error)
- window.location.replace('index.html?logged=out')
- }
+  const myOrders = ordersData.data || []
+  const pendingCount = myOrders.filter(o => o.status === 'pending' || o.status === 'confirmed' || o.status === 'ready').length
+  document.getElementById('stat-orders').textContent = myOrders.length
 
- // Create service popup
- function toggleDropdown(e) {
- e.stopPropagation()
- document.getElementById('profileDropdown').classList.toggle('open')
- }
- document.addEventListener('click', function() {
- document.getElementById('profileDropdown')?.classList.remove('open')
- })
+  if (pendingCount > 0) {
+    const badge = document.getElementById('orders-badge')
+    badge.textContent = pendingCount
+    badge.style.display = 'flex'
+  }
 
- function closePanel(id) {
- const panel = document.getElementById(id)
- if (!panel || !panel.classList.contains('active')) return
- panel.classList.add('closing')
- setTimeout(() => panel.classList.remove('active', 'closing'), 290)
- }
+  // ── Role-specific dropdown links
+  const role = profileData?.role
+  if (role === 'vendor' || role === 'admin') document.getElementById('dd-vendor-link').style.display = 'flex'
+  if (role === 'admin') document.getElementById('dd-admin-link').style.display = 'flex'
 
- function toggleCreatePopup() {
- const panel = document.getElementById('createPanel')
- closePanel('applyPanel')
- if (panel.classList.contains('active')) {
-   closePanel('createPanel')
- } else {
-   setTimeout(() => panel.classList.add('active'), panel.classList.contains('closing') ? 290 : 0)
- }
- }
+  // ── Live Gigs quick card (only if flag ON)
+  if (liveGigs) {
+    const grid = document.getElementById('quick-grid')
+    const gigCard = document.createElement('a')
+    gigCard.className = 'quick-card'
+    gigCard.href = 'gigs.html'
+    gigCard.innerHTML = '<div class="quick-icon">⚡</div><div class="quick-label">Live Gigs</div><div class="quick-sub">Grab a task</div>'
+    grid.appendChild(gigCard)
+  }
 
- // Apply for a Role popup
- function toggleApplyPanel() {
- const panel = document.getElementById('applyPanel')
- closePanel('createPanel')
- if (panel.classList.contains('active')) {
-   closePanel('applyPanel')
- } else {
-   setTimeout(() => panel.classList.add('active'), panel.classList.contains('closing') ? 290 : 0)
- }
- }
+  // ── Banners
+  renderBanners(role, liveGigs)
 
- // Quick create form submission
- document.getElementById('quickCreateForm')?.addEventListener('submit', async function(e) {
- e.preventDefault()
- if (!currentUser) { alert('Please login first'); return }
+  // ── Recent orders
+  renderRecentOrders(myOrders)
+}
 
- const btn = this.querySelector('.submit-btn')
- btn.disabled = true
- btn.textContent = 'Submitting...'
+function renderBanners(role, liveGigsOn) {
+  const banners    = []
+  const section    = document.getElementById('banners-section')
+  const container  = document.getElementById('banners')
 
- // Handle image upload
- let imageUrl = document.getElementById('quickImageUrl').value || 'https://via.placeholder.com/300x120'
- const imageFile = document.getElementById('quickImageFile').files[0]
- if (imageFile) {
- try {
- const fileExt = imageFile.name.split('.').pop()
- const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`
- const { error: uploadError } = await db.storage.from('service-images').upload(fileName, imageFile)
- if (!uploadError) {
- const { data: { publicUrl } } = db.storage.from('service-images').getPublicUrl(fileName)
- imageUrl = publicUrl
- }
- } catch (err) {
- console.error('Image upload error:', err)
- }
- }
+  if (role === 'member') {
+    banners.push(`
+      <a class="banner" href="profile.html#tasker-apply" style="margin-bottom:.6rem;display:flex">
+        <div class="banner-icon">🚀</div>
+        <div class="banner-text">
+          <div class="banner-title">Become a Tasker</div>
+          <div class="banner-sub">Apply once, earn from any gig or service on iTa'awun.</div>
+        </div>
+        <div class="banner-arrow">›</div>
+      </a>`)
+  }
 
- const svcType = document.getElementById('quickType').value
- const isNeeded = svcType === 'needed'
+  if (role === 'member' || role === 'tasker' || role === 'asnaf') {
+    banners.push(`
+      <a class="banner" href="vendor-apply.html" style="display:flex">
+        <div class="banner-icon">🏪</div>
+        <div class="banner-text">
+          <div class="banner-title">Open a Shop</div>
+          <div class="banner-sub">List your products or services for the whole campus.</div>
+        </div>
+        <div class="banner-arrow">›</div>
+      </a>`)
+  }
 
- // Time string (only for offered)
- let timeStr = null
- if (!isNeeded) {
- const weekdayTime = `Weekdays ${document.getElementById('weekdayStart').value}-${document.getElementById('weekdayEnd').value}`
- const weekendTime = `Weekends ${document.getElementById('weekendStart').value}-${document.getElementById('weekendEnd').value}`
- timeStr = `${weekdayTime}, ${weekendTime}`
- }
+  if (banners.length) {
+    section.style.display = 'block'
+    container.innerHTML = banners.join('')
+  }
+}
 
- // Pricing
- let finalPrice = null, priceMin = null, priceMax = null
- if (_pricingMode === 'fixed') {
- finalPrice = parseFloat(document.getElementById('quickPrice').value) || null
- } else {
- priceMin = parseFloat(document.getElementById('priceMin').value) || null
- priceMax = parseFloat(document.getElementById('priceMax').value) || null
- finalPrice = priceMin // store min as base price for display
- }
+const STATUS_BADGE = {
+  pending:   'badge-pending',
+  confirmed: 'badge-confirmed',
+  ready:     'badge-ready',
+  completed: 'badge-completed',
+  cancelled: 'badge-cancelled'
+}
 
- const serviceData = {
- vendor_id: currentUser.id,
- type: svcType,
- title: document.getElementById('quickTitle').value,
- category: document.getElementById('quickCategory').value,
- description: document.getElementById('quickDesc').value,
- price: finalPrice,
- price_min: priceMin,
- price_max: priceMax,
- pricing_mode: _pricingMode,
- location: document.getElementById('quickLocation').value,
- time: timeStr,
- urgency: isNeeded ? document.getElementById('quickUrgency').value : null,
- expires_at: isNeeded && document.getElementById('quickExpiry').value
-   ? new Date(document.getElementById('quickExpiry').value).toISOString() : null,
- whatsapp: document.getElementById('quickWhatsapp').value,
- telegram: document.getElementById('quickTelegram').value,
- contact: document.getElementById('quickEmail').value || null,
- image: imageUrl,
- status: 'pending' // Requires admin approval
- }
+function renderRecentOrders(orders) {
+  const el = document.getElementById('recent-orders')
+  if (!orders.length) {
+    el.innerHTML = '<div class="empty-box">No orders yet. <a href="vendors.html" style="color:var(--green)">Browse vendors →</a></div>'
+    return
+  }
+  el.innerHTML = orders.map(o => `
+    <a class="order-item" href="order-detail.html?id=${o.id}">
+      <div class="order-info">
+        <div class="order-name">${o.products?.name || 'Order'}</div>
+        <div class="order-vendor">${o.vendors?.shop_name || ''} · RM ${parseFloat(o.total_amount).toFixed(2)}</div>
+      </div>
+      <span class="order-badge ${STATUS_BADGE[o.status] || 'badge-pending'}">${o.status}</span>
+    </a>`).join('')
+}
 
- const { error } = await db.from('services').insert(serviceData)
-
- btn.disabled = false
- btn.textContent = 'Submit for Approval'
-
- if (error) {
- alert('Error: ' + error.message)
- return
- }
-
- showToast(' Service submitted! Waiting for admin approval.')
- toggleCreatePopup()
- this.reset()
- })
-
- // Apply for a Role form submission
- document.getElementById('applyRoleForm')?.addEventListener('submit', async function(e) {
- e.preventDefault()
- if (!currentUser) { alert('Please login first'); return }
-
- const btn = this.querySelector('.submit-btn')
- btn.disabled = true
- btn.textContent = 'Submitting...'
-
- // Upload CV/Resume if provided
- let resumeUrl = null
- const resumeFile = document.getElementById('applyResume').files[0]
- if (resumeFile) {
- try {
-   const ext = resumeFile.name.split('.').pop()
-   const fileName = `resume_${currentUser.id}_${Date.now()}.${ext}`
-   const { error: upErr } = await db.storage.from('application-docs').upload(fileName, resumeFile)
-   if (!upErr) {
-   const { data: { publicUrl } } = db.storage.from('application-docs').getPublicUrl(fileName)
-   resumeUrl = publicUrl
-   }
- } catch (err) { console.warn('Resume upload skipped:', err) }
- }
-
- // Derive final position from two-tier dropdown
- const category = document.getElementById('applyCategory').value
- const position = category === 'parttime'
- ? (document.getElementById('applyPartTimeRole').value || 'parttime')
- : category
-
- const { error } = await db.from('admin_applications').insert({
- user_id: currentUser.id,
- position: position,
- reason: document.getElementById('applyReason').value,
- qualifications: document.getElementById('applyQualifications').value,
- whatsapp: document.getElementById('applyWhatsapp').value,
- resume_url: resumeUrl,
- status: 'pending'
- })
-
- btn.disabled = false
- btn.textContent = 'Submit Application'
-
- if (error) {
- alert('Error: ' + error.message)
- return
- }
-
- showToast(' Application submitted! Admin will review your request.')
- toggleApplyPanel()
- this.reset()
- })
-
- function toggleServiceType(val) {
-   const isNeeded = val === 'needed'
-   document.getElementById('timeSlotSection').style.display = isNeeded ? 'none' : 'block'
-   document.getElementById('urgencySection').style.display = isNeeded ? 'block' : 'none'
-   // Set a sensible default expiry (2 weeks from now) when switching to needed
-   if (isNeeded) {
-     const d = new Date(); d.setDate(d.getDate() + 14)
-     document.getElementById('quickExpiry').value = d.toISOString().split('T')[0]
-   }
- }
-
- let _pricingMode = 'fixed'
- function setPricingMode(mode) {
-   _pricingMode = mode
-   const isNeg = mode === 'negotiable'
-   document.getElementById('fixedPriceSection').style.display = isNeg ? 'none' : 'block'
-   document.getElementById('negPriceSection').style.display = isNeg ? 'block' : 'none'
-   document.getElementById('btnFixed').style.background = isNeg ? '#fff' : '#6b21a8'
-   document.getElementById('btnFixed').style.color = isNeg ? '#6b21a8' : '#fff'
-   document.getElementById('btnNeg').style.background = isNeg ? '#6b21a8' : '#fff'
-   document.getElementById('btnNeg').style.color = isNeg ? '#fff' : '#6b21a8'
- }
-
- function toggleRoleCategory(val) {
-   const note = document.getElementById('roleNote')
-   const parttimeSec = document.getElementById('parttimeSubSection')
-   if (val === 'vendor') {
-     note.innerHTML = '📋 <strong>Vendor Note:</strong> You must have a minimum CGPA of 3.5 to be approved as a vendor.'
-     note.style.display = 'block'
-     parttimeSec.style.display = 'none'
-   } else if (val === 'parttime') {
-     note.innerHTML = '💼 <strong>Part-time Job:</strong> Select the specific position below. Relevant experience is a plus.'
-     note.style.display = 'block'
-     parttimeSec.style.display = 'block'
-   } else {
-     note.style.display = 'none'
-     parttimeSec.style.display = 'none'
-   }
- }
-
- function showToast(msg, duration = 3500) {
-   let toast = document.getElementById('homeToast')
-   if (!toast) {
-     toast = document.createElement('div')
-     toast.id = 'homeToast'
-     toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.3);transition:opacity 0.3s;pointer-events:none;'
-     document.body.appendChild(toast)
-   }
-   toast.textContent = msg
-   toast.style.opacity = '1'
-   clearTimeout(toast._t)
-   toast._t = setTimeout(() => { toast.style.opacity = '0' }, duration)
- }
- </script>
+init()
+</script>
 </body>
 </html>

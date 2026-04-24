@@ -1,0 +1,5 @@
+const SUPABASE_URL = 'https://kavcynvhcacqvzynpwrl.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthdmN5bnZoY2FjcXZ6eW5wd3JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5ODIxNjAsImV4cCI6MjA5MjU1ODE2MH0.dPBpu7BsHI01eyDPUDFl-hibD6V6-4j7HbHGfpOroWg'
+const INSTITUTION_ID = '00000000-0000-0000-0000-000000000001'
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)

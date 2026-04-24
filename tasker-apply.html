@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Become a Tasker — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:#1D9E75; --green-light:#e8f7f2; --green-dark:#15785a;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-400:#9ca3af; --gray-500:#6b7280; --gray-600:#4b5563; --gray-900:#111827;
+    --red:#ef4444; --radius:12px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 2rem; }
+
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn { color: var(--gray-600); text-decoration: none; font-size: .9rem; }
+  .header-title { font-size: 1rem; font-weight: 700; flex: 1; }
+
+  .hero { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #fff; padding: 1.75rem 1rem 2rem; text-align: center; }
+  .hero-icon  { font-size: 2.5rem; margin-bottom: .5rem; }
+  .hero-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .3rem; }
+  .hero-sub   { font-size: .83rem; opacity: .85; line-height: 1.5; }
+
+  .perks { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; padding: .75rem; background: var(--gray-50); }
+  .perk  { background: #fff; border: 1px solid var(--gray-100); border-radius: var(--radius); padding: .75rem; }
+  .perk-icon  { font-size: 1.3rem; margin-bottom: .3rem; }
+  .perk-title { font-size: .82rem; font-weight: 600; margin-bottom: .15rem; }
+  .perk-sub   { font-size: .73rem; color: var(--gray-500); line-height: 1.4; }
+
+  .form-card  { background: #fff; border-top: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); padding: 1rem; margin-top: .5rem; }
+  .form-title { font-size: .95rem; font-weight: 700; margin-bottom: .25rem; }
+  .form-sub   { font-size: .82rem; color: var(--gray-500); margin-bottom: 1rem; line-height: 1.5; }
+
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-size: .78rem; font-weight: 500; color: var(--gray-600); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .4rem; }
+  .field input, .field textarea, .field select { width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: .7rem .9rem; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .15s; color: var(--gray-900); background: #fff; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: #7c3aed; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--gray-400); }
+  .field textarea { resize: none; height: 80px; }
+  .field .hint { font-size: .74rem; color: var(--gray-400); margin-top: .3rem; }
+  .error-msg { font-size: .78rem; color: var(--red); margin-top: .3rem; display: none; }
+  .error-msg.visible { display: block; }
+
+  .skill-grid { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .skill-chip { padding: .3rem .65rem; border-radius: 100px; border: 1.5px solid var(--gray-200); font-size: .75rem; font-weight: 500; cursor: pointer; background: #fff; color: var(--gray-600); transition: border-color .15s, background .15s; white-space: nowrap; }
+  .skill-chip.selected { border-color: #7c3aed; background: #f5f3ff; color: #5b21b6; }
+
+  .btn-apply { width: 100%; padding: .85rem; background: #7c3aed; color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity .15s; }
+  .btn-apply:hover { opacity: .9; }
+  .btn-apply:disabled { opacity: .5; cursor: default; }
+
+  .success-wrap { text-align: center; padding: 3rem 1.5rem; display: none; }
+  .success-icon  { font-size: 3rem; margin-bottom: .75rem; }
+  .success-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .4rem; }
+  .success-sub   { font-size: .875rem; color: var(--gray-500); line-height: 1.6; margin-bottom: 1.5rem; }
+  .btn-home { display: block; padding: .85rem; background: #7c3aed; color: #fff; border-radius: 10px; text-decoration: none; font-size: .95rem; font-weight: 600; text-align: center; }
+
+  #toast { display: none; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" href="profile.html">&#8592;</a>
+  <div class="header-title">Become a Tasker</div>
+</header>
+
+<div id="main-content">
+  <div class="hero">
+    <div class="hero-icon">⚡</div>
+    <div class="hero-title">Earn by helping students</div>
+    <div class="hero-sub">As a Tasker you can accept service requests — running errands, printing, laundry and more.</div>
+  </div>
+
+  <div class="perks">
+    <div class="perk"><div class="perk-icon">💰</div><div class="perk-title">Earn on campus</div><div class="perk-sub">Set your own price per task</div></div>
+    <div class="perk"><div class="perk-icon">🕐</div><div class="perk-title">Flexible hours</div><div class="perk-sub">Accept only what you can handle</div></div>
+    <div class="perk"><div class="perk-icon">⭐</div><div class="perk-title">Build reputation</div><div class="perk-sub">Grow your trust score over time</div></div>
+    <div class="perk"><div class="perk-icon">🤝</div><div class="perk-title">Help the community</div><div class="perk-sub">Mutual assistance for all</div></div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-title">Your application</div>
+    <div class="form-sub">Tell us a bit about yourself. Applications are reviewed within 24 hours.</div>
+
+    <div class="field">
+      <label>Skills / services you offer <span style="color:var(--red)">*</span></label>
+      <div class="skill-grid" id="skill-grid"></div>
+      <div class="error-msg" id="skill-err">Select at least one skill.</div>
+    </div>
+
+    <div class="field">
+      <label>Why do you want to be a Tasker? <span style="color:var(--red)">*</span></label>
+      <textarea id="f-reason" placeholder="Brief motivation — 1-2 sentences is fine." maxlength="400"></textarea>
+      <div class="error-msg" id="reason-err">Please write a short reason.</div>
+    </div>
+
+    <div class="field">
+      <label>Availability <span style="color:var(--red)">*</span></label>
+      <select id="f-avail">
+        <option value="">— Select —</option>
+        <option value="weekdays">Weekdays (Mon–Fri)</option>
+        <option value="weekends">Weekends (Sat–Sun)</option>
+        <option value="both">Both weekdays and weekends</option>
+        <option value="flexible">Fully flexible</option>
+      </select>
+      <div class="error-msg" id="avail-err">Please select your availability.</div>
+    </div>
+
+    <div class="field">
+      <label>Phone number <span style="font-weight:400;text-transform:none;font-size:.76rem;color:var(--gray-400)">(optional — for urgent tasks)</span></label>
+      <input type="tel" id="f-phone" placeholder="e.g. 011-1234 5678" autocomplete="tel">
+    </div>
+
+    <button class="btn-apply" id="apply-btn" onclick="submitApplication()">Submit Application</button>
+  </div>
+</div>
+
+<div class="success-wrap" id="success-state">
+  <div class="success-icon">🎉</div>
+  <div class="success-title">Application submitted!</div>
+  <div class="success-sub">We'll review your application and update your role within 24 hours. You'll be able to accept tasks once approved.</div>
+  <a class="btn-home" href="home.html">Back to Home</a>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SKILLS = [
+  { key: 'runner',      label: '🏃 Runner'       },
+  { key: 'printing',    label: '🖨️ Printing'     },
+  { key: 'cleaning',    label: '🧹 Cleaning'      },
+  { key: 'laundry',     label: '👕 Laundry'       },
+  { key: 'delivery',    label: '📦 Delivery'      },
+  { key: 'tutoring',    label: '📚 Tutoring'      },
+  { key: 'design',      label: '🎨 Design'        },
+  { key: 'coding',      label: '💻 Coding'        },
+  { key: 'photography', label: '📷 Photography'   },
+  { key: 'repair',      label: '🔧 Repair'        },
+  { key: 'food_drinks', label: '🍱 Food & Drinks' },
+  { key: 'other',       label: '📌 Other'         }
+]
+
+let selectedSkills = new Set()
+
+const grid = document.getElementById('skill-grid')
+SKILLS.forEach(s => {
+  const btn = document.createElement('button')
+  btn.type = 'button'; btn.className = 'skill-chip'
+  btn.textContent = s.label; btn.dataset.key = s.key
+  btn.onclick = () => {
+    if (selectedSkills.has(s.key)) { selectedSkills.delete(s.key); btn.classList.remove('selected') }
+    else                           { selectedSkills.add(s.key);    btn.classList.add('selected')    }
+    document.getElementById('skill-err').classList.remove('visible')
+  }
+  grid.appendChild(btn)
+})
+
+async function submitApplication() {
+  const reason = document.getElementById('f-reason').value.trim()
+  const avail  = document.getElementById('f-avail').value
+  let ok = true
+
+  ;['skill-err','reason-err','avail-err'].forEach(id => document.getElementById(id).classList.remove('visible'))
+
+  if (!selectedSkills.size) { document.getElementById('skill-err').classList.add('visible'); ok = false }
+  if (!reason)              { document.getElementById('reason-err').classList.add('visible'); ok = false }
+  if (!avail)               { document.getElementById('avail-err').classList.add('visible'); ok = false }
+  if (!ok) return
+
+  const btn = document.getElementById('apply-btn')
+  btn.disabled = true; btn.textContent = 'Submitting…'
+
+  const session = await requireAuth()
+  if (!session) return
+
+  // Store application note in users metadata / update role to tasker directly
+  // (In a real system this would go to a review queue; for pilot we auto-approve)
+  const { error } = await db.from('users').update({
+    role: 'tasker',
+    tasker_skills:       Array.from(selectedSkills),
+    tasker_availability: avail,
+    tasker_reason:       reason
+  }).eq('id', session.user.id)
+
+  if (error) {
+    btn.disabled = false; btn.textContent = 'Submit Application'
+    showToast('Something went wrong. Please try again.')
+    return
+  }
+
+  document.getElementById('main-content').style.display = 'none'
+  document.getElementById('success-state').style.display = 'block'
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+async function init() {
+  const session = await requireAuth()
+  if (!session) return
+  // If already a tasker or above, skip form
+  const { data: user } = await db.from('users').select('role').eq('id', session.user.id).single()
+  if (user?.role && user.role !== 'member') {
+    document.querySelector('.form-card').innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--gray-500)">You already have the <strong>${user.role}</strong> role on iTa'awun.</div>`
+  }
+}
+init()
+</script>
+</body>
+</html>

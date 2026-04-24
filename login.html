@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign Up — iTa'awun</title>
+<title>Log In — iTa'awun</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
@@ -95,18 +95,6 @@
   .btn-ghost:disabled { color: var(--gray-400); cursor: default; text-decoration: none; }
   .resend-row { display: flex; align-items: center; justify-content: space-between; margin-top: .75rem; font-size: .85rem; color: var(--gray-400); }
   .sent-to { background: var(--green-light); border-radius: 8px; padding: .5rem .75rem; font-size: .82rem; color: var(--green-dark); margin-bottom: 1rem; text-align: center; }
-  .upload-area {
-    border: 1.5px dashed var(--gray-200); border-radius: 10px;
-    padding: 1rem; text-align: center; cursor: pointer;
-    transition: border-color .15s, background .15s; position: relative;
-  }
-  .upload-area:hover { border-color: var(--green); background: var(--green-light); }
-  .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-icon { font-size: 1.5rem; margin-bottom: .35rem; }
-  .upload-label { font-size: .82rem; color: var(--gray-600); }
-  .upload-filename { font-size: .8rem; color: var(--green); margin-top: .25rem; font-weight: 500; }
-  .skip-row { text-align: center; margin-top: .85rem; font-size: .85rem; }
-  .skip-row button { background: none; border: none; color: var(--gray-400); font-size: .85rem; cursor: pointer; font-family: inherit; text-decoration: underline; }
   .error-msg { font-size: .82rem; color: var(--red); margin-top: .5rem; display: none; }
   .error-msg.visible { display: block; }
   .bottom-link { text-align: center; margin-top: 1rem; font-size: .85rem; color: var(--gray-400); }
@@ -126,20 +114,19 @@
     <div class="steps">
       <div class="step-bar active" id="bar1"></div>
       <div class="step-bar" id="bar2"></div>
-      <div class="step-bar" id="bar3"></div>
     </div>
 
     <!-- Step 1: Email -->
     <div class="step visible" id="step1">
-      <div class="step-title">Create your account</div>
-      <div class="step-sub">Enter your email address. We'll send a one-time code to verify it.</div>
+      <div class="step-title">Welcome back</div>
+      <div class="step-sub">Enter your email address and we'll send you a login code.</div>
       <div class="field">
         <label>Email address</label>
         <input type="email" id="email-input" placeholder="you@example.com" autocomplete="email">
         <div class="error-msg" id="email-err"></div>
       </div>
-      <button class="btn-main" id="send-otp-btn" onclick="sendOTP()">Send Code</button>
-      <div class="bottom-link">Already have an account? <a href="login.html">Log In</a></div>
+      <button class="btn-main" id="send-btn" onclick="sendOTP()">Send Code</button>
+      <div class="bottom-link">Don't have an account? <a href="signup.html">Sign Up</a></div>
     </div>
 
     <!-- Step 2: OTP -->
@@ -155,33 +142,11 @@
         <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
       </div>
       <div class="error-msg" id="otp-err"></div>
-      <button class="btn-main" id="verify-otp-btn" onclick="verifyOTP()">Verify</button>
+      <button class="btn-main" id="verify-btn" onclick="verifyOTP()">Log In</button>
       <div class="resend-row">
         <span id="resend-timer">Resend in <span id="countdown">60</span>s</span>
         <button class="btn-ghost" id="resend-btn" disabled onclick="resendOTP()">Resend code</button>
       </div>
-    </div>
-
-    <!-- Step 3: Name + matric card -->
-    <div class="step" id="step3">
-      <div class="step-title">Almost there!</div>
-      <div class="step-sub">Tell us your name as it appears on your matric card.</div>
-      <div class="field">
-        <label>Full name</label>
-        <input type="text" id="name-input" placeholder="e.g. Ahmad bin Abdullah" autocomplete="name" maxlength="100">
-        <div class="error-msg" id="name-err"></div>
-      </div>
-      <div class="field">
-        <label>Matric card <span style="font-weight:400;text-transform:none;font-size:.78rem;color:var(--gray-400)">(optional — adds Verified badge)</span></label>
-        <div class="upload-area">
-          <input type="file" id="matric-file" accept="image/jpeg,image/png" onchange="handleMatricFile(this)">
-          <div class="upload-icon">📎</div>
-          <div class="upload-label">Tap to upload front of matric card</div>
-          <div class="upload-filename" id="upload-filename" style="display:none"></div>
-        </div>
-      </div>
-      <button class="btn-main" id="complete-btn" onclick="completeSignup()">Complete Setup</button>
-      <div class="skip-row"><button onclick="completeSignup(true)">Skip matric card for now</button></div>
     </div>
   </div>
 </div>
@@ -192,7 +157,6 @@
 let currentEmail = ''
 let resendCount  = 0
 let countdownId  = null
-let matricFile   = null
 
 const otpInputs = Array.from(document.querySelectorAll('#otp-inputs input'))
 otpInputs.forEach((inp, i) => {
@@ -209,7 +173,7 @@ function clearOTP() { otpInputs.forEach(i => i.value = ''); otpInputs[0].focus()
 
 function goToStep(n) {
   document.querySelectorAll('.step').forEach((s, i) => s.classList.toggle('visible', i + 1 === n))
-  ;[1, 2, 3].forEach(i => document.getElementById('bar' + i).classList.toggle('active', i <= n))
+  ;[1, 2].forEach(i => document.getElementById('bar' + i).classList.toggle('active', i <= n))
 }
 
 async function sendOTP() {
@@ -223,7 +187,7 @@ async function sendOTP() {
     return
   }
 
-  const btn = document.getElementById('send-otp-btn')
+  const btn = document.getElementById('send-btn')
   btn.disabled = true
   btn.textContent = 'Sending…'
 
@@ -253,14 +217,14 @@ async function verifyOTP() {
     return
   }
 
-  const btn = document.getElementById('verify-otp-btn')
+  const btn = document.getElementById('verify-btn')
   btn.disabled = true
-  btn.textContent = 'Verifying…'
+  btn.textContent = 'Logging in…'
 
   const { error } = await db.auth.verifyOtp({ email: currentEmail, token, type: 'email' })
   if (error) {
     btn.disabled = false
-    btn.textContent = 'Verify'
+    btn.textContent = 'Log In'
     clearOTP()
     err.textContent = error.message.includes('expired')
       ? 'Code expired. Tap Resend to get a new one.'
@@ -271,8 +235,7 @@ async function verifyOTP() {
     return
   }
 
-  goToStep(3)
-  document.getElementById('name-input').focus()
+  window.location.href = 'home.html'
 }
 
 async function resendOTP() {
@@ -301,54 +264,6 @@ function startCountdown() {
       document.getElementById('resend-btn').disabled = false
     }
   }, 1000)
-}
-
-function handleMatricFile(input) {
-  matricFile = input.files[0] || null
-  const nameEl = document.getElementById('upload-filename')
-  nameEl.textContent = matricFile ? matricFile.name : ''
-  nameEl.style.display = matricFile ? 'block' : 'none'
-}
-
-async function completeSignup(skipMatric = false) {
-  const nameVal = document.getElementById('name-input').value.trim()
-  const nameErr = document.getElementById('name-err')
-  nameErr.classList.remove('visible')
-
-  if (!nameVal) {
-    nameErr.textContent = 'Please enter your full name.'
-    nameErr.classList.add('visible')
-    return
-  }
-
-  const btn = document.getElementById('complete-btn')
-  btn.disabled = true
-  btn.textContent = 'Setting up…'
-
-  const { data: { session } } = await db.auth.getSession()
-  if (!session) { window.location.href = 'login.html'; return }
-
-  let matricUrl = null
-  if (!skipMatric && matricFile) {
-    btn.textContent = 'Uploading…'
-    const ext  = matricFile.name.split('.').pop()
-    const path = session.user.id + '/matric.' + ext
-    const { error: uploadErr } = await db.storage.from('matric-cards').upload(path, matricFile, { upsert: true })
-    if (!uploadErr) matricUrl = path
-  }
-
-  const updateData = { full_name: nameVal, institution_id: INSTITUTION_ID }
-  if (matricUrl) updateData.matric_card_url = matricUrl
-
-  const { error } = await db.from('users').update(updateData).eq('id', session.user.id)
-  if (error) {
-    btn.disabled = false
-    btn.textContent = 'Complete Setup'
-    showToast('Something went wrong. Please try again.')
-    return
-  }
-
-  window.location.href = 'home.html'
 }
 
 db.auth.getSession().then(({ data: { session } }) => {

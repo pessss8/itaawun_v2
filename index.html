@@ -1,179 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iTa'awun - Login</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, rgba(0, 31, 63, 0.85), #6A5ACD),
-                url('assets/images/bi1.png') no-repeat center center / cover;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iTa'awun — Campus Mutual Assistance</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .login-container {
-            background: #fff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-            width: 360px;
-            text-align: center;
-        }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --radius:      12px;
+    --shadow-md:   0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  }
 
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #001f3f;
-            margin-bottom: 10px;
-        }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    min-height: 100vh;
+  }
 
-        .tagline {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 25px;
-        }
+  /* ── HEADER ── */
+  .header {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 1.25rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--green);
+    text-decoration: none;
+    letter-spacing: -.02em;
+  }
+  .logo span { color: var(--gray-900); }
+  .header-actions { display: flex; gap: .5rem; }
 
-        h2 {
-            margin-bottom: 20px;
-            color: #001f3f;
-        }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .45rem 1rem;
+    border-radius: 8px;
+    font-size: .875rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--gray-200);
+    color: var(--gray-600);
+  }
+  .btn-outline:hover { border-color: var(--gray-400); }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { opacity: .9; }
 
-        input {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-        }
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0f7a56 0%, #1D9E75 50%, #2bb580 100%);
+    color: #fff;
+    text-align: center;
+    padding: 3rem 1.25rem 2.5rem;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 100px;
+    padding: .25rem .85rem;
+    font-size: .75rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    letter-spacing: .04em;
+  }
+  .hero h1 {
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: .75rem;
+    letter-spacing: -.03em;
+  }
+  .hero p {
+    font-size: 1rem;
+    opacity: .88;
+    max-width: 420px;
+    margin: 0 auto 1.75rem;
+    line-height: 1.55;
+  }
+  .hero-cta { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+  .btn-hero-primary {
+    background: #fff;
+    color: var(--green);
+    padding: .65rem 1.5rem;
+    font-size: .95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    transition: opacity .15s;
+  }
+  .btn-hero-primary:hover { opacity: .95; }
+  .btn-hero-outline {
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,.5);
+    color: #fff;
+    padding: .65rem 1.5rem;
+    font-size: .95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .btn-hero-outline:hover { background: rgba(255,255,255,.1); }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #001f3f;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: 0.3s;
-        }
+  /* ── INSTITUTION STRIP ── */
+  .inst-strip {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: .6rem 1.25rem;
+    font-size: .8rem;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .inst-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
 
-        button:hover {
-            background: #003366;
-        }
+  /* ── SECTION ── */
+  .section { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .section-title { font-size: 1rem; font-weight: 600; }
+  .section-sub { font-size: .8rem; color: var(--gray-400); }
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+  /* ── PRODUCT GRID ── */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: .75rem;
+  }
+  @media (min-width: 480px) {
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+  }
 
-        #msg {
-            min-height: 20px;
-            font-size: 13px;
-            margin: 8px 0;
-            padding: 6px 10px;
-            border-radius: 6px;
-        }
+  .product-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .15s, transform .1s;
+  }
+  .product-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .card-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    overflow: hidden;
+  }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .card-body { padding: .6rem .75rem .75rem; flex: 1; display: flex; flex-direction: column; gap: .25rem; }
+  .card-cat {
+    display: inline-block;
+    font-size: .68rem;
+    font-weight: 600;
+    padding: .15rem .5rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    width: fit-content;
+  }
+  .card-name {
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-price { font-size: .95rem; font-weight: 700; color: var(--green); margin-top: auto; padding-top: .2rem; }
+  .card-vendor { font-size: .72rem; color: var(--gray-400); }
+  .card-one-off {
+    font-size: .65rem;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 4px;
+    padding: .1rem .4rem;
+    font-weight: 600;
+    width: fit-content;
+  }
 
-        #msg.error {
-            background: #fef2f2;
-            color: #dc2626;
-        }
+  /* ── VIEW ALL ── */
+  .view-all {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    padding: .75rem;
+    background: #fff;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--green);
+    text-decoration: none;
+  }
+  .view-all:hover { background: var(--green-light); }
 
-        #msg.success {
-            background: #f0fdf4;
-            color: #16a34a;
-        }
+  /* ── SKELETON ── */
+  .skeleton {
+    background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: var(--radius);
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .skeleton-card { height: 220px; }
 
-        .links {
-            margin-top: 15px;
-            font-size: 14px;
-        }
+  /* ── STATES ── */
+  .state-box { text-align: center; padding: 2.5rem 1rem; color: var(--gray-400); font-size: .9rem; }
+  .state-box a { color: var(--green); }
 
-        .links a {
-            color: #6b21a8;
-            text-decoration: none;
-            margin: 0 8px;
-        }
+  /* ── TOAST ── */
+  #toast {
+    display: none;
+    position: fixed;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray-900);
+    color: #fff;
+    padding: .65rem 1.25rem;
+    border-radius: 8px;
+    font-size: .85rem;
+    z-index: 999;
+    max-width: 88vw;
+  }
 
-        .links a:hover {
-            text-decoration: underline;
-        }
-
-        .divider {
-            border: none;
-            border-top: 1px solid #eee;
-            margin: 16px 0;
-        }
-    </style>
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: .75rem;
+    color: var(--gray-400);
+    border-top: 1px solid var(--gray-200);
+    margin-top: 2rem;
+    background: #fff;
+  }
+</style>
 </head>
-
 <body>
-    <div class="login-container">
-        <div class="logo">iTa'awun</div>
-        <div class="tagline">Student Freelance Collaboration</div>
-        <h2>Login</h2>
 
-        <div id="msg"></div>
-        <input id="email" type="email" placeholder="Email">
-        <input id="pass" type="password" placeholder="Password">
-        <button id="btn-login" onclick="doLogin()">Login</button>
+<header class="header">
+  <a class="logo" href="index.html">iTa<span>'awun</span></a>
+  <div class="header-actions">
+    <a class="btn btn-outline" href="login.html">Log In</a>
+    <a class="btn btn-primary" href="signup.html">Sign Up</a>
+  </div>
+</header>
 
-        <hr class="divider">
-        <div class="links">
-            <a href="signup.html">Create Account</a> | <a href="forgot.html">Forgot Password?</a>
-        </div>
-    </div>
+<section class="hero">
+  <div class="hero-badge">CFS IIUM Gambang &middot; Pilot</div>
+  <h1>Help each other.<br>Earn together.</h1>
+  <p>A campus marketplace connecting students who need tasks done with students willing to earn by doing them.</p>
+  <div class="hero-cta">
+    <a class="btn-hero-primary" href="signup.html">Get Started</a>
+    <a class="btn-hero-outline" href="vendors.html">Browse Vendors</a>
+  </div>
+</section>
 
-    <script>
-        const SUPABASE_URL = 'https://fyahebgkacjsxmiwteny.supabase.co'
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5YWhlYmdrYWNqc3htaXd0ZW55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTg3NDEsImV4cCI6MjA4NTgzNDc0MX0.eIAWIPzB6EjW7rPKHLSsc2ryUBQ7yicRK1I-SxXg_2Y'
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+<div class="inst-strip">
+  <span class="inst-dot"></span>
+  Centre for Foundation Studies, IIUM Gambang
+</div>
 
-        // If arriving from logout, sign out first then stay on this page
-        const params = new URLSearchParams(window.location.search)
-        if (params.get('logged') === 'out') {
-            db.auth.signOut().then(() => {
-                window.history.replaceState({}, '', 'index.html')
-            })
-        } else {
-            // If already logged in (and not logging out), skip login
-            db.auth.getSession().then(({ data: { session } }) => {
-                if (session) window.location.href = 'home.html'
-            })
-        }
+<div class="section">
+  <div class="section-header">
+    <span class="section-title">Campus Vendors</span>
+    <span class="section-sub" id="vendor-count">Loading…</span>
+  </div>
+  <div class="product-grid" id="preview-grid">
+    <div class="skeleton skeleton-card"></div>
+    <div class="skeleton skeleton-card"></div>
+    <div class="skeleton skeleton-card"></div>
+    <div class="skeleton skeleton-card"></div>
+  </div>
+  <a class="view-all" href="vendors.html">See all vendors &rarr;</a>
+</div>
 
-        function setMsg(text, type = 'error') {
-            const el = document.getElementById('msg')
-            el.textContent = text
-            el.className = type
-        }
+<footer class="footer">
+  iTa&rsquo;awun &copy; 2026 &middot; CFS IIUM Gambang Pilot &middot; Built by students, for students
+</footer>
 
-        async function doLogin() {
-            const email = document.getElementById('email').value.trim()
-            const pass = document.getElementById('pass').value
-            if (!email || !pass) { setMsg('Please fill in both fields.'); return }
+<div id="toast"></div>
 
-            document.getElementById('btn-login').disabled = true
-            setMsg('Logging in...', 'success')
+<script>
+const CATEGORY_COLORS = {
+  food_drinks:  { bg:'#fff7ed', text:'#c2410c' },
+  runner:       { bg:'#eff6ff', text:'#1d4ed8' },
+  printing:     { bg:'#f3f4f6', text:'#374151' },
+  cleaning:     { bg:'#ecfdf5', text:'#065f46' },
+  laundry:      { bg:'#f5f3ff', text:'#5b21b6' },
+  delivery:     { bg:'#fffbeb', text:'#92400e' },
+  tutoring:     { bg:'#fef2f2', text:'#991b1b' },
+  design:       { bg:'#fdf2f8', text:'#9d174d' },
+  coding:       { bg:'#f0fdfa', text:'#0f766e' },
+  photography:  { bg:'#fff7ed', text:'#9a3412' },
+  repair:       { bg:'#eef2ff', text:'#3730a3' },
+  sell_product: { bg:'#f7fee7', text:'#3f6212' },
+  other:        { bg:'#f3f4f6', text:'#6b7280' }
+}
+const CATEGORY_LABELS = {
+  food_drinks:'Food & Drinks', runner:'Runner', printing:'Printing',
+  cleaning:'Cleaning', laundry:'Laundry', delivery:'Delivery',
+  tutoring:'Tutoring', design:'Design', coding:'Coding',
+  photography:'Photography', repair:'Repair', sell_product:'Sell Product',
+  other:'Other'
+}
 
-            const { error } = await db.auth.signInWithPassword({ email, password: pass })
-            document.getElementById('btn-login').disabled = false
+function productCardHTML(p) {
+  const cat   = p.category || 'other'
+  const col   = CATEGORY_COLORS[cat] || CATEGORY_COLORS.other
+  const label = CATEGORY_LABELS[cat] || cat
+  const vendorId = p.vendors?.id || ''
+  const imgEl = p.image_url
+    ? `<div class="card-img"><img src="${p.image_url}" alt="${p.name}" loading="lazy"></div>`
+    : `<div class="card-img" style="background:${col.bg}">🛍️</div>`
+  return `
+    <a class="product-card" href="vendors.html?vendor=${vendorId}">
+      ${imgEl}
+      <div class="card-body">
+        <span class="card-cat" style="background:${col.bg};color:${col.text}">${label}</span>
+        <div class="card-name">${p.name}</div>
+        <div class="card-price">RM ${parseFloat(p.price).toFixed(2)}</div>
+        <div class="card-vendor">${p.vendors?.shop_name || ''}</div>
+        ${p.listing_type === 'one_off' ? '<div class="card-one-off">One-off</div>' : ''}
+      </div>
+    </a>`
+}
 
-            if (error) { setMsg(error.message); return }
-            window.location.href = 'home.html'
-        }
+async function loadPreview() {
+  const grid  = document.getElementById('preview-grid')
+  const count = document.getElementById('vendor-count')
 
-        document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
-    </script>
+  const { data: flag } = await db
+    .from('feature_flags')
+    .select('enabled')
+    .eq('institution_id', INSTITUTION_ID)
+    .eq('feature_name', 'campus_vendors')
+    .single()
+
+  if (!flag?.enabled) {
+    count.textContent = ''
+    grid.innerHTML = '<div class="state-box">Vendor marketplace coming soon.</div>'
+    return
+  }
+
+  const { data: products, error } = await db
+    .from('products')
+    .select('id, name, price, category, listing_type, image_url, vendors!inner(id, shop_name, avg_rating)')
+    .eq('is_active', true)
+    .eq('vendors.is_active', true)
+    .eq('vendors.institution_id', INSTITUTION_ID)
+    .order('created_at', { ascending: false })
+    .limit(8)
+
+  if (error || !products?.length) {
+    count.textContent = '0 live'
+    grid.innerHTML = `<div class="state-box">No vendors yet. Be the first — <a href="signup.html">sign up</a>.</div>`
+    return
+  }
+
+  count.textContent = products.length + ' shown'
+  grid.innerHTML = products.map(productCardHTML).join('')
+}
+
+// If already logged in, go straight to home
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) window.location.href = 'home.html'
+  else loadPreview()
+})
+</script>
 </body>
-
 </html>

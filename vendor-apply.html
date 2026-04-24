@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open a Shop — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --green-dark:  #15785a;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --red:         #ef4444;
+    --radius:      12px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 2rem; }
+
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn    { color: var(--gray-600); text-decoration: none; font-size: .9rem; flex-shrink: 0; }
+  .header-title { font-size: 1rem; font-weight: 700; flex: 1; }
+
+  /* ── HERO BANNER ── */
+  .hero { background: linear-gradient(135deg, #1D9E75 0%, #15785a 100%); color: #fff; padding: 1.5rem 1rem 1.75rem; text-align: center; }
+  .hero-icon  { font-size: 2.5rem; margin-bottom: .5rem; }
+  .hero-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .3rem; }
+  .hero-sub   { font-size: .83rem; opacity: .85; line-height: 1.5; }
+
+  /* ── STEPS INDICATOR ── */
+  .steps-bar { display: flex; align-items: center; background: #fff; border-bottom: 1px solid var(--gray-100); padding: .75rem 1rem; gap: 0; }
+  .step-item { display: flex; align-items: center; gap: .4rem; flex: 1; }
+  .step-item:not(:last-child)::after { content: '›'; color: var(--gray-300); font-size: 1rem; flex-shrink: 0; }
+  .step-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 700; flex-shrink: 0; background: var(--gray-200); color: var(--gray-500); transition: background .3s; }
+  .step-dot.active { background: var(--green); color: #fff; }
+  .step-dot.done   { background: var(--green-dark); color: #fff; }
+  .step-label { font-size: .72rem; color: var(--gray-400); white-space: nowrap; }
+  .step-item.active .step-label { color: var(--green); font-weight: 600; }
+
+  /* ── FORM CARD ── */
+  .form-card { background: #fff; border-bottom: 1px solid var(--gray-100); padding: 1rem; }
+  .form-title { font-size: .95rem; font-weight: 700; margin-bottom: .25rem; }
+  .form-sub   { font-size: .82rem; color: var(--gray-500); margin-bottom: 1rem; line-height: 1.5; }
+
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-size: .78rem; font-weight: 500; color: var(--gray-600); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .4rem; }
+  .field input, .field textarea, .field select {
+    width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px;
+    padding: .75rem .9rem; font-size: .9rem; font-family: inherit;
+    outline: none; transition: border-color .15s; color: var(--gray-900);
+    background: #fff;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--green); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--gray-400); }
+  .field textarea { resize: none; height: 80px; }
+  .field .hint { font-size: .75rem; color: var(--gray-400); margin-top: .3rem; }
+  .error-msg { font-size: .8rem; color: var(--red); margin-top: .3rem; display: none; }
+  .error-msg.visible { display: block; }
+
+  /* ── CATEGORY CHIPS ── */
+  .cat-grid { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .5rem; }
+  .cat-chip {
+    padding: .35rem .75rem; border-radius: 100px;
+    border: 1.5px solid var(--gray-200); font-size: .78rem; font-weight: 500;
+    cursor: pointer; transition: border-color .15s, background .15s, color .15s;
+    background: #fff; color: var(--gray-600); white-space: nowrap;
+  }
+  .cat-chip.selected { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+
+  /* ── BANNER UPLOAD ── */
+  .upload-area {
+    border: 1.5px dashed var(--gray-200); border-radius: 10px;
+    padding: 1.25rem; text-align: center; cursor: pointer;
+    transition: border-color .15s, background .15s; position: relative;
+    overflow: hidden;
+  }
+  .upload-area:hover { border-color: var(--green); background: var(--green-light); }
+  .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-icon    { font-size: 1.5rem; margin-bottom: .3rem; }
+  .upload-label   { font-size: .82rem; color: var(--gray-500); }
+  .upload-preview { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; display: none; }
+
+  /* ── PAYMENT TOGGLES ── */
+  .pay-grid { display: flex; flex-direction: column; gap: .4rem; }
+  .pay-option {
+    display: flex; align-items: center; gap: .75rem;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    padding: .65rem .9rem; cursor: pointer; transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .pay-option.selected { border-color: var(--green); background: var(--green-light); }
+  .pay-option input[type="checkbox"] { display: none; }
+  .pay-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .pay-name { font-size: .875rem; font-weight: 500; flex: 1; }
+  .pay-check { color: var(--green); font-size: 1rem; display: none; }
+  .pay-option.selected .pay-check { display: block; }
+
+  /* ── REVIEW CARD ── */
+  .review-card { background: var(--gray-50); border-radius: 10px; padding: .85rem; margin-bottom: 1rem; }
+  .review-row  { display: flex; justify-content: space-between; font-size: .875rem; margin-bottom: .3rem; color: var(--gray-600); }
+  .review-row:last-child { margin-bottom: 0; }
+  .review-row strong { color: var(--gray-900); }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    width: 100%; padding: .85rem; background: var(--green); color: #fff;
+    border: none; border-radius: 10px; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: opacity .15s, transform .1s;
+  }
+  .btn-primary:hover { opacity: .9; }
+  .btn-primary:active { transform: scale(.98); }
+  .btn-primary:disabled { opacity: .5; cursor: default; }
+  .btn-ghost {
+    width: 100%; padding: .75rem; background: none;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    font-size: .875rem; font-weight: 500; color: var(--gray-600);
+    cursor: pointer; font-family: inherit; transition: border-color .15s;
+    margin-top: .5rem;
+  }
+  .btn-ghost:hover { border-color: var(--gray-400); }
+
+  /* ── SUCCESS STATE ── */
+  .success-wrap { text-align: center; padding: 3rem 1.5rem; }
+  .success-icon  { font-size: 3rem; margin-bottom: .75rem; }
+  .success-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .4rem; }
+  .success-sub   { font-size: .875rem; color: var(--gray-500); line-height: 1.6; margin-bottom: 1.5rem; }
+  .btn-goto { display: block; padding: .85rem; background: var(--green); color: #fff; border-radius: 10px; text-decoration: none; font-size: .95rem; font-weight: 600; text-align: center; }
+
+  #toast { display: none; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" href="profile.html">&#8592;</a>
+  <div class="header-title">Open a Shop</div>
+</header>
+
+<div class="hero">
+  <div class="hero-icon">🏪</div>
+  <div class="hero-title">Start selling on iTa'awun</div>
+  <div class="hero-sub">Reach students across campus. Set up takes less than 2 minutes.</div>
+</div>
+
+<div class="steps-bar" id="steps-bar">
+  <div class="step-item active" id="step-item-1">
+    <div class="step-dot active" id="dot-1">1</div>
+    <span class="step-label">Shop Info</span>
+  </div>
+  <div style="color:var(--gray-300);padding:0 .25rem">›</div>
+  <div class="step-item" id="step-item-2">
+    <div class="step-dot" id="dot-2">2</div>
+    <span class="step-label">Payments</span>
+  </div>
+  <div style="color:var(--gray-300);padding:0 .25rem">›</div>
+  <div class="step-item" id="step-item-3">
+    <div class="step-dot" id="dot-3">3</div>
+    <span class="step-label">Review</span>
+  </div>
+</div>
+
+<div id="page-content">
+
+  <!-- ── STEP 1: SHOP INFO ── -->
+  <div id="step1" class="form-card">
+    <div class="form-title">Tell us about your shop</div>
+    <div class="form-sub">This is what students will see when they browse vendors.</div>
+
+    <div class="field">
+      <label>Shop name <span style="color:var(--red)">*</span></label>
+      <input type="text" id="shop-name" placeholder="e.g. Syafiq's Laundry" maxlength="80" autocomplete="off">
+      <div class="error-msg" id="shop-name-err"></div>
+    </div>
+
+    <div class="field">
+      <label>Short description <span style="color:var(--red)">*</span></label>
+      <textarea id="shop-desc" placeholder="What do you sell or offer? Keep it short and clear." maxlength="300"></textarea>
+      <div class="hint" id="desc-count">0 / 300</div>
+      <div class="error-msg" id="shop-desc-err"></div>
+    </div>
+
+    <div class="field">
+      <label>Primary category <span style="color:var(--red)">*</span></label>
+      <div class="cat-grid" id="cat-grid"></div>
+      <div class="error-msg" id="cat-err">Please select a category.</div>
+    </div>
+
+    <div class="field">
+      <label>Shop banner <span style="font-weight:400;text-transform:none;font-size:.76rem;color:var(--gray-400)">(optional)</span></label>
+      <div class="upload-area" id="banner-area">
+        <input type="file" id="banner-file" accept="image/jpeg,image/png" onchange="previewBanner(this)">
+        <img id="banner-preview" class="upload-preview" alt="Banner preview">
+        <div id="banner-placeholder">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-label">Tap to upload a banner photo</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="goStep2()">Continue →</button>
+  </div>
+
+  <!-- ── STEP 2: PAYMENTS ── -->
+  <div id="step2" class="form-card" style="display:none">
+    <div class="form-title">Accepted payment methods</div>
+    <div class="form-sub">Choose which payment methods you'll accept from buyers.</div>
+
+    <div class="pay-grid">
+      <label class="pay-option selected" id="pay-tng" onclick="togglePay('tng', this)">
+        <input type="checkbox" checked>
+        <span class="pay-icon">💳</span>
+        <span class="pay-name">Touch 'n Go eWallet</span>
+        <span class="pay-check">✓</span>
+      </label>
+      <label class="pay-option selected" id="pay-duitnow" onclick="togglePay('duitnow', this)">
+        <input type="checkbox" checked>
+        <span class="pay-icon">🏦</span>
+        <span class="pay-name">DuitNow</span>
+        <span class="pay-check">✓</span>
+      </label>
+      <label class="pay-option selected" id="pay-cash" onclick="togglePay('cash', this)">
+        <input type="checkbox" checked>
+        <span class="pay-icon">💵</span>
+        <span class="pay-name">Cash</span>
+        <span class="pay-check">✓</span>
+      </label>
+    </div>
+    <div class="error-msg" id="pay-err" style="margin-top:.5rem">Select at least one payment method.</div>
+
+    <div style="margin-top:1.25rem">
+      <button class="btn-primary" onclick="goStep3()">Continue →</button>
+      <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: REVIEW ── -->
+  <div id="step3" class="form-card" style="display:none">
+    <div class="form-title">Review & Submit</div>
+    <div class="form-sub">Double-check your shop details before going live.</div>
+
+    <div class="review-card" id="review-card"></div>
+
+    <button class="btn-primary" id="submit-btn" onclick="submitShop()">Open My Shop 🚀</button>
+    <button class="btn-ghost" onclick="goStep(2)">← Back</button>
+  </div>
+
+  <!-- ── SUCCESS ── -->
+  <div id="success-state" style="display:none">
+    <div class="success-wrap">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Your shop is live!</div>
+      <div class="success-sub">Students can now find and order from your shop. Add your first product to start selling.</div>
+      <a class="btn-goto" id="goto-dashboard" href="vendor-dashboard.html">Go to Dashboard →</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const CATEGORIES = [
+  { key: 'food_drinks', label: '🍱 Food & Drinks' },
+  { key: 'runner',      label: '🏃 Runner'        },
+  { key: 'printing',    label: '🖨️ Printing'      },
+  { key: 'cleaning',    label: '🧹 Cleaning'       },
+  { key: 'laundry',     label: '👕 Laundry'        },
+  { key: 'delivery',    label: '📦 Delivery'       },
+  { key: 'tutoring',    label: '📚 Tutoring'       },
+  { key: 'design',      label: '🎨 Design'         },
+  { key: 'coding',      label: '💻 Coding'         },
+  { key: 'photography', label: '📷 Photography'    },
+  { key: 'repair',      label: '🔧 Repair'         },
+  { key: 'sell_product',label: '🛍️ Sell Product'  },
+  { key: 'other',       label: '📌 Other'          }
+]
+
+let currentStep    = 1
+let selectedCat    = null
+let selectedPays   = { tng: true, duitnow: true, cash: true }
+let bannerFile     = null
+let currentSession = null
+
+// Build category chips
+const catGrid = document.getElementById('cat-grid')
+CATEGORIES.forEach(c => {
+  const btn = document.createElement('button')
+  btn.type = 'button'
+  btn.className = 'cat-chip'
+  btn.textContent = c.label
+  btn.dataset.key = c.key
+  btn.onclick = () => selectCat(c.key, btn)
+  catGrid.appendChild(btn)
+})
+
+// Description char count
+document.getElementById('shop-desc').addEventListener('input', e => {
+  document.getElementById('desc-count').textContent = e.target.value.length + ' / 300'
+})
+
+function selectCat(key, btn) {
+  selectedCat = key
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('selected'))
+  btn.classList.add('selected')
+  document.getElementById('cat-err').classList.remove('visible')
+}
+
+function togglePay(key, el) {
+  selectedPays[key] = !selectedPays[key]
+  el.classList.toggle('selected', selectedPays[key])
+}
+
+function previewBanner(input) {
+  bannerFile = input.files[0] || null
+  const preview = document.getElementById('banner-preview')
+  const placeholder = document.getElementById('banner-placeholder')
+  if (bannerFile) {
+    const url = URL.createObjectURL(bannerFile)
+    preview.src = url
+    preview.style.display = 'block'
+    placeholder.style.display = 'none'
+  } else {
+    preview.style.display = 'none'
+    placeholder.style.display = 'block'
+  }
+}
+
+function goStep(n) {
+  currentStep = n
+  ;[1, 2, 3].forEach(i => {
+    document.getElementById('step' + i).style.display = i === n ? 'block' : 'none'
+    const dot = document.getElementById('dot-' + i)
+    dot.classList.toggle('active', i === n)
+    dot.classList.toggle('done',   i < n)
+    document.getElementById('step-item-' + i).classList.toggle('active', i === n)
+  })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// ── STEP 1 VALIDATION ──────────────────────────────────────
+function goStep2() {
+  const name = document.getElementById('shop-name').value.trim()
+  const desc = document.getElementById('shop-desc').value.trim()
+  let ok = true
+
+  const nameErr = document.getElementById('shop-name-err')
+  const descErr = document.getElementById('shop-desc-err')
+  const catErr  = document.getElementById('cat-err')
+  nameErr.classList.remove('visible')
+  descErr.classList.remove('visible')
+  catErr.classList.remove('visible')
+
+  if (!name) { nameErr.textContent = 'Shop name is required.'; nameErr.classList.add('visible'); ok = false }
+  if (!desc) { descErr.textContent = 'Please add a short description.'; descErr.classList.add('visible'); ok = false }
+  if (!selectedCat) { catErr.classList.add('visible'); ok = false }
+  if (!ok) return
+
+  goStep(2)
+}
+
+// ── STEP 2 VALIDATION ──────────────────────────────────────
+function goStep3() {
+  const anySelected = Object.values(selectedPays).some(v => v)
+  const payErr = document.getElementById('pay-err')
+  if (!anySelected) { payErr.classList.add('visible'); return }
+  payErr.classList.remove('visible')
+
+  // Build review card
+  const name  = document.getElementById('shop-name').value.trim()
+  const desc  = document.getElementById('shop-desc').value.trim()
+  const catLabel = CATEGORIES.find(c => c.key === selectedCat)?.label || selectedCat
+  const pays  = Object.entries(selectedPays).filter(([,v]) => v).map(([k]) => ({
+    tng: '💳 TNG', duitnow: '🏦 DuitNow', cash: '💵 Cash'
+  }[k])).join(', ')
+
+  document.getElementById('review-card').innerHTML = `
+    <div class="review-row"><span>Shop name</span><strong>${name}</strong></div>
+    <div class="review-row"><span>Category</span><strong>${catLabel}</strong></div>
+    <div class="review-row"><span>Description</span><strong style="max-width:55%;text-align:right;word-break:break-word">${desc}</strong></div>
+    <div class="review-row"><span>Payments</span><strong>${pays}</strong></div>
+    <div class="review-row"><span>Banner</span><strong>${bannerFile ? '✅ ' + bannerFile.name : '— (none)'}</strong></div>`
+
+  goStep(3)
+}
+
+// ── SUBMIT ─────────────────────────────────────────────────
+async function submitShop() {
+  const btn = document.getElementById('submit-btn')
+  btn.disabled = true; btn.textContent = 'Creating shop…'
+
+  const session = await requireAuth()
+  if (!session) return
+
+  let bannerUrl = null
+  if (bannerFile) {
+    btn.textContent = 'Uploading banner…'
+    const ext  = bannerFile.name.split('.').pop()
+    const path = session.user.id + '/banner.' + ext
+    const { error: upErr } = await db.storage.from('vendor-assets').upload(path, bannerFile, { upsert: true })
+    if (!upErr) bannerUrl = path
+  }
+
+  btn.textContent = 'Opening shop…'
+  const name = document.getElementById('shop-name').value.trim()
+  const desc = document.getElementById('shop-desc').value.trim()
+
+  const insertData = {
+    owner_id:         session.user.id,
+    institution_id:   INSTITUTION_ID,
+    shop_name:        name,
+    description:      desc,
+    category:         selectedCat,
+    accepted_payments: Object.entries(selectedPays).filter(([,v]) => v).map(([k]) => k),
+    is_active:        true
+  }
+  if (bannerUrl) insertData.banner_url = bannerUrl
+
+  const { data: vendor, error } = await db.from('vendors').insert(insertData).select('id').single()
+  if (error) {
+    btn.disabled = false; btn.textContent = 'Open My Shop 🚀'
+    showToast('Something went wrong. Please try again.')
+    return
+  }
+
+  // Update user role to vendor
+  await db.from('users').update({ role: 'vendor' }).eq('id', session.user.id)
+
+  document.getElementById('step3').style.display = 'none'
+  document.getElementById('success-state').style.display = 'block'
+  document.getElementById('goto-dashboard').href = 'vendor-dashboard.html?vendor=' + vendor.id
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+async function init() {
+  currentSession = await requireAuth()
+  if (!currentSession) return
+
+  // If already a vendor, redirect to dashboard
+  const { data: user } = await db.from('users').select('role').eq('id', currentSession.user.id).single()
+  if (user?.role === 'vendor') {
+    const { data: existing } = await db.from('vendors').select('id').eq('owner_id', currentSession.user.id).maybeSingle()
+    if (existing) { window.location.href = 'vendor-dashboard.html?vendor=' + existing.id; return }
+  }
+}
+
+init()
+</script>
+</body>
+</html>

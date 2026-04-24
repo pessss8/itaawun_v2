@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Shop — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --radius:      12px;
+    --shadow-md:   0 4px 6px rgba(0,0,0,.07);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 2rem; }
+
+  /* ── HEADER ── */
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn { color: var(--gray-600); text-decoration: none; font-size: .9rem; flex-shrink: 0; }
+  .header-title { font-size: .95rem; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ── SHOP BANNER ── */
+  .shop-banner {
+    width: 100%; height: 140px;
+    background: linear-gradient(135deg, #1D9E75, #2bb580);
+    overflow: hidden; position: relative;
+  }
+  .shop-banner img { width: 100%; height: 100%; object-fit: cover; }
+  .banner-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.25); }
+
+  /* ── SHOP HEADER ── */
+  .shop-header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 1rem; position: relative; }
+  .shop-avatar {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    background: var(--green-light);
+    border: 3px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    overflow: hidden;
+    margin-top: -30px;
+    margin-bottom: .6rem;
+  }
+  .shop-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .shop-name { font-size: 1.1rem; font-weight: 700; letter-spacing: -.02em; }
+  .shop-desc { font-size: .85rem; color: var(--gray-500); margin-top: .25rem; line-height: 1.5; }
+  .shop-meta { display: flex; align-items: center; gap: 1rem; margin-top: .6rem; }
+  .shop-rating { display: flex; align-items: center; gap: .3rem; font-size: .82rem; color: var(--gray-600); }
+  .stars { color: #f59e0b; font-size: .85rem; }
+  .shop-reviews { font-size: .78rem; color: var(--gray-400); }
+
+  /* ── FILTER CHIPS ── */
+  .filter-bar { background: #fff; border-bottom: 1px solid var(--gray-200); padding: .6rem 1rem; }
+  .chips-scroll { display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: none; }
+  .chips-scroll::-webkit-scrollbar { display: none; }
+  .chip { flex-shrink: 0; padding: .28rem .7rem; border-radius: 100px; font-size: .78rem; font-weight: 500; border: 1.5px solid var(--gray-200); background: #fff; color: var(--gray-600); cursor: pointer; white-space: nowrap; user-select: none; transition: all .15s; }
+  .chip:hover { border-color: var(--gray-400); }
+  .chip.selected { background: var(--green); color: #fff; border-color: var(--green); }
+
+  /* ── PRODUCT GRID ── */
+  .main { max-width: 900px; margin: 0 auto; padding: 1rem; }
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: .75rem; }
+  @media (min-width: 480px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); } }
+
+  .product-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    overflow: hidden; display: flex; flex-direction: column;
+    text-decoration: none; color: inherit; cursor: pointer;
+    transition: box-shadow .15s, transform .1s;
+  }
+  .product-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .card-img { width: 100%; aspect-ratio: 4/3; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; overflow: hidden; flex-shrink: 0; }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .card-body { padding: .6rem .75rem .8rem; flex: 1; display: flex; flex-direction: column; gap: .22rem; }
+  .card-cat { display: inline-block; font-size: .67rem; font-weight: 600; padding: .13rem .48rem; border-radius: 100px; text-transform: uppercase; letter-spacing: .04em; width: fit-content; }
+  .card-name { font-size: .875rem; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-price { font-size: .95rem; font-weight: 700; color: var(--green); margin-top: auto; padding-top: .2rem; }
+  .card-one-off { font-size: .65rem; background: #fef3c7; color: #92400e; border-radius: 4px; padding: .1rem .4rem; font-weight: 600; width: fit-content; }
+  .card-out-stock { font-size: .68rem; color: #ef4444; font-weight: 500; }
+
+  /* ── STATES ── */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: var(--radius); }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .skeleton-card { height: 220px; }
+  .state-box { grid-column: 1/-1; text-align: center; padding: 2.5rem 1rem; color: var(--gray-400); font-size: .9rem; }
+
+  /* ── REVIEWS ── */
+  .reviews-section { background: #fff; border-top: 1px solid var(--gray-200); padding: 1rem; margin-top: .5rem; }
+  .reviews-title { font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); margin-bottom: .75rem; }
+  .review-item { padding: .75rem 0; border-bottom: 1px solid var(--gray-100); }
+  .review-item:last-child { border-bottom: none; }
+  .review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .3rem; }
+  .review-author { font-size: .82rem; font-weight: 500; }
+  .review-stars { color: #f59e0b; font-size: .8rem; }
+  .review-text { font-size: .82rem; color: var(--gray-500); line-height: 1.5; }
+  .review-date { font-size: .72rem; color: var(--gray-400); margin-top: .2rem; }
+  .no-reviews { font-size: .85rem; color: var(--gray-400); text-align: center; padding: 1rem 0; }
+
+  #toast { display: none; position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" href="vendors.html">&#8592;</a>
+  <span class="header-title" id="header-title">Shop</span>
+</header>
+
+<div id="shop-banner" class="shop-banner">
+  <div class="banner-overlay"></div>
+</div>
+
+<div class="shop-header">
+  <div class="shop-avatar" id="shop-avatar">🏪</div>
+  <div class="shop-name" id="shop-name">Loading…</div>
+  <div class="shop-desc" id="shop-desc"></div>
+  <div class="shop-meta">
+    <div class="shop-rating">
+      <span class="stars" id="shop-stars"></span>
+      <span id="shop-rating-num"></span>
+    </div>
+    <span class="shop-reviews" id="shop-reviews"></span>
+  </div>
+</div>
+
+<div class="filter-bar" id="filter-bar" style="display:none">
+  <div class="chips-scroll" id="cat-chips">
+    <div class="chip selected" data-cat="all" onclick="selectCat(this)">All</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="product-grid" id="product-grid">
+    <div class="skeleton skeleton-card"></div>
+    <div class="skeleton skeleton-card"></div>
+    <div class="skeleton skeleton-card"></div>
+  </div>
+</div>
+
+<div class="reviews-section" id="reviews-section" style="display:none">
+  <div class="reviews-title">Customer Reviews</div>
+  <div id="reviews-list"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const CATEGORY_COLORS = {
+  food_drinks:  { bg:'#fff7ed', text:'#c2410c', emoji:'🍱' },
+  runner:       { bg:'#eff6ff', text:'#1d4ed8', emoji:'🏃' },
+  printing:     { bg:'#f3f4f6', text:'#374151', emoji:'🖨️' },
+  cleaning:     { bg:'#ecfdf5', text:'#065f46', emoji:'🧹' },
+  laundry:      { bg:'#f5f3ff', text:'#5b21b6', emoji:'👕' },
+  delivery:     { bg:'#fffbeb', text:'#92400e', emoji:'📦' },
+  tutoring:     { bg:'#fef2f2', text:'#991b1b', emoji:'📚' },
+  design:       { bg:'#fdf2f8', text:'#9d174d', emoji:'🎨' },
+  coding:       { bg:'#f0fdfa', text:'#0f766e', emoji:'💻' },
+  photography:  { bg:'#fff7ed', text:'#9a3412', emoji:'📷' },
+  repair:       { bg:'#eef2ff', text:'#3730a3', emoji:'🔧' },
+  sell_product: { bg:'#f7fee7', text:'#3f6212', emoji:'🛍️' },
+  other:        { bg:'#f3f4f6', text:'#6b7280', emoji:'📌' }
+}
+const CATEGORY_LABELS = {
+  food_drinks:'Food & Drinks', runner:'Runner', printing:'Printing',
+  cleaning:'Cleaning', laundry:'Laundry', delivery:'Delivery',
+  tutoring:'Tutoring', design:'Design', coding:'Coding',
+  photography:'Photography', repair:'Repair', sell_product:'Sell Product',
+  other:'Other'
+}
+
+let allProducts = []
+let activeCat   = 'all'
+let vendorId    = null
+
+const params = new URLSearchParams(window.location.search)
+vendorId = params.get('vendor')
+if (!vendorId) window.location.href = 'vendors.html'
+
+async function init() {
+  const [vendorRes, productsRes, reviewsRes] = await Promise.all([
+    db.from('vendors').select('id, shop_name, shop_desc, banner_url, avg_rating, total_reviews').eq('id', vendorId).eq('is_active', true).single(),
+    db.from('products').select('id, name, description, price, category, listing_type, stock, image_url').eq('vendor_id', vendorId).eq('is_active', true).order('created_at', { ascending: false }),
+    db.from('reviews').select('id, rating, comment, created_at, reviewer_id, public_profiles!reviewer_id(full_name)').eq('target_type', 'vendor').eq('target_id', vendorId).order('created_at', { ascending: false }).limit(10)
+  ])
+
+  if (vendorRes.error || !vendorRes.data) {
+    document.getElementById('shop-name').textContent = 'Shop not found'
+    document.getElementById('product-grid').innerHTML = '<div class="state-box">This shop is no longer available.</div>'
+    return
+  }
+
+  const vendor = vendorRes.data
+  renderVendorHeader(vendor)
+
+  allProducts = productsRes.data || []
+  buildCategoryChips(allProducts)
+  renderProducts(allProducts)
+  renderReviews(reviewsRes.data || [])
+}
+
+function renderVendorHeader(v) {
+  document.title = v.shop_name + ' — iTa\'awun'
+  document.getElementById('header-title').textContent = v.shop_name
+  document.getElementById('shop-name').textContent    = v.shop_name
+  document.getElementById('shop-desc').textContent    = v.shop_desc || ''
+
+  if (v.banner_url) {
+    const banner = document.getElementById('shop-banner')
+    banner.innerHTML = `<img src="${v.banner_url}" alt="${v.shop_name} banner"><div class="banner-overlay"></div>`
+  }
+
+  const avatarEl = document.getElementById('shop-avatar')
+  if (v.banner_url) avatarEl.style.background = 'var(--gray-100)'
+
+  if (v.avg_rating && v.avg_rating > 0) {
+    const full  = Math.round(v.avg_rating)
+    const stars = '★'.repeat(full) + '☆'.repeat(5 - full)
+    document.getElementById('shop-stars').textContent      = stars
+    document.getElementById('shop-rating-num').textContent = parseFloat(v.avg_rating).toFixed(1)
+    document.getElementById('shop-reviews').textContent    = v.total_reviews + ' review' + (v.total_reviews !== 1 ? 's' : '')
+  } else {
+    document.getElementById('shop-reviews').textContent = 'No reviews yet'
+  }
+}
+
+function buildCategoryChips(products) {
+  const cats = [...new Set(products.map(p => p.category))].filter(Boolean)
+  if (cats.length <= 1) return
+  const chipsEl = document.getElementById('cat-chips')
+  cats.forEach(cat => {
+    const chip = document.createElement('div')
+    chip.className = 'chip'
+    chip.dataset.cat = cat
+    chip.textContent = CATEGORY_LABELS[cat] || cat
+    chip.onclick = () => selectCat(chip)
+    chipsEl.appendChild(chip)
+  })
+  document.getElementById('filter-bar').style.display = 'block'
+}
+
+function selectCat(el) {
+  document.querySelectorAll('#cat-chips .chip').forEach(c => c.classList.remove('selected'))
+  el.classList.add('selected')
+  activeCat = el.dataset.cat
+  const filtered = activeCat === 'all' ? allProducts : allProducts.filter(p => p.category === activeCat)
+  renderProducts(filtered)
+}
+
+function renderProducts(products) {
+  const grid = document.getElementById('product-grid')
+  if (!products.length) {
+    grid.innerHTML = '<div class="state-box">No products in this category.</div>'
+    return
+  }
+  grid.innerHTML = products.map(p => productCardHTML(p)).join('')
+}
+
+function productCardHTML(p) {
+  const cat   = p.category || 'other'
+  const col   = CATEGORY_COLORS[cat] || CATEGORY_COLORS.other
+  const label = CATEGORY_LABELS[cat] || cat
+  const imgEl = p.image_url
+    ? `<div class="card-img"><img src="${p.image_url}" alt="${p.name}" loading="lazy"></div>`
+    : `<div class="card-img" style="background:${col.bg}">${col.emoji}</div>`
+  const outOfStock = p.stock === 0
+
+  return `
+    <a class="product-card" href="product-detail.html?vendor=${vendorId}&product=${p.id}" style="${outOfStock ? 'opacity:.6' : ''}">
+      ${imgEl}
+      <div class="card-body">
+        <span class="card-cat" style="background:${col.bg};color:${col.text}">${label}</span>
+        <div class="card-name">${p.name}</div>
+        <div class="card-price">RM ${parseFloat(p.price).toFixed(2)}</div>
+        ${p.listing_type === 'one_off' ? '<div class="card-one-off">One-off</div>' : ''}
+        ${outOfStock ? '<div class="card-out-stock">Out of stock</div>' : ''}
+      </div>
+    </a>`
+}
+
+function renderReviews(reviews) {
+  const section = document.getElementById('reviews-section')
+  const list    = document.getElementById('reviews-list')
+  section.style.display = 'block'
+
+  if (!reviews.length) {
+    list.innerHTML = '<div class="no-reviews">No reviews yet — be the first!</div>'
+    return
+  }
+
+  list.innerHTML = reviews.map(r => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)
+    const name  = r.public_profiles?.full_name || 'Student'
+    const date  = new Date(r.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })
+    return `
+      <div class="review-item">
+        <div class="review-header">
+          <span class="review-author">${name}</span>
+          <span class="review-stars">${stars}</span>
+        </div>
+        ${r.comment ? `<div class="review-text">${r.comment}</div>` : ''}
+        <div class="review-date">${date}</div>
+      </div>`
+  }).join('')
+}
+
+init()
+</script>
+</body>
+</html>

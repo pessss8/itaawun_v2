@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — iTa'awun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green:       #1D9E75;
+    --green-light: #e8f7f2;
+    --green-dark:  #15785a;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-900:    #111827;
+    --red:         #ef4444;
+    --radius:      12px;
+    --shadow-md:   0 4px 6px rgba(0,0,0,.07);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; padding-bottom: 100px; }
+
+  /* ── HEADER ── */
+  .header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 100; }
+  .back-btn { color: var(--gray-600); text-decoration: none; font-size: .9rem; flex-shrink: 0; }
+  .header-title { font-size: .95rem; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ── PRODUCT IMAGE ── */
+  .product-img {
+    width: 100%; aspect-ratio: 4/3; max-height: 300px;
+    background: var(--gray-100);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; overflow: hidden;
+  }
+  .product-img img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── PRODUCT BODY ── */
+  .product-body { background: #fff; padding: 1rem 1rem .5rem; border-bottom: 1px solid var(--gray-100); }
+  .product-cat { display: inline-block; font-size: .7rem; font-weight: 600; padding: .15rem .55rem; border-radius: 100px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: .5rem; }
+  .product-name { font-size: 1.2rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.3; }
+  .product-price { font-size: 1.5rem; font-weight: 800; color: var(--green); margin: .35rem 0; }
+  .product-desc { font-size: .875rem; color: var(--gray-500); line-height: 1.6; margin-top: .4rem; }
+
+  /* ── META ROW ── */
+  .meta-row { display: flex; gap: .5rem; flex-wrap: wrap; padding: .75rem 1rem; background: #fff; border-bottom: 1px solid var(--gray-100); }
+  .meta-chip { display: flex; align-items: center; gap: .3rem; font-size: .75rem; color: var(--gray-600); background: var(--gray-100); border-radius: 6px; padding: .3rem .6rem; }
+
+  /* ── PAYMENT BADGES ── */
+  .section { padding: .85rem 1rem; background: #fff; border-bottom: 1px solid var(--gray-100); }
+  .section-label { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); margin-bottom: .5rem; }
+  .payment-badges { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .payment-badge { display: flex; align-items: center; gap: .3rem; font-size: .78rem; font-weight: 500; padding: .3rem .65rem; border-radius: 7px; border: 1.5px solid; }
+  .badge-tng     { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .badge-duitnow { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+  .badge-cash    { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+
+  /* ── VENDOR ROW ── */
+  .vendor-row { display: flex; align-items: center; gap: .75rem; padding: .85rem 1rem; background: #fff; border-bottom: 1px solid var(--gray-100); text-decoration: none; color: inherit; transition: background .1s; }
+  .vendor-row:hover { background: var(--gray-50); }
+  .vendor-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .vendor-info .vendor-name { font-size: .875rem; font-weight: 600; }
+  .vendor-info .vendor-rating { font-size: .75rem; color: var(--gray-400); margin-top: .1rem; }
+  .vendor-arrow { margin-left: auto; color: var(--gray-400); }
+
+  /* ── STICKY ORDER BAR ── */
+  .order-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 1px solid var(--gray-200);
+    padding: .75rem 1rem;
+    display: flex; align-items: center; gap: .75rem;
+    z-index: 100;
+    box-shadow: 0 -2px 8px rgba(0,0,0,.06);
+  }
+  .qty-control { display: flex; align-items: center; gap: .4rem; border: 1.5px solid var(--gray-200); border-radius: 9px; padding: .15rem .2rem; }
+  .qty-btn { width: 30px; height: 30px; border: none; background: none; font-size: 1.1rem; cursor: pointer; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: var(--gray-600); transition: background .1s; }
+  .qty-btn:hover { background: var(--gray-100); }
+  .qty-btn:disabled { color: var(--gray-300); cursor: default; }
+  .qty-num { font-size: .95rem; font-weight: 600; min-width: 22px; text-align: center; }
+  .order-total { flex: 1; }
+  .order-total-label { font-size: .7rem; color: var(--gray-400); }
+  .order-total-num { font-size: 1.05rem; font-weight: 700; color: var(--green); }
+  .btn-order {
+    padding: .7rem 1.4rem; background: var(--green); color: #fff;
+    border: none; border-radius: 10px; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn-order:hover { opacity: .9; }
+  .btn-order:active { transform: scale(.97); }
+  .btn-order:disabled { opacity: .5; cursor: default; }
+  .btn-order.btn-login { background: var(--gray-900); }
+
+  /* ── ORDER DIALOG (bottom sheet) ── */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; }
+  .overlay.open { display: block; }
+  .sheet {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-radius: 20px 20px 0 0;
+    padding: 1.25rem 1rem 2rem;
+    z-index: 201;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    max-height: 92vh; overflow-y: auto;
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet-handle { width: 36px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 auto 1.1rem; }
+  .sheet-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+
+  /* order summary in sheet */
+  .order-summary { background: var(--gray-50); border-radius: 10px; padding: .85rem; margin-bottom: 1rem; }
+  .summary-row { display: flex; justify-content: space-between; font-size: .875rem; margin-bottom: .35rem; color: var(--gray-600); }
+  .summary-row:last-child { margin-bottom: 0; }
+  .summary-row.total { font-weight: 700; color: var(--gray-900); font-size: .95rem; border-top: 1px solid var(--gray-200); padding-top: .4rem; margin-top: .4rem; }
+  .summary-row .fee-note { font-size: .72rem; color: var(--gray-400); font-weight: 400; }
+
+  /* payment method select */
+  .payment-options { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1rem; }
+  .payment-option {
+    display: flex; align-items: center; gap: .75rem;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    padding: .75rem .9rem; cursor: pointer;
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .payment-option.selected { border-color: var(--green); background: var(--green-light); }
+  .payment-option input[type="radio"] { display: none; }
+  .payment-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .payment-info .p-name { font-size: .875rem; font-weight: 600; }
+  .payment-info .p-desc { font-size: .75rem; color: var(--gray-500); margin-top: .1rem; }
+  .payment-check { margin-left: auto; color: var(--green); font-size: 1.1rem; display: none; }
+  .payment-option.selected .payment-check { display: block; }
+
+  /* payment reference input */
+  .ref-field { margin-bottom: 1rem; }
+  .ref-field label { display: block; font-size: .78rem; font-weight: 500; color: var(--gray-600); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .4rem; }
+  .ref-field input { width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: .7rem .9rem; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .15s; }
+  .ref-field input:focus { border-color: var(--green); }
+  .ref-field input::placeholder { color: var(--gray-400); }
+
+  /* notes field */
+  .notes-field { margin-bottom: 1.25rem; }
+  .notes-field label { display: block; font-size: .78rem; font-weight: 500; color: var(--gray-600); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .4rem; }
+  .notes-field textarea { width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: .7rem .9rem; font-size: .875rem; font-family: inherit; outline: none; resize: none; height: 72px; transition: border-color .15s; }
+  .notes-field textarea:focus { border-color: var(--green); }
+  .notes-field textarea::placeholder { color: var(--gray-400); }
+
+  /* cash notice */
+  .cash-notice { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: .65rem .85rem; font-size: .8rem; color: #92400e; margin-bottom: 1rem; line-height: 1.5; display: none; }
+  .cash-notice.visible { display: block; }
+
+  .btn-confirm { width: 100%; padding: .85rem; background: var(--green); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity .15s; }
+  .btn-confirm:hover { opacity: .9; }
+  .btn-confirm:disabled { opacity: .5; cursor: default; }
+
+  /* ── OUT OF STOCK ── */
+  .out-of-stock-bar { background: #fee2e2; color: #991b1b; text-align: center; padding: .6rem 1rem; font-size: .85rem; font-weight: 500; }
+
+  /* ── SKELETON ── */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  #toast { display: none; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; padding: .65rem 1.25rem; border-radius: 8px; font-size: .85rem; z-index: 999; max-width: 88vw; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" id="back-btn" href="vendors.html">&#8592;</a>
+  <span class="header-title" id="header-title">Product</span>
+</header>
+
+<div id="page-content">
+  <!-- Populated by JS -->
+  <div class="product-img skeleton" style="aspect-ratio:4/3;max-height:300px;border-radius:0"></div>
+  <div class="product-body">
+    <div class="skeleton" style="height:14px;width:70px;margin-bottom:.5rem"></div>
+    <div class="skeleton" style="height:24px;width:80%;margin-bottom:.35rem"></div>
+    <div class="skeleton" style="height:30px;width:40%"></div>
+  </div>
+</div>
+
+<!-- Order bar (populated by JS) -->
+<div class="order-bar" id="order-bar" style="display:none">
+  <div class="qty-control">
+    <button class="qty-btn" id="qty-dec" onclick="changeQty(-1)">−</button>
+    <span class="qty-num" id="qty-num">1</span>
+    <button class="qty-btn" id="qty-inc" onclick="changeQty(1)">+</button>
+  </div>
+  <div class="order-total">
+    <div class="order-total-label">Total</div>
+    <div class="order-total-num" id="order-total">RM 0.00</div>
+  </div>
+  <button class="btn-order" id="order-btn" onclick="handleOrderBtn()">Order</button>
+</div>
+
+<!-- Confirm order sheet -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="order-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Confirm Order</div>
+
+  <div class="order-summary" id="order-summary"></div>
+
+  <div class="section-label" style="margin-bottom:.5rem">Payment method</div>
+  <div class="payment-options">
+    <label class="payment-option" onclick="selectPayment('tng', this)">
+      <input type="radio" name="payment" value="tng">
+      <span class="payment-icon">💳</span>
+      <div class="payment-info">
+        <div class="p-name">Touch 'n Go eWallet</div>
+        <div class="p-desc">Pay via TNG QR — digital escrow applies</div>
+      </div>
+      <span class="payment-check">✓</span>
+    </label>
+    <label class="payment-option" onclick="selectPayment('duitnow', this)">
+      <input type="radio" name="payment" value="duitnow">
+      <span class="payment-icon">🏦</span>
+      <div class="payment-info">
+        <div class="p-name">DuitNow</div>
+        <div class="p-desc">Transfer via DuitNow QR — digital escrow applies</div>
+      </div>
+      <span class="payment-check">✓</span>
+    </label>
+    <label class="payment-option" onclick="selectPayment('cash', this)">
+      <input type="radio" name="payment" value="cash">
+      <span class="payment-icon">💵</span>
+      <div class="payment-info">
+        <div class="p-name">Cash</div>
+        <div class="p-desc">Pay in person at point of handover</div>
+      </div>
+      <span class="payment-check">✓</span>
+    </label>
+  </div>
+
+  <div class="ref-field" id="ref-field" style="display:none">
+    <label id="ref-label">Transaction reference</label>
+    <input type="text" id="payment-ref" placeholder="e.g. TNG-XXXXXXXX">
+  </div>
+
+  <div class="cash-notice" id="cash-notice">
+    📸 You'll need to show proof of cash payment to the vendor at handover. The vendor may request a photo of the payment.
+  </div>
+
+  <div class="notes-field">
+    <label>Notes to vendor <span style="font-weight:400;text-transform:none;color:var(--gray-400)">(optional)</span></label>
+    <textarea id="buyer-notes" placeholder="Any special requests, delivery instructions, etc."></textarea>
+  </div>
+
+  <button class="btn-confirm" id="confirm-btn" onclick="placeOrder()">Place Order</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const CATEGORY_COLORS = {
+  food_drinks:{bg:'#fff7ed',text:'#c2410c',emoji:'🍱'}, runner:{bg:'#eff6ff',text:'#1d4ed8',emoji:'🏃'},
+  printing:{bg:'#f3f4f6',text:'#374151',emoji:'🖨️'}, cleaning:{bg:'#ecfdf5',text:'#065f46',emoji:'🧹'},
+  laundry:{bg:'#f5f3ff',text:'#5b21b6',emoji:'👕'}, delivery:{bg:'#fffbeb',text:'#92400e',emoji:'📦'},
+  tutoring:{bg:'#fef2f2',text:'#991b1b',emoji:'📚'}, design:{bg:'#fdf2f8',text:'#9d174d',emoji:'🎨'},
+  coding:{bg:'#f0fdfa',text:'#0f766e',emoji:'💻'}, photography:{bg:'#fff7ed',text:'#9a3412',emoji:'📷'},
+  repair:{bg:'#eef2ff',text:'#3730a3',emoji:'🔧'}, sell_product:{bg:'#f7fee7',text:'#3f6212',emoji:'🛍️'},
+  other:{bg:'#f3f4f6',text:'#6b7280',emoji:'📌'}
+}
+const CATEGORY_LABELS = {
+  food_drinks:'Food & Drinks', runner:'Runner', printing:'Printing', cleaning:'Cleaning',
+  laundry:'Laundry', delivery:'Delivery', tutoring:'Tutoring', design:'Design',
+  coding:'Coding', photography:'Photography', repair:'Repair', sell_product:'Sell Product', other:'Other'
+}
+
+const params    = new URLSearchParams(window.location.search)
+const vendorId  = params.get('vendor')
+const productId = params.get('product')
+if (!vendorId || !productId) window.location.href = 'vendors.html'
+
+let product       = null
+let vendor        = null
+let currentQty    = 1
+let selectedPay   = null
+let currentSession = null
+const FEE_RATE    = 0.025
+
+async function init() {
+  const { data: { session } } = await db.auth.getSession()
+  currentSession = session
+
+  const [productRes, vendorRes] = await Promise.all([
+    db.from('products').select('*').eq('id', productId).single(),
+    db.from('vendors').select('id, shop_name, avg_rating, banner_url').eq('id', vendorId).eq('is_active', true).single()
+  ])
+
+  if (productRes.error || !productRes.data) {
+    document.getElementById('page-content').innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--gray-400)">Product not found.</div>'
+    return
+  }
+
+  product = productRes.data
+  vendor  = vendorRes.data
+
+  renderPage()
+}
+
+function renderPage() {
+  const cat   = product.category || 'other'
+  const col   = CATEGORY_COLORS[cat] || CATEGORY_COLORS.other
+  const label = CATEGORY_LABELS[cat] || cat
+  const outOfStock = product.stock === 0
+
+  // Back button goes to vendor shop
+  document.getElementById('back-btn').href = `vendor-shop.html?vendor=${vendorId}`
+  document.title = product.name + ' — iTa\'awun'
+  document.getElementById('header-title').textContent = product.name
+
+  const imgHTML = product.image_url
+    ? `<div class="product-img"><img src="${product.image_url}" alt="${product.name}"></div>`
+    : `<div class="product-img" style="background:${col.bg}">${col.emoji}</div>`
+
+  let metaChips = `<div class="meta-chip">📦 ${product.listing_type === 'one_off' ? 'One-off item' : 'Permanent listing'}</div>`
+  if (product.stock > 0) metaChips += `<div class="meta-chip">✅ ${product.stock} in stock</div>`
+  if (product.stock === 0) metaChips += `<div class="meta-chip" style="color:var(--red)">❌ Out of stock</div>`
+
+  let payBadges = ''
+  // Show all accepted payment methods (all three per PRD)
+  payBadges += '<span class="payment-badge badge-tng">💳 TNG eWallet</span>'
+  payBadges += '<span class="payment-badge badge-duitnow">🏦 DuitNow</span>'
+  payBadges += '<span class="payment-badge badge-cash">💵 Cash</span>'
+
+  const vendorStars = vendor?.avg_rating
+    ? '★'.repeat(Math.round(vendor.avg_rating)) + '☆'.repeat(5 - Math.round(vendor.avg_rating)) + ' ' + parseFloat(vendor.avg_rating).toFixed(1)
+    : 'No reviews yet'
+
+  document.getElementById('page-content').innerHTML = `
+    ${outOfStock ? '<div class="out-of-stock-bar">This item is currently out of stock</div>' : ''}
+    ${imgHTML}
+    <div class="product-body">
+      <span class="product-cat" style="background:${col.bg};color:${col.text}">${label}</span>
+      <div class="product-name">${product.name}</div>
+      <div class="product-price">RM ${parseFloat(product.price).toFixed(2)}</div>
+      ${product.description ? `<div class="product-desc">${product.description}</div>` : ''}
+    </div>
+    <div class="meta-row">${metaChips}</div>
+    <div class="section">
+      <div class="section-label">Accepted payments</div>
+      <div class="payment-badges">${payBadges}</div>
+    </div>
+    ${vendor ? `
+    <a class="vendor-row" href="vendor-shop.html?vendor=${vendorId}">
+      <div class="vendor-avatar">🏪</div>
+      <div class="vendor-info">
+        <div class="vendor-name">${vendor.shop_name}</div>
+        <div class="vendor-rating">${vendorStars}</div>
+      </div>
+      <div class="vendor-arrow">›</div>
+    </a>` : ''}`
+
+  // Order bar
+  updateTotal()
+  const bar = document.getElementById('order-bar')
+  bar.style.display = 'flex'
+
+  const btn = document.getElementById('order-btn')
+  if (outOfStock) {
+    btn.textContent = 'Out of Stock'
+    btn.disabled = true
+    document.getElementById('qty-inc').disabled = true
+    document.getElementById('qty-dec').disabled = true
+  } else if (!currentSession) {
+    btn.textContent = 'Log in to Order'
+    btn.classList.add('btn-login')
+  }
+
+  // Max qty = stock (cap at 99)
+  document.getElementById('qty-inc').dataset.max = Math.min(product.stock || 99, 99)
+}
+
+// ── QTY CONTROL ───────────────────────────────────────────────
+function changeQty(delta) {
+  const max = parseInt(document.getElementById('qty-inc').dataset.max) || 99
+  currentQty = Math.max(1, Math.min(max, currentQty + delta))
+  document.getElementById('qty-num').textContent = currentQty
+  document.getElementById('qty-dec').disabled = currentQty <= 1
+  document.getElementById('qty-inc').disabled = currentQty >= max
+  updateTotal()
+  if (document.getElementById('order-sheet').classList.contains('open')) updateSummary()
+}
+
+function updateTotal() {
+  if (!product) return
+  const total = product.price * currentQty
+  document.getElementById('order-total').textContent = 'RM ' + total.toFixed(2)
+}
+
+// ── ORDER FLOW ────────────────────────────────────────────────
+function handleOrderBtn() {
+  if (!currentSession) { window.location.href = 'login.html'; return }
+  openSheet()
+}
+
+function openSheet() {
+  updateSummary()
+  document.getElementById('overlay').classList.add('open')
+  document.getElementById('order-sheet').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('open')
+  document.getElementById('order-sheet').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+function updateSummary() {
+  const subtotal   = product.price * currentQty
+  const serviceFee = subtotal * FEE_RATE
+  const total      = subtotal + serviceFee
+
+  document.getElementById('order-summary').innerHTML = `
+    <div class="summary-row"><span>${product.name} × ${currentQty}</span><span>RM ${subtotal.toFixed(2)}</span></div>
+    <div class="summary-row"><span>Service fee <span class="fee-note">(2.5%)</span></span><span>RM ${serviceFee.toFixed(2)}</span></div>
+    <div class="summary-row total"><span>Total</span><span>RM ${total.toFixed(2)}</span></div>`
+}
+
+function selectPayment(method, el) {
+  selectedPay = method
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'))
+  el.classList.add('selected')
+
+  const refField   = document.getElementById('ref-field')
+  const cashNotice = document.getElementById('cash-notice')
+  const refLabel   = document.getElementById('ref-label')
+
+  if (method === 'cash') {
+    refField.style.display   = 'none'
+    cashNotice.classList.add('visible')
+  } else {
+    refField.style.display   = 'block'
+    cashNotice.classList.remove('visible')
+    refLabel.textContent = method === 'tng' ? 'TNG transaction reference' : 'DuitNow reference number'
+    document.getElementById('payment-ref').placeholder = method === 'tng' ? 'e.g. TNG-XXXXXXXX' : 'e.g. DN-XXXXXXXX'
+  }
+}
+
+async function placeOrder() {
+  if (!selectedPay) { showToast('Please select a payment method.'); return }
+
+  const btn    = document.getElementById('confirm-btn')
+  const notes  = document.getElementById('buyer-notes').value.trim()
+  const payRef = selectedPay !== 'cash' ? document.getElementById('payment-ref').value.trim() : null
+
+  const subtotal   = product.price * currentQty
+  const serviceFee = subtotal * FEE_RATE
+
+  btn.disabled = true
+  btn.textContent = 'Placing order…'
+
+  const { data: order, error } = await db.from('orders').insert({
+    product_id:        productId,
+    buyer_id:          currentSession.user.id,
+    vendor_id:         vendorId,
+    quantity:          currentQty,
+    total_amount:      subtotal + serviceFee,
+    payment_method:    selectedPay,
+    payment_reference: payRef || null,
+    buyer_notes:       notes || null,
+    service_fee:       serviceFee,
+    fee_rate:          FEE_RATE,
+    status:            'pending'
+  }).select('id').single()
+
+  if (error) {
+    btn.disabled = false
+    btn.textContent = 'Place Order'
+    showToast('Failed to place order. Please try again.')
+    return
+  }
+
+  closeSheet()
+  window.location.href = `order-detail.html?id=${order.id}&new=1`
+}
+
+init()
+</script>
+</body>
+</html>
