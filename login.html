@@ -66,10 +66,19 @@
   }
   .field input:focus { border-color: var(--green); }
   .field input::placeholder { color: var(--gray-400); }
-  .magic-wrap { text-align: center; padding: 1.25rem 0 .5rem; }
-  .magic-icon  { font-size: 2.75rem; margin-bottom: .75rem; }
-  .magic-text  { font-size: .9rem; color: var(--gray-900); line-height: 1.6; margin-bottom: .4rem; }
-  .magic-hint  { font-size: .78rem; color: var(--gray-400); }
+  .otp-wrap { display: flex; gap: .5rem; margin-bottom: .75rem; }
+  .otp-wrap input {
+    flex: 1; height: 52px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.3rem; font-weight: 600;
+    outline: none;
+    transition: border-color .15s;
+    font-family: monospace;
+    caret-color: var(--green);
+  }
+  .otp-wrap input:focus { border-color: var(--green); }
   .btn-main {
     width: 100%; padding: .8rem;
     background: var(--green); color: #fff;
@@ -120,18 +129,23 @@
       <div class="bottom-link">Don't have an account? <a href="signup.html">Sign Up</a></div>
     </div>
 
-    <!-- Step 2: Magic link sent -->
+    <!-- Step 2: OTP -->
     <div class="step" id="step2">
       <div class="step-title">Check your email</div>
       <div class="sent-to" id="sent-to-msg"></div>
-      <div class="magic-wrap">
-        <div class="magic-icon">📧</div>
-        <div class="magic-text">We sent a magic link to your email.<br>Click it to log in.</div>
-        <div class="magic-hint">Can't find it? Check your spam folder.</div>
+      <div class="otp-wrap" id="otp-inputs">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
       </div>
+      <div class="error-msg" id="otp-err"></div>
+      <button class="btn-main" id="verify-btn" onclick="verifyOTP()">Log In</button>
       <div class="resend-row">
         <span id="resend-timer">Resend in <span id="countdown">60</span>s</span>
-        <button class="btn-ghost" id="resend-btn" disabled onclick="resendOTP()">Resend link</button>
+        <button class="btn-ghost" id="resend-btn" disabled onclick="resendOTP()">Resend code</button>
       </div>
     </div>
   </div>
@@ -144,10 +158,18 @@ let currentEmail = ''
 let resendCount  = 0
 let countdownId  = null
 
-function getRedirectTo() {
-  const base = window.location.href.split('?')[0].split('#')[0]
-  return base.replace('login.html', 'home.html')
-}
+const otpInputs = Array.from(document.querySelectorAll('#otp-inputs input'))
+otpInputs.forEach((inp, i) => {
+  inp.addEventListener('input', () => {
+    inp.value = inp.value.replace(/\D/, '')
+    if (inp.value && i < otpInputs.length - 1) otpInputs[i + 1].focus()
+  })
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !inp.value && i > 0) otpInputs[i - 1].focus()
+  })
+})
+function getOTP() { return otpInputs.map(i => i.value).join('') }
+function clearOTP() { otpInputs.forEach(i => i.value = ''); otpInputs[0].focus() }
 
 function goToStep(n) {
   document.querySelectorAll('.step').forEach((s, i) => s.classList.toggle('visible', i + 1 === n))
@@ -169,10 +191,7 @@ async function sendOTP() {
   btn.disabled = true
   btn.textContent = 'Sending…'
 
-  const { error } = await db.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: getRedirectTo() }
-  })
+  const { error } = await db.auth.signInWithOtp({ email })
   if (error) {
     btn.disabled = false
     btn.textContent = 'Send Code'
@@ -182,22 +201,52 @@ async function sendOTP() {
   }
 
   currentEmail = email
-  document.getElementById('sent-to-msg').textContent = 'Link sent to ' + email
+  document.getElementById('sent-to-msg').textContent = 'Code sent to ' + email
   goToStep(2)
   startCountdown()
+}
+
+async function verifyOTP() {
+  const token = getOTP()
+  const err   = document.getElementById('otp-err')
+  err.classList.remove('visible')
+
+  if (token.length < 6) {
+    err.textContent = 'Enter all 6 digits.'
+    err.classList.add('visible')
+    return
+  }
+
+  const btn = document.getElementById('verify-btn')
+  btn.disabled = true
+  btn.textContent = 'Logging in…'
+
+  const { error } = await db.auth.verifyOtp({ email: currentEmail, token, type: 'email' })
+  if (error) {
+    btn.disabled = false
+    btn.textContent = 'Log In'
+    clearOTP()
+    err.textContent = error.message.includes('expired')
+      ? 'Code expired. Tap Resend to get a new one.'
+      : error.message.includes('invalid')
+        ? 'Incorrect code. Please try again.'
+        : error.message
+    err.classList.add('visible')
+    return
+  }
+
+  window.location.href = 'home.html'
 }
 
 async function resendOTP() {
   if (resendCount >= 3) { showToast('Maximum resend attempts reached.'); return }
   resendCount++
   document.getElementById('resend-btn').disabled = true
-  const { error } = await db.auth.signInWithOtp({
-    email: currentEmail,
-    options: { emailRedirectTo: getRedirectTo() }
-  })
+  const { error } = await db.auth.signInWithOtp({ email: currentEmail })
   if (error) { showToast('Failed to resend. Try again.'); return }
+  clearOTP()
   startCountdown()
-  showToast('New link sent to ' + currentEmail)
+  showToast('New code sent to ' + currentEmail)
 }
 
 function startCountdown() {
